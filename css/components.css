@@ -1,0 +1,156 @@
+/* ==========================================================================
+   COMPONENTS: cards, buttons, sync chip, theme picker, dialog, toast.
+   Interactive controls are at least 44px tall so they are easy to tap.
+   ========================================================================== */
+
+/* ---- Cards ---- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1.1rem 1.1rem 1.2rem;
+  box-shadow: var(--shadow);
+}
+.card-narrow { width: 100%; max-width: 26rem; }
+
+.signin-card { text-align: center; }
+.signin-logo { border-radius: 18px; margin-bottom: .75rem; }
+
+/* ---- Buttons ---- */
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  min-height: 44px;
+  padding: .5rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.btn:hover { filter: brightness(.97); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+
+.btn-primary { background: var(--primary); border-color: transparent; color: var(--on-primary); }
+.btn-primary:hover { background: var(--primary-hover); filter: none; }
+
+.btn-large { width: 100%; min-height: 52px; font-size: 1.05rem; margin: .5rem 0; }
+.btn-small { min-height: 36px; padding: .25rem .75rem; font-size: .875rem; border-radius: 10px; }
+
+/* ---- Sync indicator (the chip in the header) ---- */
+.sync-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  min-height: 36px;
+  padding: .25rem .75rem;
+  border-radius: 999px;
+  font-size: .875rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+}
+.sync-icon { width: 1.1em; text-align: center; font-weight: 800; }
+
+/* Each state has its own icon character AND text, not just a color. */
+.sync-chip[data-state="synced"]     { background: var(--ok-bg);   color: var(--ok);     border-color: transparent; }
+.sync-chip[data-state="synced"]     .sync-icon::before { content: "✓"; }
+.sync-chip[data-state="pending"]    { background: var(--warn-bg); color: var(--warn);   border-color: transparent; }
+.sync-chip[data-state="pending"]    .sync-icon::before { content: "↻"; }
+.sync-chip[data-state="offline"]    { background: var(--surface-2); color: var(--text); }
+.sync-chip[data-state="offline"]    .sync-icon::before { content: "⏸"; }
+.sync-chip[data-state="connecting"] .sync-icon::before { content: "…"; }
+.sync-chip[data-state="error"]      { background: var(--danger-bg); color: var(--danger); border-color: transparent; }
+.sync-chip[data-state="error"]      .sync-icon::before { content: "!"; }
+
+/* ---- Banner (update available) ---- */
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  padding: .5rem 1rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+/* ---- Offline check card ---- */
+.check-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin: .75rem 0; }
+.check-value { display: flex; flex-direction: column; }
+.check-number { font-size: 2rem; font-weight: 800; line-height: 1; }
+
+/* ---- Key/value list (account) ---- */
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: .4rem .9rem; margin: 0 0 .75rem; }
+.kv dt { color: var(--text-muted); }
+.kv dd { margin: 0; min-width: 0; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+
+/* ---- Theme picker ---- */
+.theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: .75rem; }
+
+.theme-option {
+  position: relative;
+  text-align: left;
+  min-height: 64px;
+  padding: .6rem .7rem;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  font: inherit;
+  cursor: pointer;
+  /* Each option previews its OWN colors via inline custom properties */
+  background: var(--swatch-bg);
+  color: var(--swatch-text);
+}
+.theme-option .theme-name { display: block; font-weight: 700; }
+.theme-option .theme-dots { display: flex; gap: .3rem; margin-top: .35rem; }
+.theme-option .dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,.15); }
+.theme-option[aria-checked="true"] { border-color: var(--focus); box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus); }
+.theme-option[aria-checked="true"] .theme-name::after { content: " ✓"; }
+
+/* ---- Dialog ---- */
+.dialog {
+  max-width: 24rem;
+  width: calc(100% - 2rem);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1.25rem;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+.dialog::backdrop { background: rgba(0, 0, 0, .45); }
+.dialog-actions { display: flex; justify-content: flex-end; gap: .6rem; margin-top: 1rem; }
+.check { display: flex; gap: .6rem; align-items: flex-start; margin-top: .5rem; }
+.check input { width: 1.25rem; height: 1.25rem; margin-top: .2rem; flex: none; }
+
+/* ---- Toast ---- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  max-width: calc(100% - 2rem);
+  padding: .65rem 1rem;
+  border-radius: 12px;
+  background: var(--text);
+  color: var(--bg);
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  z-index: 50;
+}
+
+/* ---- Loading spinner ---- */
+.spinner {
+  width: 40px; height: 40px;
+  border: 4px solid var(--border);
+  border-top-color: var(--primary-hover);
+  border-radius: 50%;
+  animation: spin .9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

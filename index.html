@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en" data-theme="teal-sunshine">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>TaskNest</title>
+  <meta name="description" content="A personal school and organization task tracker that works offline.">
+  <meta name="theme-color" content="#8ED1C4">
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!--
+    Apply the saved theme BEFORE the page paints, so there is no flash of the
+    wrong colors. The real theme (from the cloud) is applied later by js/theme.js.
+  -->
+  <script>
+    try {
+      var t = localStorage.getItem('tasknest.theme');
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    } catch (e) { /* storage can be blocked; the default theme is fine */ }
+  </script>
+
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <!-- Only ONE of these screens is visible at a time. js/ui/screens.js switches them. -->
+
+  <!-- Loading -->
+  <main id="screen-loading" class="screen screen-center">
+    <div class="spinner" role="status" aria-label="Loading"></div>
+  </main>
+
+  <!-- Shown if js/config.js still has the placeholder Firebase values -->
+  <main id="screen-setup" class="screen screen-center" hidden>
+    <section class="card card-narrow">
+      <h1>Almost there</h1>
+      <p>The app files are working, but Firebase isn't connected yet.</p>
+      <p>Open <code>js/config.js</code>, paste your Firebase web app values, and upload it to GitHub again. The README (Part A) shows exactly where to find them.</p>
+    </section>
+  </main>
+
+  <!-- Shown if the Firebase code could not be loaded or started -->
+  <main id="screen-error" class="screen screen-center" hidden>
+    <section class="card card-narrow">
+      <h1>Couldn't start the app</h1>
+      <p id="error-message"></p>
+      <button type="button" class="btn btn-primary" id="error-retry">Try again</button>
+    </section>
+  </main>
+
+  <!-- Sign in -->
+  <main id="screen-signin" class="screen screen-center" hidden>
+    <section class="card card-narrow signin-card">
+      <img src="icons/icon.svg" alt="" width="72" height="72" class="signin-logo">
+      <h1>TaskNest</h1>
+      <p class="muted">Your school and organization tasks, on every device, even offline.</p>
+      <button type="button" class="btn btn-primary btn-large" id="signin-button">Sign in with Google</button>
+      <p class="muted small" id="signin-offline-note" hidden>You're offline. You only need internet for the very first sign-in.</p>
+      <p class="error-text" id="signin-error" role="alert" hidden></p>
+    </section>
+  </main>
+
+  <!-- The app itself (after sign-in) -->
+  <div id="screen-app" class="app" hidden>
+    <header class="app-header">
+      <div class="brand">
+        <img src="icons/icon.svg" alt="" width="32" height="32">
+        <span class="brand-name">TaskNest</span>
+      </div>
+      <!-- The sync indicator is filled in by js/sync-status.js -->
+      <div id="sync-indicator" class="sync-chip" data-state="connecting" role="status" aria-live="polite" tabindex="0">
+        <span class="sync-icon" aria-hidden="true"></span>
+        <span class="sync-label">Connecting…</span>
+      </div>
+    </header>
+
+    <div id="update-banner" class="banner" hidden>
+      <span>A new version is ready.</span>
+      <button type="button" class="btn btn-small" id="update-reload">Reload</button>
+    </div>
+
+    <main class="app-main">
+      <section class="hero">
+        <h1 id="welcome-title">Hello!</h1>
+        <p class="muted">Phase 1 is running: sign-in, offline storage, sync status and themes. Tasks arrive in Phase 2.</p>
+      </section>
+
+      <div class="grid">
+        <!-- Sync check: proves offline saving works on your phone -->
+        <section class="card" aria-labelledby="sync-check-title">
+          <h2 id="sync-check-title">Offline check</h2>
+          <p class="muted">Tap the button, then try it again in airplane mode. The counter should still go up, and the status at the top should say it is waiting to sync. Turn the internet back on and it should change to Synced.</p>
+          <div class="check-row">
+            <button type="button" class="btn btn-primary" id="ping-button">Add 1 to counter</button>
+            <div class="check-value">
+              <span class="check-number" id="ping-count">0</span>
+              <span class="muted small" id="ping-last">No taps yet</span>
+            </div>
+          </div>
+          <p class="small" id="sync-detail"></p>
+        </section>
+
+        <!-- Theme picker: proves settings are saved and synced -->
+        <section class="card" aria-labelledby="theme-title">
+          <h2 id="theme-title">Theme</h2>
+          <p class="muted">Saved to your account, so it follows you to other devices.</p>
+          <div class="theme-grid" id="theme-grid" role="radiogroup" aria-labelledby="theme-title"></div>
+        </section>
+
+        <!-- Account -->
+        <section class="card" aria-labelledby="account-title">
+          <h2 id="account-title">Account</h2>
+          <dl class="kv">
+            <dt>Name</dt><dd id="account-name">—</dd>
+            <dt>Email</dt><dd id="account-email">—</dd>
+            <dt>Account ID</dt>
+            <dd>
+              <code id="account-uid">—</code>
+              <button type="button" class="btn btn-small" id="copy-uid">Copy</button>
+            </dd>
+          </dl>
+          <p class="muted small">You need the Account ID once, to lock the database to your account (README, Part C).</p>
+          <button type="button" class="btn" id="signout-button">Sign out</button>
+        </section>
+
+        <!-- Install -->
+        <section class="card" aria-labelledby="install-title">
+          <h2 id="install-title">Install the app</h2>
+          <p class="muted" id="install-text">On Android Chrome: open the ⋮ menu, then choose <strong>Install app</strong> (or <strong>Add to Home screen</strong>).</p>
+          <button type="button" class="btn btn-primary" id="install-button" hidden>Install TaskNest</button>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Sign-out confirmation -->
+  <dialog id="signout-dialog" class="dialog" aria-labelledby="signout-dialog-title">
+    <form method="dialog">
+      <h2 id="signout-dialog-title">Sign out?</h2>
+      <p id="signout-pending-warning" class="warn-text" hidden>
+        Some changes have not synced yet. If you also remove data from this device, those changes will be lost.
+      </p>
+      <label class="check">
+        <input type="checkbox" id="signout-clear">
+        <span>Also remove saved data from this device (useful on a shared or borrowed phone)</span>
+      </label>
+      <div class="dialog-actions">
+        <button class="btn" value="cancel">Cancel</button>
+        <button class="btn btn-primary" value="confirm" id="signout-confirm">Sign out</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

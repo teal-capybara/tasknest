@@ -1,0 +1,45 @@
+/* ==========================================================================
+   LAYOUT: page structure. Mobile first; wider screens add columns.
+   ========================================================================== */
+
+.screen { min-height: 100vh; min-height: 100dvh; }
+
+.screen-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .6rem 1rem;
+  padding-top: max(.6rem, env(safe-area-inset-top));
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand { display: flex; align-items: center; gap: .5rem; font-weight: 700; font-size: 1.1rem; }
+
+.app-main {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+  padding-bottom: max(2rem, env(safe-area-inset-bottom));
+}
+
+.hero { margin: .5rem 0 1.25rem; }
+
+/* One column on phones, two on wider screens */
+.grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+@media (min-width: 760px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+  .app-main { padding: 1.5rem; }
+}

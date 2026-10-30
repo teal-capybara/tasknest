@@ -1,0 +1,53 @@
+/* ==========================================================================
+   BASE: resets, typography, and accessibility basics.
+   System fonts are used on purpose: they work offline and cost nothing.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+h1, h2 { line-height: 1.2; margin: 0 0 .5rem; }
+h1 { font-size: 1.6rem; }
+h2 { font-size: 1.1rem; }
+p  { margin: 0 0 .75rem; }
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .9em;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: .05em .35em;
+  word-break: break-all;
+}
+
+a { color: var(--link); }
+
+.muted { color: var(--text-muted); }
+.small { font-size: .875rem; }
+.error-text { color: var(--danger); font-weight: 600; }
+.warn-text  { color: var(--warn);   font-weight: 600; }
+
+[hidden] { display: none !important; }
+
+/* Clear keyboard focus ring (important for accessibility) */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

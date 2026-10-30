@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// ============================================================================
+// FIRESTORE SECURITY RULES: who may read and write your data.
+//
+// Paste this whole file into Firebase console > Firestore Database > Rules,
+// then press Publish. (README, Part A step 6.)
+//
+// STEP 1 RULES (this file, as it is now):
+//   A signed-in person can only touch THEIR OWN folder: users/{their-own-id}/...
+//   Everything else is blocked.
+//
+// STEP 2 (README, Part C): after your first sign-in, copy your Account ID from
+//   the app and use the "locked" version in firestore.rules.locked, so that
+//   ONLY your account can use the database at all.
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Anything not matched above is denied by default.
+  }
+}

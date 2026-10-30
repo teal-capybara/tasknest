@@ -1,0 +1,104 @@
+/* ==========================================================================
+   THEMES
+   Each theme is just a set of color "variables". The rest of the CSS only uses
+   the variable names (like var(--bg)), so adding or tweaking a theme means
+   editing ONLY this file.
+
+   The active theme is chosen by the data-theme attribute on <html>.
+   To add a theme: copy a block, rename it, change the colors, then add it to
+   the THEMES list in js/theme.js.
+
+   Contrast notes: text colors are dark on the pastel backgrounds so they stay
+   readable. Urgency colors (danger / warn / ok) always come with an icon or
+   text in the UI, never color alone.
+   ========================================================================== */
+
+/* Theme 1: Teal & Sunshine (your favorite, and the default) */
+:root,
+:root[data-theme="teal-sunshine"] {
+  --bg: #FDF9E3;            /* cream */
+  --surface: #FFFFFF;
+  --surface-2: #F1F8F4;     /* very light teal tint */
+  --border: #CFE3DB;
+  --text: #17352F;
+  --text-muted: #4B6861;
+  --primary: #8ED1C4;       /* pastel teal */
+  --primary-hover: #7BC6B8;
+  --on-primary: #0F3D36;
+  --accent: #F5DB6E;        /* buttery yellow */
+  --on-accent: #4A3B00;
+  --link: #1D7466;
+  --focus: #1D7466;
+  --danger: #B3261E;  --danger-bg: #FCE4E1;
+  --warn: #8A5A00;    --warn-bg: #FFF0C2;
+  --ok: #19704F;      --ok-bg: #DDF3E8;
+  --shadow: 0 1px 2px rgba(23, 53, 47, .08), 0 6px 18px rgba(23, 53, 47, .07);
+  --meta-theme: #8ED1C4;
+}
+
+/* Theme 2: Pastel Bloom */
+:root[data-theme="pastel-bloom"] {
+  --bg: #FFF5FA;
+  --surface: #FFFFFF;
+  --surface-2: #F8EEFB;
+  --border: #EBD3EE;
+  --text: #3B2142;
+  --text-muted: #6B4C75;
+  --primary: #F4B6D6;       /* soft pink */
+  --primary-hover: #EFA3CB;
+  --on-primary: #4A1D3A;
+  --accent: #CDBDF5;        /* lavender / lilac */
+  --on-accent: #2F1F57;
+  --link: #8E3A78;
+  --focus: #8E3A78;
+  --danger: #B3261E;  --danger-bg: #FCE4E1;
+  --warn: #8A5A00;    --warn-bg: #FFF0C2;
+  --ok: #19704F;      --ok-bg: #DDF3E8;
+  --shadow: 0 1px 2px rgba(59, 33, 66, .08), 0 6px 18px rgba(59, 33, 66, .07);
+  --meta-theme: #F4B6D6;
+}
+
+/* Theme 3: Ocean Breeze */
+:root[data-theme="ocean-breeze"] {
+  --bg: #F4F8FF;
+  --surface: #FFFFFF;
+  --surface-2: #EAF0FD;
+  --border: #CBD8F2;
+  --text: #1D2A4D;
+  --text-muted: #4A5B87;
+  --primary: #A9C8F5;       /* powder blue */
+  --primary-hover: #94BBF1;
+  --on-primary: #14284F;
+  --accent: #BDB9F7;        /* periwinkle */
+  --on-accent: #231F5C;
+  --link: #3A4FA3;
+  --focus: #3A4FA3;
+  --danger: #B3261E;  --danger-bg: #FCE4E1;
+  --warn: #8A5A00;    --warn-bg: #FFF0C2;
+  --ok: #19704F;      --ok-bg: #DDF3E8;
+  --shadow: 0 1px 2px rgba(29, 42, 77, .08), 0 6px 18px rgba(29, 42, 77, .07);
+  --meta-theme: #A9C8F5;
+}
+
+/* Theme 4: Midnight (dark) */
+:root[data-theme="midnight"] {
+  --bg: #1F2430;            /* dark slate */
+  --surface: #2A3040;
+  --surface-2: #323A4D;
+  --border: #444E64;
+  --text: #EEEBDF;
+  --text-muted: #B2BACB;
+  --primary: #6FB9AB;       /* muted teal */
+  --primary-hover: #82C7BA;
+  --on-primary: #0E2227;
+  --accent: #E8C36F;        /* gold */
+  --on-accent: #2E2300;
+  --link: #8ED1C4;
+  --focus: #E8C36F;
+  --danger: #FF9C94;  --danger-bg: #4A2A2C;
+  --warn: #F2CB6B;    --warn-bg: #46391A;
+  --ok: #8FD9B4;      --ok-bg: #1F3F31;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
+  --meta-theme: #1F2430;
+  color-scheme: dark;
+}

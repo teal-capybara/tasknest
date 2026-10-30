@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Maskable: background fills the whole square; artwork stays inside the central safe zone -->
+  <rect width="512" height="512" fill="#7CCBBA"/>
+  <g transform="translate(76.8 76.8) scale(0.7)">
+    <rect x="96" y="120" width="320" height="300" rx="44" fill="#FDF9E3"/>
+    <path d="M96 164a44 44 0 0 1 44-44h232a44 44 0 0 1 44 44v52H96z" fill="#F5D24F"/>
+    <rect x="164" y="84" width="34" height="72" rx="17" fill="#17695C"/>
+    <rect x="314" y="84" width="34" height="72" rx="17" fill="#17695C"/>
+    <path d="M172 318l62 62 112-128" fill="none" stroke="#17695C" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
