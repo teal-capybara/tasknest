@@ -1,38 +1,48 @@
 /* ==========================================================================
    INSTALL BUTTON
    Chrome on Android fires a "beforeinstallprompt" event when the app can be
-   installed. We keep it and show our own Install button. If it never fires
-   (already installed, or a browser that does not support it), the card just
-   shows the manual instructions that are already in index.html.
+   installed. It fires EARLY (before the Settings screen exists), so
+   captureInstallPrompt() runs at startup and keeps the event. When the Settings
+   screen is drawn it calls bindInstallCard() to wire up its button.
+   If the event never fires (already installed, or an unsupported browser) the
+   card just shows the manual instructions.
    ========================================================================== */
 
 let deferredPrompt = null;
+let button = null;
+let text = null;
 
-export function initInstallButton() {
-  const button = document.getElementById("install-button");
-  const text = document.getElementById("install-text");
+const isStandalone = () => window.matchMedia("(display-mode: standalone)").matches;
 
+export function captureInstallPrompt() {
   window.addEventListener("beforeinstallprompt", (event) => {
-    event.preventDefault();      // stop Chrome's default mini-bar; we use our own button
+    event.preventDefault();   // we show our own button instead of Chrome's mini-bar
     deferredPrompt = event;
-    button.hidden = false;
+    refresh();
   });
+  window.addEventListener("appinstalled", () => {
+    deferredPrompt = null;
+    if (text) text.textContent = "TaskNest is installed on this device.";
+    refresh();
+  });
+}
 
-  button.addEventListener("click", async () => {
+/** Called by the Settings screen once its install card exists. */
+export function bindInstallCard(buttonEl, textEl) {
+  button = buttonEl;
+  text = textEl;
+  button.onclick = async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     await deferredPrompt.userChoice;
     deferredPrompt = null;
-    button.hidden = true;
-  });
+    refresh();
+  };
+  refresh();
+}
 
-  window.addEventListener("appinstalled", () => {
-    button.hidden = true;
-    text.textContent = "TaskNest is installed on this device.";
-  });
-
-  // Already running as an installed app?
-  if (window.matchMedia("(display-mode: standalone)").matches) {
-    text.textContent = "You're using the installed app.";
-  }
+function refresh() {
+  if (!button) return;
+  button.hidden = !deferredPrompt;
+  if (isStandalone()) text.textContent = "You're using the installed app.";
 }

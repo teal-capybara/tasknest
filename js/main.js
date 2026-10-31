@@ -7,28 +7,47 @@
      3. Start Firebase (with offline storage).
      4. Watch sign-in state:
           signed out -> show the sign-in screen
-          signed in  -> start database listeners and show the app
+          signed in  -> start the database listeners (js/data.js), then the
+                        router (js/router.js) draws the right screen
+
+   To add a new screen: write a view in js/views/, then add ONE line to ROUTES.
    ========================================================================== */
 
-import { APP_NAME, isConfigured } from "./config.js";
+import { isConfigured } from "./config.js";
 import { initFirebase } from "./firebase.js";
 import { watchAuth, signIn, signOutUser, finishRedirectSignIn, friendlyAuthError } from "./auth.js";
-import { applyTheme, currentTheme, isValidTheme } from "./theme.js";
-import { watchSettings, saveSettings } from "./db/settings.js";
-import { watchSyncTest, addPing } from "./db/syncTest.js";
-import { onChange as onSyncChange, describe, currentState, hasPendingChanges, forgetAll } from "./sync-status.js";
+import { startData } from "./data.js";
+import { defineRoutes, startRouter, stopRouter } from "./router.js";
+import { hasPendingChanges, forgetAll } from "./sync-status.js";
 import { showScreen, toast } from "./ui/screens.js";
-import { renderThemePicker, markSelected } from "./ui/themePicker.js";
-import { initInstallButton } from "./ui/install.js";
+import { captureInstallPrompt } from "./ui/install.js";
+import { session } from "./session.js";
+
+import { tasksView } from "./views/tasksView.js";
+import { taskFormView } from "./views/taskFormView.js";
+import { taskDetailView } from "./views/taskDetailView.js";
+import { manageView } from "./views/manageView.js";
+import { settingsView } from "./views/settingsView.js";
+
+/* path: the address after #   nav: which menu item to highlight   view: the screen.
+   Order matters: "/task/new" must come before "/task/:id". */
+const ROUTES = [
+  { path: "/tasks",         nav: "tasks",    title: "Tasks",     view: tasksView },
+  { path: "/task/new",      nav: "tasks",    title: "Add task",  view: taskFormView },
+  { path: "/task/:id/edit", nav: "tasks",    title: "Edit task", view: taskFormView },
+  { path: "/task/:id",      nav: "tasks",    title: "Task",      view: taskDetailView },
+  { path: "/manage",        nav: "manage",   title: "Manage",    view: manageView },
+  { path: "/settings",      nav: "settings", title: "Settings",  view: settingsView },
+];
 
 const $ = (id) => document.getElementById(id);
 
-let fb = null;            // the Firebase handles once started
-let stopListeners = [];   // functions that stop the database listeners
-let activeUid = null;     // who is signed in right now
+let fb = null;          // the Firebase handles once started
+let stopData = null;    // stops the database listeners
+let activeUid = null;   // who is signed in right now
 
 registerServiceWorker();
-initInstallButton();
+captureInstallPrompt();
 start();
 
 /* ------------------------------------------------------------------ startup */
@@ -51,17 +70,15 @@ async function start() {
   }
 
   rememberFirebaseFilesForOffline();
-  wireStaticButtons();
+  wireButtons();
+  defineRoutes(ROUTES);
 
   // If a redirect-based sign-in just finished, surface any error from it.
   const redirectError = await finishRedirectSignIn(fb);
   if (redirectError) showSignInError(friendlyAuthError(redirectError));
 
   // Runs immediately with the saved session (even offline), then on every change.
-  watchAuth(fb, (user) => {
-    if (user) enterApp(user);
-    else leaveApp();
-  });
+  watchAuth(fb, (user) => (user ? enterApp(user) : leaveApp()));
 
   window.addEventListener("online", updateSigninOfflineNote);
   window.addEventListener("offline", updateSigninOfflineNote);
@@ -70,64 +87,33 @@ async function start() {
 /* ------------------------------------------------------------ signed-in app */
 
 function enterApp(user) {
-  if (activeUid === user.uid) return; // already set up (auth can fire repeatedly)
-  stopAllListeners();
+  if (activeUid === user.uid) return; // auth can fire repeatedly; set up only once
+  teardown();
   activeUid = user.uid;
 
-  // Account card
-  $("welcome-title").textContent = `Hello, ${(user.displayName || "there").split(" ")[0]}!`;
-  $("account-name").textContent = user.displayName || "—";
-  $("account-email").textContent = user.email || "—";
-  $("account-uid").textContent = user.uid;
-
-  // Theme picker + settings listener
-  renderThemePicker($("theme-grid"), currentTheme(), (id) => chooseTheme(user.uid, id));
-  stopListeners.push(
-    watchSettings(fb, user.uid, (settings) => {
-      // Only follow the cloud value if one has been saved; otherwise keep the local choice.
-      if (isValidTheme(settings.theme) && settings.theme !== currentTheme()) {
-        applyTheme(settings.theme);
-      }
-      markSelected($("theme-grid"), currentTheme());
-    })
-  );
-
-  // Offline check card
-  stopListeners.push(
-    watchSyncTest(fb, user.uid, (data) => {
-      $("ping-count").textContent = data.count ?? 0;
-      $("ping-last").textContent = data.lastTapAt
-        ? "Last tap: " + new Date(data.lastTapAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
-        : "No taps yet";
-    })
-  );
-
-  showSyncDetail(describe());
-  if (!fb.offlineReady) {
-    $("sync-detail").textContent = "Warning: this browser blocked offline storage, so offline editing will not work here.";
-  }
-
+  stopData = startData(fb, user.uid);
   showScreen("app");
+  startRouter($("view"));
 }
 
 function leaveApp() {
-  stopAllListeners();
-  activeUid = null;
+  teardown();
   $("signin-button").disabled = false;
   updateSigninOfflineNote();
   showScreen("signin");
 }
 
-function stopAllListeners() {
-  stopListeners.forEach((stop) => stop());
-  stopListeners = [];
+function teardown() {
+  stopRouter();
+  if (stopData) stopData();
+  stopData = null;
+  activeUid = null;
   forgetAll();
 }
 
 /* ------------------------------------------------------------- user actions */
 
-function wireStaticButtons() {
-  // Sign in
+function wireButtons() {
   $("signin-button").onclick = async () => {
     showSignInError("");
     $("signin-button").disabled = true;
@@ -140,25 +126,8 @@ function wireStaticButtons() {
     }
   };
 
-  // Offline check: add 1. The promise only finishes when the CLOUD confirms,
-  // which can take forever offline, so we do NOT wait on it. The listener
-  // updates the screen instantly from the local copy.
-  $("ping-button").onclick = () => {
-    addPing(fb, activeUid).catch((err) => toast("Could not save: " + (err.code || err.message)));
-  };
-
-  // Copy account id
-  $("copy-uid").onclick = async () => {
-    try {
-      await navigator.clipboard.writeText($("account-uid").textContent);
-      toast("Account ID copied");
-    } catch (e) {
-      toast("Couldn't copy. Select the ID and copy it manually.");
-    }
-  };
-
-  // Sign out (with an optional "clear this device" step)
-  $("signout-button").onclick = () => {
+  // Settings calls this. The dialog also offers to wipe this device's saved copy.
+  session.requestSignOut = () => {
     $("signout-pending-warning").hidden = !hasPendingChanges();
     $("signout-clear").checked = false;
     $("signout-dialog").showModal();
@@ -166,20 +135,10 @@ function wireStaticButtons() {
   $("signout-dialog").addEventListener("close", async () => {
     if ($("signout-dialog").returnValue !== "confirm") return;
     const clearLocal = $("signout-clear").checked;
-    stopAllListeners();
-    activeUid = null;
+    teardown();
     await signOutUser(fb);
     if (clearLocal) await clearThisDevice();
   });
-
-  onSyncChange(showSyncDetail);
-}
-
-function chooseTheme(uid, themeId) {
-  applyTheme(themeId);                          // instant, on this device
-  markSelected($("theme-grid"), themeId);
-  saveSettings(fb, uid, { theme: themeId })     // saved + synced in the background
-    .catch((err) => toast("Theme not saved: " + (err.code || err.message)));
 }
 
 /** Removes the offline copy from this browser. Anything not yet synced is lost. */
@@ -207,12 +166,6 @@ function showSignInError(message) {
 
 function updateSigninOfflineNote() {
   $("signin-offline-note").hidden = navigator.onLine;
-}
-
-function showSyncDetail(info) {
-  // Don't overwrite the "offline storage blocked" warning.
-  if (fb && !fb.offlineReady) return;
-  $("sync-detail").textContent = info.detail;
 }
 
 /* ----------------------------------------------------------- service worker */
@@ -261,6 +214,3 @@ async function rememberFirebaseFilesForOffline() {
     if (reg.active && urls.length) reg.active.postMessage({ type: "CACHE_URLS", urls });
   } catch (e) { /* not critical */ }
 }
-
-// Keep APP_NAME referenced so renaming in config.js is a one-place change.
-document.title = APP_NAME;

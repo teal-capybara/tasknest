@@ -13,7 +13,7 @@
 
   <!--
     Apply the saved theme BEFORE the page paints, so there is no flash of the
-    wrong colors. The real theme (from the cloud) is applied later by js/theme.js.
+    wrong colors. The real theme (from the cloud) is applied later by js/data.js.
   -->
   <script>
     try {
@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/views.css">
 </head>
 <body>
 
@@ -66,77 +67,75 @@
     </section>
   </main>
 
-  <!-- The app itself (after sign-in) -->
+  <!-- The app itself (after sign-in). The changing part is <main id="view">, drawn by js/router.js -->
   <div id="screen-app" class="app" hidden>
-    <header class="app-header">
+
+    <!-- Desktop sidebar (hidden on phones; the bottom bar is used there) -->
+    <aside class="sidebar">
       <div class="brand">
         <img src="icons/icon.svg" alt="" width="32" height="32">
         <span class="brand-name">TaskNest</span>
       </div>
-      <!-- The sync indicator is filled in by js/sync-status.js -->
-      <div id="sync-indicator" class="sync-chip" data-state="connecting" role="status" aria-live="polite" tabindex="0">
-        <span class="sync-icon" aria-hidden="true"></span>
-        <span class="sync-label">Connecting…</span>
-      </div>
-    </header>
+      <a class="btn btn-primary btn-large side-add" href="#/task/new" data-add-task>
+        <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Add task
+      </a>
+      <nav class="side-nav" aria-label="Main">
+        <a class="nav-link" href="#/tasks" data-route="tasks">
+          <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>
+          <span>Tasks</span>
+        </a>
+        <a class="nav-link" href="#/manage" data-route="manage">
+          <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
+          <span>Manage</span>
+        </a>
+        <a class="nav-link" href="#/settings" data-route="settings">
+          <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </aside>
 
-    <div id="update-banner" class="banner" hidden>
-      <span>A new version is ready.</span>
-      <button type="button" class="btn btn-small" id="update-reload">Reload</button>
+    <div class="app-body">
+      <header class="app-header">
+        <div class="brand">
+          <img src="icons/icon.svg" alt="" width="32" height="32">
+          <span class="brand-name">TaskNest</span>
+        </div>
+        <!-- The sync indicator is filled in by js/sync-status.js -->
+        <div id="sync-indicator" class="sync-chip" data-state="connecting" role="status" aria-live="polite" tabindex="0">
+          <span class="sync-icon" aria-hidden="true"></span>
+          <span class="sync-label">Connecting…</span>
+        </div>
+      </header>
+
+      <div id="update-banner" class="banner" hidden>
+        <span>A new version is ready.</span>
+        <button type="button" class="btn btn-small" id="update-reload">Reload</button>
+      </div>
+
+      <main id="view" class="app-main" tabindex="-1"></main>
     </div>
 
-    <main class="app-main">
-      <section class="hero">
-        <h1 id="welcome-title">Hello!</h1>
-        <p class="muted">Phase 1 is running: sign-in, offline storage, sync status and themes. Tasks arrive in Phase 2.</p>
-      </section>
-
-      <div class="grid">
-        <!-- Sync check: proves offline saving works on your phone -->
-        <section class="card" aria-labelledby="sync-check-title">
-          <h2 id="sync-check-title">Offline check</h2>
-          <p class="muted">Tap the button, then try it again in airplane mode. The counter should still go up, and the status at the top should say it is waiting to sync. Turn the internet back on and it should change to Synced.</p>
-          <div class="check-row">
-            <button type="button" class="btn btn-primary" id="ping-button">Add 1 to counter</button>
-            <div class="check-value">
-              <span class="check-number" id="ping-count">0</span>
-              <span class="muted small" id="ping-last">No taps yet</span>
-            </div>
-          </div>
-          <p class="small" id="sync-detail"></p>
-        </section>
-
-        <!-- Theme picker: proves settings are saved and synced -->
-        <section class="card" aria-labelledby="theme-title">
-          <h2 id="theme-title">Theme</h2>
-          <p class="muted">Saved to your account, so it follows you to other devices.</p>
-          <div class="theme-grid" id="theme-grid" role="radiogroup" aria-labelledby="theme-title"></div>
-        </section>
-
-        <!-- Account -->
-        <section class="card" aria-labelledby="account-title">
-          <h2 id="account-title">Account</h2>
-          <dl class="kv">
-            <dt>Name</dt><dd id="account-name">—</dd>
-            <dt>Email</dt><dd id="account-email">—</dd>
-            <dt>Account ID</dt>
-            <dd>
-              <code id="account-uid">—</code>
-              <button type="button" class="btn btn-small" id="copy-uid">Copy</button>
-            </dd>
-          </dl>
-          <p class="muted small">You need the Account ID once, to lock the database to your account (README, Part C).</p>
-          <button type="button" class="btn" id="signout-button">Sign out</button>
-        </section>
-
-        <!-- Install -->
-        <section class="card" aria-labelledby="install-title">
-          <h2 id="install-title">Install the app</h2>
-          <p class="muted" id="install-text">On Android Chrome: open the ⋮ menu, then choose <strong>Install app</strong> (or <strong>Add to Home screen</strong>).</p>
-          <button type="button" class="btn btn-primary" id="install-button" hidden>Install TaskNest</button>
-        </section>
-      </div>
-    </main>
+    <!-- Phone: quick-add button and bottom navigation -->
+    <a class="fab" href="#/task/new" data-add-task>
+      <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      <span>Add task</span>
+    </a>
+    <nav class="bottom-nav" aria-label="Main">
+      <a class="nav-link" href="#/tasks" data-route="tasks">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>
+        <span>Tasks</span>
+      </a>
+      <a class="nav-link" href="#/manage" data-route="manage">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
+        <span>Manage</span>
+      </a>
+      <a class="nav-link" href="#/settings" data-route="settings">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
   </div>
 
   <!-- Sign-out confirmation -->

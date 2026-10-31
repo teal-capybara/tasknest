@@ -1,0 +1,183 @@
+/* ==========================================================================
+   VIEWS: styles for the task list, cards, form, detail page and manage page.
+   Colors come only from the theme variables (css/themes.css).
+   ========================================================================== */
+
+/* ---- Generic bits ---- */
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .75rem; }
+.page-head h1 { margin: 0; }
+.app-main > .card, .app-main > .detail-status { margin-top: 1rem; }
+h3 { font-size: 1rem; margin: 1.25rem 0 .5rem; }
+
+.empty { text-align: center; padding: 2.5rem 1rem; }
+.empty .btn { margin-top: .5rem; }
+.loading-view { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 4rem 1rem; text-align: center; }
+.back-link { display: inline-block; margin-bottom: .5rem; font-weight: 600; min-height: 44px; line-height: 44px; }
+
+.btn-danger { background: var(--danger); color: var(--bg); border-color: transparent; }
+.btn-danger:hover { filter: brightness(.92); }
+.btn-danger-outline { color: var(--danger); border-color: var(--danger); background: transparent; }
+.btn-link { background: none; border: 0; color: var(--link); text-decoration: underline; padding-left: .25rem; padding-right: .25rem; }
+a.btn { text-decoration: none; }
+
+.banner-inline { border-radius: 12px; margin: .25rem 0 .75rem; justify-content: space-between; }
+
+/* ---- Form controls ---- */
+.input, .select, .textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: .5rem .75rem;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.textarea { resize: vertical; min-height: 7rem; }
+.input[aria-invalid="true"], .select[aria-invalid="true"], .textarea[aria-invalid="true"] { border-color: var(--danger); border-width: 2px; }
+
+.field { margin: 0 0 1rem; padding: 0; border: 0; min-width: 0; }
+.label { display: block; font-weight: 600; margin-bottom: .3rem; }
+.inline-label { display: inline-flex; align-items: center; gap: .6rem; margin: 0; }
+.inline-label .select { width: auto; }
+.req { color: var(--danger); }
+.hint { margin: .3rem 0 0; font-size: .875rem; color: var(--text-muted); }
+.field-error { margin: .3rem 0 0; font-size: .9rem; }
+
+.form-summary { padding: .7rem 1rem; margin-bottom: 1rem; border-radius: 12px; background: var(--danger-bg); }
+.task-form { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 1.1rem; box-shadow: var(--shadow); }
+.due-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.form-actions { display: flex; justify-content: flex-end; gap: .6rem; margin-top: 1rem; }
+
+/* ---- Segmented buttons (workspace tabs; also radio groups in the form) ---- */
+.seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; max-width: 100%; }
+.seg-btn, .seg-radio span {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 40px; padding: 0 1rem;
+  font: inherit; font-weight: 600; color: var(--text-muted);
+  background: transparent; border: 0; border-radius: 999px; cursor: pointer;
+}
+.seg-btn[aria-pressed="true"], .seg-radio input:checked + span { background: var(--primary); color: var(--on-primary); }
+.seg-radio { display: inline-flex; }
+.seg-radio input { position: absolute; opacity: 0; pointer-events: none; }
+.seg-radio input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+/* Small phones: tighter buttons so the three workspace tabs always fit */
+@media (max-width: 400px) {
+  .seg-btn, .seg-radio span { padding: 0 .6rem; font-size: .9rem; }
+}
+.seg-form { display: flex; }
+.seg-form .seg-radio { flex: 1; }
+.seg-form .seg-radio span { width: 100%; }
+
+/* ---- Toolbar + filters ---- */
+.toolbar { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: .75rem 0; }
+.toolbar .input { flex: 1 1 12rem; width: auto; }
+.filter-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 1rem; margin-bottom: .75rem; }
+.filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .25rem .75rem; }
+.result-count { margin: .25rem 0 .5rem; min-height: 1.2em; }
+
+/* ---- Chips and badges ---- */
+.chips { display: flex; flex-wrap: wrap; gap: .35rem; margin: .35rem 0; padding: 0; list-style: none; }
+.chip {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .1rem .6rem; font-size: .8rem; font-weight: 600;
+  color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px;
+}
+.chip-academics { background: var(--primary); color: var(--on-primary); border-color: transparent; }
+.chip-organizations { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+.chip-archived { background: var(--surface-2); color: var(--text-muted); margin-left: .5rem; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .15rem .65rem; font-size: .85rem; font-weight: 700; border-radius: 999px;
+  background: var(--surface-2); color: var(--text-muted);
+}
+.badge-icon { font-weight: 800; }
+.badge-overdue { background: var(--danger-bg); color: var(--danger); }
+.badge-due_today, .badge-due_soon { background: var(--warn-bg); color: var(--warn); }
+.badge-upcoming { background: var(--surface-2); color: var(--link); }
+.badge-no_deadline { color: var(--text-muted); }
+.badge-done { background: var(--ok-bg); color: var(--ok); }
+
+/* ---- Task cards ---- */
+.task-list { display: flex; flex-direction: column; gap: .75rem; }
+
+.task-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .4rem .8rem;
+  padding: .9rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+.urg-overdue { border-left-color: var(--danger); }
+.urg-due_today, .urg-due_soon { border-left-color: var(--warn); }
+.urg-upcoming { border-left-color: var(--primary-hover); }
+.urg-done { border-left-color: var(--ok); }
+.urg-done .task-title { color: var(--text-muted); }
+.is-archived { opacity: .72; }
+
+.task-check { width: 1.6rem; height: 1.6rem; margin: .1rem 0 0; accent-color: var(--link); cursor: pointer; }
+.task-body { min-width: 0; }
+.task-title { display: block; font-weight: 700; font-size: 1.05rem; color: var(--text); text-decoration: none; overflow-wrap: anywhere; }
+.task-title:hover { text-decoration: underline; }
+.task-due { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-top: .25rem; }
+.due-text { font-size: .9rem; color: var(--text-muted); }
+.task-preview {
+  margin: .4rem 0 0; color: var(--text-muted); font-size: .9rem; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.task-side { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.status-select { width: auto; min-width: 9.5rem; flex: 1 1 9.5rem; max-width: 14rem; }
+
+@media (min-width: 720px) {
+  .task-card { grid-template-columns: auto 1fr auto; }
+  .task-side { grid-column: auto; flex-direction: column; align-items: stretch; justify-content: center; width: 10.5rem; }
+  /* flex: none stops the dropdown from stretching tall inside the column */
+  .task-side .status-select { max-width: none; flex: none; }
+}
+
+/* ---- ⋯ menu ---- */
+.menu { position: relative; }
+.menu-button { list-style: none; cursor: pointer; width: 44px; }
+.menu-button::-webkit-details-marker { display: none; }
+.menu-list {
+  position: absolute; right: 0; top: calc(100% + 4px); z-index: 30; min-width: 12rem;
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden;
+}
+.menu-list a, .menu-list button {
+  display: block; width: 100%; min-height: 44px; padding: .6rem .9rem; text-align: left;
+  font: inherit; color: var(--text); text-decoration: none; background: none; border: 0; cursor: pointer;
+}
+.menu-list a:hover, .menu-list button:hover { background: var(--surface-2); }
+.menu-list .danger-item { color: var(--danger); }
+
+/* ---- Detail page ---- */
+.detail-title { margin: .25rem 0 .25rem; overflow-wrap: anywhere; }
+.detail-status { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; padding: .8rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+.detail-status p { margin: 0; flex-basis: 100%; }
+.action-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+.detail-list { margin: 0; }
+.detail-row { display: grid; grid-template-columns: 1fr; gap: 0; padding: .45rem 0; border-bottom: 1px solid var(--border); }
+.detail-row:last-child { border-bottom: 0; }
+.detail-row dt { color: var(--text-muted); font-size: .875rem; }
+.detail-row dd { margin: 0; overflow-wrap: anywhere; }
+.prewrap { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
+.history { margin: 0; padding-left: 1.2rem; }
+.history li { margin-bottom: .4rem; }
+@media (min-width: 600px) { .detail-row { grid-template-columns: 13rem 1fr; } }
+
+/* ---- Manage page ---- */
+.add-form { display: flex; gap: .5rem; margin: .5rem 0; }
+/* min-width: 0 lets the text box shrink so the button never gets pushed out of the card */
+.add-form .input { flex: 1 1 0; width: auto; min-width: 0; }
+.add-form .btn { flex: none; white-space: nowrap; }
+.row-list { list-style: none; margin: .75rem 0 0; padding: 0; }
+.row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem .75rem; padding: .7rem 0; border-top: 1px solid var(--border); }
+.row-main { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+.row-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+.empty-row { border-top: 0; }

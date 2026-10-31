@@ -42,6 +42,14 @@ export function currentState() {
 }
 
 export function describe(state = currentState()) {
+  // Offline but with changes waiting: say so, so you know your last edit was kept.
+  if (state === "offline" && hasPendingChanges()) {
+    return {
+      state,
+      label: "Offline · saved",
+      detail: "You're offline. Your changes are saved on this device and will upload when you reconnect.",
+    };
+  }
   return { state, ...LABELS[state] };
 }
 

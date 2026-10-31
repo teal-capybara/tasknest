@@ -1,5 +1,7 @@
 /* ==========================================================================
-   LAYOUT: page structure. Mobile first; wider screens add columns.
+   LAYOUT: page structure. Mobile first.
+     Phones : top bar + bottom navigation + floating "Add task" button
+     Wide   : left sidebar (navigation + Add task), no bottom bar
    ========================================================================== */
 
 .screen { min-height: 100vh; min-height: 100dvh; }
@@ -11,6 +13,11 @@
   padding: 1rem;
   padding-top: max(1rem, env(safe-area-inset-top));
 }
+
+.app { min-height: 100vh; min-height: 100dvh; }
+.app-body { min-width: 0; }
+
+.brand { display: flex; align-items: center; gap: .5rem; font-weight: 700; font-size: 1.1rem; }
 
 .app-header {
   position: sticky;
@@ -26,20 +33,104 @@
   border-bottom: 1px solid var(--border);
 }
 
-.brand { display: flex; align-items: center; gap: .5rem; font-weight: 700; font-size: 1.1rem; }
-
 .app-main {
   max-width: 64rem;
   margin: 0 auto;
   padding: 1rem;
-  padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  /* room for the floating button and the bottom bar on phones */
+  padding-bottom: calc(9rem + env(safe-area-inset-bottom));
+  outline: none;
 }
-
-.hero { margin: .5rem 0 1.25rem; }
 
 /* One column on phones, two on wider screens */
 .grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+
+/* ---- Phone navigation ---- */
+.sidebar { display: none; }
+
+.bottom-nav {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 58px;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.nav-link[aria-current="page"] { color: var(--text); }
+.nav-link[aria-current="page"] .nav-icon { color: var(--on-primary); background: var(--primary); border-radius: 999px; padding: 4px 14px; width: 56px; box-sizing: content-box; }
+
+.fab {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(70px + env(safe-area-inset-bottom));
+  z-index: 15;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 52px;
+  padding: 0 1.2rem;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(0, 0, 0, .06);
+}
+
+/* ---- Wide screens ---- */
 @media (min-width: 760px) {
   .grid { grid-template-columns: 1fr 1fr; }
   .app-main { padding: 1.5rem; }
+}
+
+@media (min-width: 900px) {
+  .app { display: grid; grid-template-columns: 15rem 1fr; }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    padding: 1.25rem 1rem;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+  }
+  .side-add { margin: 0; text-decoration: none; }
+  .side-nav { display: flex; flex-direction: column; gap: .25rem; }
+  .side-nav .nav-link {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: .75rem;
+    min-height: 46px;
+    padding: 0 .9rem;
+    border-radius: 12px;
+    font-size: 1rem;
+  }
+  .side-nav .nav-link:hover { background: var(--surface-2); }
+  .side-nav .nav-link[aria-current="page"] { background: var(--primary); color: var(--on-primary); }
+  .side-nav .nav-link[aria-current="page"] .nav-icon { background: none; padding: 0; width: auto; color: inherit; }
+
+  .bottom-nav, .fab { display: none; }
+  .app-header .brand { display: none; }
+  .app-header { justify-content: flex-end; }
+  .app-main { padding-bottom: 3rem; }
 }
