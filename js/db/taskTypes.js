@@ -1,9 +1,10 @@
 /* ==========================================================================
    TASK TYPES (database)
 
-   Only YOUR custom types are stored here: { name, createdAt, updatedAt }.
-   The five built-in types (Project, Assignment, Exam, Quiz, Recitation) live in
-   js/constants.js and can't be renamed or deleted.
+   Only YOUR custom types are stored here: { name, workspace, createdAt, updatedAt }.
+   workspace is "academics" or "organizations". (Types saved before Phase 2.5 have no
+   workspace field and are treated as Academics.)
+   The built-in types live in js/constants.js and can't be renamed or deleted.
 
    Deleting a custom type never leaves tasks without a type: the caller picks a
    replacement type and every task using the old type is moved to it first.
@@ -15,10 +16,10 @@ export function watchTaskTypes(fb, uid, onData) {
   return watchCollection(fb, uid, "taskTypes", onData);
 }
 
-export function addTaskType(fb, uid, name) {
+export function addTaskType(fb, uid, name, workspace) {
   const id = newId(fb, uid, "taskTypes");
   const now = Date.now();
-  guard(fb.F.setDoc(docRef(fb, uid, "taskTypes", id), { name: name.trim(), createdAt: now, updatedAt: now }));
+  guard(fb.F.setDoc(docRef(fb, uid, "taskTypes", id), { name: name.trim(), workspace, createdAt: now, updatedAt: now }));
   return id;
 }
 

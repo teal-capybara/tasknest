@@ -93,6 +93,9 @@
   border: 1px solid rgba(0, 0, 0, .06);
 }
 
+/* Hidden on the Add/Edit task screens (router.js sets this class) */
+.hide-fab .fab { display: none; }
+
 /* ---- Wide screens ---- */
 @media (min-width: 760px) {
   .grid { grid-template-columns: 1fr 1fr; }

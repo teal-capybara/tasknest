@@ -1,13 +1,14 @@
-# TaskNest (Phase 2: Tasks)
+# TaskNest (Phase 2.5: Tasks, polished)
 
 A personal school and organization task tracker that installs on your phone and works offline.
 
-**This is Phase 2 of 5.**
+**This is Phase 2.5 (halfway to Phase 3).**
 
 | Phase | What you get | Status |
 |---|---|---|
 | 1 | Installable app, Google sign-in, offline storage, sync chip, four themes | Done |
-| 2 | Courses, task types, Add/Edit/Duplicate task, task cards, inline status, urgency sorting, filters, search, archive/delete, task pages, Academics + Organizations | **This version** |
+| 2 | Courses, task types, Add/Edit/Duplicate task, task cards, inline status, urgency sorting, filters, search, archive/delete, task pages, Academics + Organizations | Done |
+| 2.5 | Task types per workspace, form drafts that survive leaving the page, no floating Add button on the form, Settings as a list, Archived tasks in Settings, "Due soon" wording | **This version** |
 | 3 | Dashboard, Calendar, Board view, adjustable urgency settings | Next |
 | 4 | Reports, export/import backup, optional start date, polish | Later |
 | 5 | Recurring tasks | Later |
@@ -40,10 +41,11 @@ js/
   db/                   Everything that reads/writes the database
     courses.js  taskTypes.js  tasks.js  settings.js  helpers.js  syncTest.js
   logic/                Pure rules, no screens: urgency.js, filters.js, validate.js,
-                        timing.js (early/on time/late), format.js (dates)
+                        timing.js (early/on time/late), format.js (dates),
+                        drafts.js (saves the half-filled task form)
   ui/                   Reusable pieces: dom.js, dialogs.js, taskCard.js, taskActions.js ...
   views/                One file per screen: tasksView, taskFormView, taskDetailView,
-                        manageView, settingsView
+                        manageView, settingsView (the Settings list and all its pages)
 icons/                  Original app icon (SVG + PNG sizes)
 ```
 
@@ -51,15 +53,16 @@ Technologies: plain HTML, CSS and JavaScript (no build step, nothing to install)
 
 ---
 
-## Upgrading an existing Phase 1 site to Phase 2
+## Upgrading an existing site to Phase 2.5
 
 You already have the repo, Firebase and GitHub Pages set up. You only replace the files.
 
-1. Unzip `tasknest-phase2.zip`. **It does not contain `js/config.js`, on purpose.** Your repo already has your Firebase values in it, and this keeps them safe from being overwritten. Do not upload or create a new `config.js`.
+1. Unzip `tasknest-phase2.5.zip`. **It does not contain `js/config.js`, on purpose.** Your repo already has your Firebase values in it, and this keeps them safe from being overwritten. Do not upload or create a new `config.js`.
 2. On GitHub, open your `tasknest` repo, click **Add file, then Upload files**.
 3. Drag in **everything inside the unzipped `tasknest` folder** (the `css`, `js`, `icons` folders and the loose files). GitHub replaces files with the same name and adds the new ones. Commit changes.
 4. Wait about a minute. Open the app. A banner **"A new version is ready. Reload"** appears; tap **Reload**.
 5. No Firebase changes are needed. Your database rules already cover the new data.
+6. Your existing tasks, courses and custom task types keep working. Custom types you made before this version count as **Academics** types. An Organizations task that still has an Academics type (for example "Project") keeps showing it, and asks you to pick an Organizations type the next time you edit it.
 
 If you ever see old behavior, close the app completely and reopen it, or bump `VERSION` in `service-worker.js` (see "Updating the app" below).
 
@@ -92,13 +95,15 @@ New **public** repository, upload the files (including the `css`, `js`, `icons` 
 
 ## Using the app
 
-**Navigation.** Phone: bottom bar (Tasks, Manage, Settings) and the **Add task** button. Computer: the sidebar.
+**Navigation.** Phone: bottom bar (Tasks, Manage, Settings) and the **Add task** button (it hides itself on the Add/Edit form, where it would only be in the way). Computer: the sidebar.
 
 **First time:**
-1. **Manage**, add your courses (for example `CS 101`). Add any custom task types you want.
+1. **Manage**, add your courses (for example `CS 101`). Add any custom task types you want, in the Academics list or the Organizations list.
 2. Tap **Add task**.
 
 **Add task.** Title, workspace (Academics or Organizations), course or organization, task type, Individual or Group work, due date and time, status, instructions, personal notes.
+- **Task types follow the workspace.** Academics offers Project, Assignment, Exam, Quiz, Recitation. Organizations offers Meeting, Event prep, Script writing, Content creation, Other. Your own types (Manage) are added to one workspace or the other. Changing the workspace clears a type that doesn't belong to the new one.
+- **Your entries are kept.** If you leave the form (say you tap Settings by accident, or close the app), everything you typed is still there when you open it again. Tap **Add task** (or **Continue** on the Tasks list banner). A note says "Your unsaved entries were restored" and offers **Start over**. The draft is removed when you save, press **Cancel**, or tap **Start over**. Drafts stay on this device only (not synced). Editing a task has its own separate draft.
 - A date without a time becomes **11:59 PM**. Leave the date empty for a task with no deadline.
 - Nothing is saved if something is missing or invalid; the form shows what to fix.
 - If you opened Add task while looking at a course or organization, it is pre-selected.
@@ -108,20 +113,33 @@ New **public** repository, upload the files (including the `css`, `js`, `icons` 
 - use the dropdown to switch between Not started, In progress and Done,
 - open the **⋯** menu for Edit, Duplicate, Archive, Delete.
 
-**Urgency vs. status** are separate. Status is what you say (Not started, In progress, Done). Urgency is how close the deadline is: **Overdue, Due today, Due soon (within 48 hours), Upcoming, No deadline**. A task can be In progress and Overdue at once.
+**Urgency vs. status** are separate. Status is what you say (Not started, In progress, Done). Urgency is how close the deadline is: **Overdue, Due today, Due soon (not today, but within 48 hours; the card also shows the exact date), Upcoming, No deadline**. You can change the 48 hours under Settings, View. A task can be In progress and Overdue at once.
 
 **Default order:** unfinished tasks with a deadline, soonest first (so overdue, then today, then tomorrow ...), then tasks without a deadline, then finished tasks at the bottom. You can also sort by due date, recently added, or title.
 
-**Filters and search.** Workspace tabs (All, Academics, Organizations), a search box (title, course, organization, type, instructions, notes), and the Filters panel: course, organization, task type, Individual/Group, status, deadline (due today, next 7 days, upcoming, overdue, unfinished, completed, no deadline) and "Show archived". They all combine.
+**Filters and search.** Workspace tabs (All, Academics, Organizations), a search box (title, course, organization, type, instructions, notes), and the Filters panel: course, organization, task type (only the types of the tab you are on), Individual/Group, status, and deadline (due today, next 7 days, upcoming, overdue, unfinished, completed, no deadline). They all combine.
 
 **Task page.** Tap a title. Each task has its own address (`#/task/ID`) you can bookmark. It shows the full instructions, notes, timeline, whether it was finished early, on time or late, and the **deadline history**.
 
 **Archive vs. delete.**
-- **Archive** hides a task (or a course and all its tasks) but keeps everything. Show it again with Filters, **Show archived**. Reports in Phase 4 will include archived tasks.
+- **Archive** hides a task (or a course and all its tasks) but keeps everything. Archived tasks are listed under **Settings, Archived tasks**, where you can restore or delete them. Tasks hidden because their course is archived come back when you restore the course (Manage, Show archived courses). Reports in Phase 4 will include archived tasks.
 - **Delete** is permanent and always asks first, saying what will be lost. Deleting a course also deletes its tasks and tells you the exact number first.
 - Deleting one of your custom task types asks where to move its tasks, so no task is left without a type.
 
 **Early / on time / late** is worked out from when you pressed Done and the deadline. "Early" means at least 24 hours before it. **It says when you finished, not when you started.** The first time a task becomes In progress is also recorded ("First marked In progress"), which is a real signal of when work began; the creation date is not.
+
+---
+
+**Settings** is a short list. Tap a word to open its page:
+
+| Word | What is inside |
+|---|---|
+| Theme | The four color themes |
+| View | The "Due soon" window and the "Early" window (hours). The default screen (list, calendar, board) arrives in Phase 3 |
+| Account | Your name, email, Account ID, Sign out |
+| Archived tasks | Tasks you archived |
+| Install the app | Install on your phone |
+| Offline check | The little counter that proves offline saving works |
 
 ---
 
@@ -132,13 +150,14 @@ Everything lives under your account: `users/{your-id}/...`
 | Collection | What is in a document |
 |---|---|
 | `courses` | name, archived, createdAt, updatedAt |
-| `taskTypes` | your custom types only: name, createdAt, updatedAt |
+| `taskTypes` | your custom types only: name, workspace (`academics` or `organizations`), createdAt, updatedAt |
 | `tasks` | title, workspace, courseId or orgId, typeId, arrangement, status, dueAt, instructions, notes, createdAt, updatedAt, inProgressAt, completedAt, archived, archivedAt, deadlineHistory |
-| `settings/main` | theme (more in Phase 3) |
+| `settings/main` | theme, dueSoonHours, earlyHours (more in Phase 3) |
 | `meta/syncTest` | the little counter on the Settings page. Safe to ignore |
 
 - Tasks point to courses and types by **id**, not name, so renaming a course or type updates every task.
-- The five built-in task types live in `js/constants.js`, not the database, and cannot be deleted.
+- The built-in task types (five for Academics, five for Organizations) live in `js/constants.js`, not the database, and cannot be deleted.
+- Half-filled forms (drafts) are kept only in this browser, not in the database.
 - All times are numbers (milliseconds since 1970) from your device clock, in your own time zone.
 
 ## How offline storage and sync work
@@ -157,7 +176,7 @@ Everything lives under your account: `users/{your-id}/...`
 
 Whenever you change any app file:
 
-1. Open `service-worker.js` and change `const VERSION = "v2-phase2";` to a new value (`"v3"`, `"v4"` ...).
+1. Open `service-worker.js` and change `const VERSION = "v2.5-phase2-5";` to a new value (`"v3"`, `"v4"` ...).
 2. Upload the changed files to GitHub.
 3. Open the app online. Tap **Reload** on the banner.
 
@@ -168,8 +187,10 @@ If you add a new file, also add it to `SHELL_FILES` in `service-worker.js`.
 | I want to change | Edit |
 |---|---|
 | Add or rename an organization | `ORGS` in `js/constants.js` (never change an existing `id`) |
-| Built-in task types | `DEFAULT_TYPES` in `js/constants.js` |
-| "Due soon" window (48 h) / "early" window (24 h) | `DEFAULT_SETTINGS` in `js/constants.js` (a Settings screen for these comes in Phase 3) |
+| Built-in task types | `ACADEMIC_TYPES` and `ORG_TYPES` in `js/constants.js` (never change an existing `id`) |
+| "Due soon" window (48 h) / "early" window (24 h) | Settings, View in the app. The starting values are `DEFAULT_SETTINGS` in `js/constants.js` |
+| Which screens hide the floating Add task button | `hideAdd: true` on the route in `js/main.js` |
+| What the Settings list says | `SECTION_ORDER`, `SUMMARY` and `SECTIONS` in `js/views/settingsView.js` |
 | Default time when you pick only a date | `DEFAULT_DUE_TIME` in `js/constants.js` |
 | Colors of a theme | `css/themes.css` |
 | What the urgency labels say | `js/logic/urgency.js` |
@@ -190,6 +211,8 @@ If you add a new file, also add it to `SHELL_FILES` in `service-worker.js`.
 | Blank page on GitHub Pages | You uploaded the `tasknest` folder itself instead of what is inside it |
 | After the update, sign-in screen asks for Firebase values | `config.js` was overwritten with the placeholder. Paste your values in again |
 | A course or type shows "Unknown" | It was deleted on another device and this one has not synced yet |
+| The form shows old text I didn't expect | It is a saved draft. Tap **Start over** (or **Cancel**) to remove it |
+| I can't find my archived task | Settings, Archived tasks. (If its course is archived, restore the course in Manage) |
 
 ## Free-plan limits (checked October 2026 against Google's documentation)
 

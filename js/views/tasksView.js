@@ -10,10 +10,11 @@
 
 import { h, clear, fillSelect } from "../ui/dom.js";
 import { ARRANGEMENTS, ORGS, STATUSES, WORKSPACES } from "../constants.js";
-import { state, allTypes, orgName, courseName, typeName, isTaskArchived } from "../state.js";
+import { state, allTypes, typesFor, orgName, courseName, typeName, isTaskArchived } from "../state.js";
 import { applyFilters, emptyFilters, countActiveFilters, hasAnyFilter, WHEN_OPTIONS } from "../logic/filters.js";
 import { SORTS } from "../logic/urgency.js";
 import { buildTaskCard, arrangementName } from "../ui/taskCard.js";
+import { loadDraft, clearDraft } from "../logic/drafts.js";
 
 // Remembered while you move between screens (reset when you close the app).
 let filters = emptyFilters();
@@ -53,17 +54,20 @@ export function tasksView(container) {
   const status = select("status", "Status");
   const when = select("when", "Deadline");
   const sort = select("sort", "Sort by");
-  const archivedBox = h("input", { type: "checkbox", id: "flt-archived", onChange: (e) => { filters.showArchived = e.target.checked; refresh(); } });
 
   const panel = h("div", { class: "filter-panel", id: "filter-panel" },
     h("div", { class: "filter-grid" }, course.field, org.field, type.field, arrangement.field, status.field, when.field, sort.field),
-    h("label", { class: "check" }, archivedBox, h("span", {}, "Show archived tasks")));
+    h("p", { class: "muted small" }, "Archived tasks are kept under Settings, then Archived tasks."));
+
+  // Shown only while an unfinished "Add task" form is waiting (see js/logic/drafts.js).
+  const draftBox = h("div", { class: "banner banner-inline", role: "status", hidden: true });
 
   const summary = h("p", { class: "muted small result-count", role: "status", "aria-live": "polite" });
   const list = h("div", { class: "task-list" });
 
   container.append(
     h("div", { class: "page-head" }, h("h1", {}, "Tasks")),
+    draftBox,
     h("div", { class: "seg", role: "group", "aria-label": "Workspace" }, tabButtons),
     h("div", { class: "toolbar" }, search, filterToggle, clearButton),
     panel, summary, list);
@@ -74,12 +78,12 @@ export function tasksView(container) {
 
     fillSelect(course.el, state.courses.map((c) => ({ id: c.id, name: c.archived ? `${c.name} (archived)` : c.name })), filters.courseId, { placeholder: "All courses" });
     fillSelect(org.el, ORGS, filters.orgId, { placeholder: "All organizations" });
-    fillSelect(type.el, allTypes(), filters.typeId, { placeholder: "All types" });
+    // Task types of the workspace you are looking at (all of them on the "All" tab).
+    fillSelect(type.el, filters.workspace === "all" ? allTypes() : typesFor(filters.workspace), filters.typeId, { placeholder: "All types" });
     fillSelect(arrangement.el, ARRANGEMENTS, filters.arrangement, { placeholder: "Individual or group" });
     fillSelect(status.el, STATUSES, filters.status, { placeholder: "Any status" });
     fillSelect(when.el, WHEN_OPTIONS.slice(1), filters.when, { placeholder: "Any time" });
     fillSelect(sort.el, SORTS, filters.sort);
-    archivedBox.checked = filters.showArchived;
 
     // A filter that points at something that no longer exists would hide everything.
     if (filters.courseId && course.el.value !== filters.courseId) filters.courseId = "";
@@ -132,7 +136,20 @@ export function tasksView(container) {
     }
   }
 
-  function refresh() { syncControls(); renderList(); }
+  function showDraftNote() {
+    const draft = loadDraft(state.uid, "new");
+    clear(draftBox);
+    draftBox.hidden = !draft;
+    if (!draft) return;
+    const title = (draft.title || "").trim();
+    draftBox.append(
+      h("span", {}, title ? `Unfinished task: “${title}”` : "You have an unfinished task."),
+      h("span", { class: "row-actions" },
+        h("a", { class: "btn btn-small btn-primary", href: "#/task/new" }, "Continue"),
+        h("button", { type: "button", class: "btn btn-small", onClick: () => { clearDraft(state.uid, "new"); showDraftNote(); } }, "Discard")));
+  }
+
+  function refresh() { syncControls(); renderList(); showDraftNote(); }
 
   // Close any open ⋯ menu when you tap elsewhere.
   const closeMenus = (e) => {

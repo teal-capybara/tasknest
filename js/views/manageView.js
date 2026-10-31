@@ -6,15 +6,15 @@
    - Delete also deletes every task in the course, so it always shows a clear
      warning with the number of tasks and asks you to confirm. Archive is the
      safer choice and is offered first.
-   TASK TYPES
-   - The five built-in types are fixed. Your own types can be renamed or deleted.
-   - Deleting a type asks where to move its tasks first, so no task ever ends
-     up without a type.
+   TASK TYPES (one list for Academics, one for Organizations)
+   - The built-in types are fixed. Your own types can be renamed or deleted.
+   - Deleting a type asks where to move its tasks first (to another type of the
+     SAME workspace), so no task ever ends up without a type.
    ========================================================================== */
 
 import { h, clear } from "../ui/dom.js";
-import { DEFAULT_TYPES } from "../constants.js";
-import { state, allTypes } from "../state.js";
+import { DEFAULT_TYPES, WORKSPACES } from "../constants.js";
+import { state, typesFor } from "../state.js";
 import { validateName } from "../logic/validate.js";
 import { addCourse, renameCourse, setCourseArchived, deleteCourse } from "../db/courses.js";
 import { addTaskType, renameTaskType, deleteTaskType } from "../db/taskTypes.js";
@@ -104,28 +104,52 @@ export function manageView(container) {
     toast(n ? `Course and ${plural(n, "task")} deleted.` : "Course deleted.");
   }
 
-  /* ---------- task types ---------- */
-  const builtInList = h("ul", { class: "chips" }, DEFAULT_TYPES.map((t) => h("li", { class: "chip" }, t.name)));
-  const typeList = h("ul", { class: "row-list" });
+  /* ---------- task types (one block per workspace) ---------- */
+  const typeBlocks = WORKSPACES.map((ws) => {
+    const builtIn = h("ul", { class: "chips" }, DEFAULT_TYPES.filter((t) => t.workspace === ws.id).map((t) => h("li", { class: "chip" }, t.name)));
+    const list = h("ul", { class: "row-list" });
+    const form = addForm({
+      label: `New ${ws.name} task type name`,
+      placeholder: ws.id === "academics" ? "e.g. Laboratory" : "e.g. Fundraising",
+      button: "Add type",
+      existingNames: () => typesFor(ws.id).map((t) => t.name),
+      onAdd: (name) => { addTaskType(state.fb, state.uid, name, ws.id); toast("Task type added."); },
+    });
+    const node = h("section", { class: "type-block" },
+      h("h3", {}, `${ws.name} task types`),
+      h("p", { class: "muted small" }, "Built-in (fixed):"),
+      builtIn,
+      h("p", { class: "muted small" }, "Your own:"),
+      form, list);
+    return { ws, list, node };
+  });
+
+  const customOf = (wsId) => state.customTypes
+    .filter((t) => (t.workspace || "academics") === wsId)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   function renderTypes() {
-    clear(typeList);
-    if (!state.customTypes.length) {
-      typeList.append(h("li", { class: "row empty-row muted" }, "No custom types yet."));
-      return;
-    }
-    for (const type of state.customTypes) {
-      const count = state.tasks.filter((t) => t.typeId === type.id).length;
-      typeList.append(h("li", { class: "row" },
-        h("div", { class: "row-main" }, h("strong", {}, type.name), h("span", { class: "muted small" }, plural(count, "task"))),
-        h("div", { class: "row-actions" },
-          h("button", { type: "button", class: "btn btn-small", onClick: () => onRenameType(type) }, "Rename"),
-          h("button", { type: "button", class: "btn btn-small btn-danger-outline", onClick: () => onDeleteType(type) }, "Delete…"))));
+    for (const block of typeBlocks) {
+      clear(block.list);
+      const custom = customOf(block.ws.id);
+      if (!custom.length) {
+        block.list.append(h("li", { class: "row empty-row muted" }, "No custom types yet."));
+        continue;
+      }
+      for (const type of custom) {
+        const count = state.tasks.filter((t) => t.typeId === type.id).length;
+        block.list.append(h("li", { class: "row" },
+          h("div", { class: "row-main" }, h("strong", {}, type.name), h("span", { class: "muted small" }, plural(count, "task"))),
+          h("div", { class: "row-actions" },
+            h("button", { type: "button", class: "btn btn-small", onClick: () => onRenameType(type) }, "Rename"),
+            h("button", { type: "button", class: "btn btn-small btn-danger-outline", onClick: () => onDeleteType(type) }, "Delete…"))));
+      }
     }
   }
 
   async function onRenameType(type) {
-    const others = allTypes().map((t) => t.name);
+    const workspace = type.workspace || "academics";
+    const others = typesFor(workspace).map((t) => t.name);
     const name = await promptDialog({
       title: "Rename task type", label: "Type name", value: type.name,
       validate: (text) => validateName(text, others, { ignore: type.name }).error || "",
@@ -136,8 +160,9 @@ export function manageView(container) {
   }
 
   async function onDeleteType(type) {
+    const workspace = type.workspace || "academics";
     const affected = state.tasks.filter((t) => t.typeId === type.id);
-    const replacements = allTypes().filter((t) => t.id !== type.id);
+    const replacements = typesFor(workspace).filter((t) => t.id !== type.id);
     const picker = h("select", { class: "select", "aria-label": "Move tasks to this type" },
       replacements.map((t) => h("option", { value: t.id }, t.name)));
 
@@ -172,15 +197,8 @@ export function manageView(container) {
 
     h("section", { class: "card" },
       h("h2", {}, "Task types"),
-      h("p", { class: "muted" }, "Built-in types (fixed):"),
-      builtInList,
-      h("h3", {}, "Your own types"),
-      addForm({
-        label: "New task type name", placeholder: "e.g. Laboratory", button: "Add type",
-        existingNames: () => allTypes().map((t) => t.name),
-        onAdd: (name) => { addTaskType(state.fb, state.uid, name); toast("Task type added."); },
-      }),
-      typeList));
+      h("p", { class: "muted" }, "Each workspace has its own task types. The Add task form shows the ones for the workspace you pick."),
+      typeBlocks.map((b) => b.node)));
 
   function refresh() { renderCourses(); renderTypes(); }
   refresh();

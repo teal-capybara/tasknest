@@ -181,3 +181,22 @@ a.btn { text-decoration: none; }
 .row-main { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
 .row-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
 .empty-row { border-top: 0; }
+
+/* ---- Manage: one block of task types per workspace ---- */
+.type-block + .type-block { margin-top: 1.25rem; padding-top: .5rem; border-top: 1px solid var(--border); }
+.type-block h3 { margin-top: .75rem; }
+.type-block > p { margin: .5rem 0 .25rem; }
+
+/* ---- Settings: a short list of words ---- */
+.settings-list { padding: 0; overflow: hidden; }
+.settings-row {
+  display: grid; grid-template-columns: 1fr auto; grid-template-areas: "name chev" "hint chev";
+  align-items: center; column-gap: .75rem;
+  min-height: 56px; padding: .6rem 1rem;
+  color: var(--text); text-decoration: none; border-top: 1px solid var(--border);
+}
+.settings-row:first-child { border-top: 0; }
+.settings-row:hover { background: var(--surface-2); }
+.settings-name { grid-area: name; font-weight: 700; }
+.settings-hint { grid-area: hint; font-size: .85rem; color: var(--text-muted); overflow-wrap: anywhere; }
+.settings-chevron { grid-area: chev; font-size: 1.6rem; color: var(--text-muted); }

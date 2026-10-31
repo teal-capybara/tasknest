@@ -8,16 +8,24 @@
    Nothing is saved until it passes validation (js/logic/validate.js).
    Saving never waits for the internet: it writes to the copy on your device and
    returns straight to the list.
+
+   Your entries are kept as a DRAFT while you fill the form (js/logic/drafts.js).
+   If you leave the form (say, by tapping Settings) and come back, everything is
+   still there. A draft is removed when you save, press Cancel, or tap "Start over".
+
+   The Task type list follows the workspace: Academics shows Quiz, Exam ...;
+   Organizations shows Meeting, Event prep ...
    ========================================================================== */
 
-import { h, optionEls } from "../ui/dom.js";
+import { h, clear, optionEls } from "../ui/dom.js";
 import { ARRANGEMENTS, LIMITS, ORGS, STATUSES, WORKSPACES } from "../constants.js";
-import { state, allTypes } from "../state.js";
+import { state, typesFor } from "../state.js";
 import { validateTaskForm } from "../logic/validate.js";
 import { fromInputs, toInputDate, toInputTime } from "../logic/format.js";
 import { createTask, updateTask } from "../db/tasks.js";
 import { toast } from "../ui/screens.js";
-import { go } from "../router.js";
+import { go, reload } from "../router.js";
+import { DRAFT_FIELDS, saveDraft, loadDraft, clearDraft, isDifferent } from "../logic/drafts.js";
 
 export function taskFormView(container, params, query) {
   const editing = params.id ? state.tasks.find((t) => t.id === params.id) : null;
@@ -27,8 +35,22 @@ export function taskFormView(container, params, query) {
   const base = editing || copyOf;
   const mode = editing ? "edit" : "create";
 
+  /* ---------- choices for the dropdowns ---------- */
+  // Archived courses can't be picked for NEW work, but keep the one this task already uses.
+  const courses = state.courses.filter((c) => !c.archived || (editing && c.id === editing.courseId));
+  const courseIds = courses.map((c) => c.id);
+  const typeIdsByWorkspace = Object.fromEntries(WORKSPACES.map((w) => [w.id, typesFor(w.id).map((t) => t.id)]));
+
+  /** Resets a course or type that is not available (deleted, or from the other workspace). */
+  function normalize(v) {
+    const out = { ...v };
+    if (!courseIds.includes(out.courseId)) out.courseId = "";
+    if (!(typeIdsByWorkspace[out.workspace] || []).includes(out.typeId)) out.typeId = "";
+    return out;
+  }
+
   /* ---------- starting values ---------- */
-  const initial = base
+  const fresh = base
     ? {
         title: copyOf ? `${base.title} (copy)` : base.title,
         workspace: base.workspace, courseId: base.courseId || "", orgId: base.orgId || "",
@@ -44,14 +66,13 @@ export function taskFormView(container, params, query) {
         typeId: "", arrangement: "individual", dueDate: "", dueTime: "",
         status: "not_started", instructions: "", notes: "",
       };
+  // What the form looks like before you touch it. A draft only exists if you changed something.
+  const baseline = normalize(fresh);
+  const typeWasReset = Boolean(base) && fresh.typeId !== "" && baseline.typeId === "";
 
-  /* ---------- choices for the dropdowns ---------- */
-  // Archived courses can't be picked for NEW work, but keep the one this task already uses.
-  const courses = state.courses.filter((c) => !c.archived || (editing && c.id === editing.courseId));
-  const types = allTypes();
-  const courseIds = courses.map((c) => c.id);
-  const typeIds = types.map((t) => t.id);
-  if (!courseIds.includes(initial.courseId)) initial.courseId = "";
+  const draftKey = editing ? `edit:${editing.id}` : copyOf ? `copy:${copyOf.id}` : "new";
+  const draft = readDraft(state.uid, draftKey, baseline);
+  const initial = draft ? normalize({ ...baseline, ...draft }) : baseline;
 
   /* ---------- form controls ---------- */
   const el = {
@@ -61,8 +82,7 @@ export function taskFormView(container, params, query) {
       courses.map((c) => h("option", { value: c.id }, c.archived ? `${c.name} (archived)` : c.name))),
     orgId: h("select", { class: "select", id: "f-orgId", name: "orgId", "aria-describedby": "f-orgId-error", value: initial.orgId },
       h("option", { value: "" }, "Choose an organization…"), optionEls(ORGS, initial.orgId)),
-    typeId: h("select", { class: "select", id: "f-typeId", name: "typeId", "aria-describedby": "f-typeId-error", value: initial.typeId },
-      h("option", { value: "" }, "Choose a task type…"), optionEls(types, initial.typeId)),
+    typeId: h("select", { class: "select", id: "f-typeId", name: "typeId", "aria-describedby": "f-typeId-error f-typeId-hint" }),
     dueDate: h("input", { type: "date", class: "input", id: "f-dueDate", name: "dueDate", value: initial.dueDate, "aria-describedby": "f-dueDate-error f-due-hint" }),
     dueTime: h("input", { type: "time", class: "input", id: "f-dueTime", name: "dueTime", value: initial.dueTime, "aria-describedby": "f-dueTime-error f-due-hint" }),
     status: h("select", { class: "select", id: "f-status", name: "status", "aria-describedby": "f-status-error", value: initial.status }, optionEls(STATUSES, initial.status)),
@@ -79,10 +99,10 @@ export function taskFormView(container, params, query) {
   }
 
   const errorLine = (name) => h("p", { class: "error-text field-error", id: `f-${name}-error`, role: "alert", hidden: true });
-  const field = (name, label, control, { hint, required } = {}) =>
+  const field = (name, label, control, { hint, hintEl, required } = {}) =>
     h("div", { class: "field", dataset: { field: name } },
       h("label", { class: "label", for: `f-${name}` }, label, required ? h("span", { class: "req", "aria-hidden": "true" }, " *") : null),
-      control, hint ? h("p", { class: "hint" }, hint) : null, errorLine(name));
+      control, hintEl || (hint ? h("p", { class: "hint" }, hint) : null), errorLine(name));
 
   const workspaceGroup = h("fieldset", { class: "field", dataset: { field: "workspace" } },
     h("legend", { class: "label" }, "Workspace"),
@@ -96,6 +116,8 @@ export function taskFormView(container, params, query) {
     hint: courses.length ? null : "You have no courses yet. Add one on the Manage page, then come back.",
   });
   const orgField = field("orgId", "Organization", el.orgId, { required: true });
+  const typeHint = h("p", { class: "hint", id: "f-typeId-hint" });
+  const typeField = field("typeId", "Task type", el.typeId, { required: true, hintEl: typeHint });
 
   const dueHint = h("p", { class: "hint", id: "f-due-hint" });
   const dueWarn = h("p", { class: "warn-text", hidden: true });
@@ -108,7 +130,7 @@ export function taskFormView(container, params, query) {
     field("title", "Task title", el.title, { required: true }),
     workspaceGroup,
     courseField, orgField,
-    field("typeId", "Task type", el.typeId, { required: true, hint: "Need a different type? Add your own on the Manage page." }),
+    typeField,
     arrangementGroup,
     h("div", { class: "due-row" },
       field("dueDate", "Due date", el.dueDate),
@@ -118,22 +140,41 @@ export function taskFormView(container, params, query) {
     field("instructions", "Instructions / task details", el.instructions, { hint: "The full instructions from your professor or organization." }),
     field("notes", "Personal notes", el.notes, { hint: "Only for you: reminders, ideas, who is doing what." }),
     h("div", { class: "form-actions" },
-      h("a", { class: "btn", href: editing ? `#/task/${encodeURIComponent(editing.id)}` : "#/tasks" }, "Cancel"),
+      h("a", { class: "btn", href: editing ? `#/task/${encodeURIComponent(editing.id)}` : "#/tasks", onClick: () => discard() }, "Cancel"),
       h("button", { type: "submit", class: "btn btn-primary" }, mode === "edit" ? "Save changes" : "Save task")));
 
   const heading = mode === "edit" ? "Edit task" : copyOf ? "Duplicate task" : "Add task";
   container.append(h("div", { class: "page-head" }, h("h1", {}, heading)));
   // (append(null) would print the word "null", so only add the note when there is one)
   if (copyOf) container.append(h("p", { class: "muted" }, "This is a copy. Change whatever is different, then save."));
+  if (draft) {
+    container.append(h("div", { class: "banner banner-inline", role: "status" },
+      h("span", {}, "Your unsaved entries were restored."),
+      h("button", { type: "button", class: "btn btn-small", onClick: () => { discard(); reload(); } }, "Start over")));
+  }
   container.append(form);
 
   /* ---------- small behaviors ---------- */
   function currentWorkspace() { return form.elements.workspace.value; }
 
-  function syncWorkspace() {
+  /** Offers only the task types of the chosen workspace; keeps the current pick if it is still offered. */
+  function fillTypes(selected) {
+    const workspace = currentWorkspace();
+    const keep = selected !== undefined ? selected : el.typeId.value;
+    const list = typesFor(workspace);
+    clear(el.typeId).append(h("option", { value: "" }, "Choose a task type…"), ...optionEls(list, ""));
+    el.typeId.value = list.some((t) => t.id === keep) ? keep : "";
+    const name = (WORKSPACES.find((w) => w.id === workspace) || {}).name;
+    typeHint.textContent = typeWasReset && el.typeId.value === ""
+      ? `This task's old type doesn't belong to ${name}. Please choose a new one.`
+      : `Types for ${name}. Need another? Add your own on the Manage page.`;
+  }
+
+  function syncWorkspace(firstTime) {
     const academics = currentWorkspace() === "academics";
     courseField.hidden = !academics;
     orgField.hidden = academics;
+    fillTypes(firstTime ? initial.typeId : undefined);
   }
 
   // Explains what will be saved and warns when the deadline is already in the past.
@@ -154,8 +195,35 @@ export function taskFormView(container, params, query) {
   }
 
   for (const input of [el.dueDate, el.dueTime, el.status]) input.addEventListener("input", syncDueHint);
-  syncWorkspace();
+  syncWorkspace(true);
   syncDueHint();
+
+  /* ---------- draft: save what you type, so leaving the form never loses it ---------- */
+  let finished = false;   // true after save / cancel / start over, so nothing is re-saved
+  let timer = null;
+
+  function currentValues() {
+    const data = new FormData(form);
+    return Object.fromEntries(DRAFT_FIELDS.map((f) => [f, String(data.get(f) ?? "")]));
+  }
+  function persist() {
+    clearTimeout(timer);
+    if (finished) return;
+    const values = currentValues();
+    if (isDifferent(values, baseline)) saveDraft(state.uid, draftKey, values);
+    else clearDraft(state.uid, draftKey);
+  }
+  function discard() {
+    finished = true;
+    clearTimeout(timer);
+    clearDraft(state.uid, draftKey);
+  }
+  const schedulePersist = () => { clearTimeout(timer); timer = setTimeout(persist, 250); };
+  form.addEventListener("input", schedulePersist);
+  form.addEventListener("change", schedulePersist);
+  // Phones can close the app without warning, so also save the moment the page is hidden.
+  const onVisibility = () => { if (document.visibilityState === "hidden") persist(); };
+  document.addEventListener("visibilitychange", onVisibility);
 
   /* ---------- saving ---------- */
   function clearErrors() {
@@ -170,7 +238,7 @@ export function taskFormView(container, params, query) {
 
     const data = new FormData(form);
     const values = Object.fromEntries([...data.entries()].map(([k, v]) => [k, String(v)]));
-    const { errors, value } = validateTaskForm(values, { courseIds, typeIds });
+    const { errors, value } = validateTaskForm(values, { courseIds, typeIds: typeIdsByWorkspace });
 
     const names = Object.keys(errors);
     if (names.length) {
@@ -187,6 +255,7 @@ export function taskFormView(container, params, query) {
       return;
     }
 
+    discard();
     if (mode === "edit") {
       updateTask(state.fb, state.uid, editing, value);
       toast("Changes saved.");
@@ -198,7 +267,28 @@ export function taskFormView(container, params, query) {
     }
   }
 
-  return {};
+  return {
+    // Leaving the form (any way) keeps a draft of what is in it.
+    destroy() {
+      document.removeEventListener("visibilitychange", onVisibility);
+      persist();
+    },
+  };
+}
+
+/** Reads a saved draft and keeps only known, valid fields. Returns null if there is nothing worth restoring. */
+function readDraft(uid, key, baseline) {
+  const saved = loadDraft(uid, key);
+  if (!saved) return null;
+  const clean = {};
+  for (const f of DRAFT_FIELDS) if (typeof saved[f] === "string") clean[f] = saved[f];
+  if (clean.workspace && !WORKSPACES.some((w) => w.id === clean.workspace)) delete clean.workspace;
+  if (clean.arrangement && !ARRANGEMENTS.some((a) => a.id === clean.arrangement)) delete clean.arrangement;
+  if (clean.status && !STATUSES.some((s) => s.id === clean.status)) delete clean.status;
+  if (clean.orgId && !ORGS.some((o) => o.id === clean.orgId)) clean.orgId = "";
+  const merged = { ...baseline, ...clean };
+  if (!isDifferent(merged, baseline)) { clearDraft(uid, key); return null; }
+  return clean;
 }
 
 function notFound(container) {

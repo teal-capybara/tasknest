@@ -25,14 +25,13 @@ export function emptyFilters() {
   return {
     workspace: "all",   // all | academics | organizations
     courseId: "", orgId: "", typeId: "", arrangement: "", status: "",
-    when: "", search: "", sort: "urgency", showArchived: false,
+    when: "", search: "", sort: "urgency",
   };
 }
 
 /** How many of the filters in the panel are active (for the "Filters (2)" label). */
 export function countActiveFilters(f) {
-  return ["courseId", "orgId", "typeId", "arrangement", "status", "when"].filter((k) => f[k]).length
-    + (f.showArchived ? 1 : 0);
+  return ["courseId", "orgId", "typeId", "arrangement", "status", "when"].filter((k) => f[k]).length;
 }
 
 export function hasAnyFilter(f) {
@@ -68,7 +67,7 @@ export function applyFilters(tasks, f, ctx) {
   const tokens = f.search.trim().toLowerCase().split(/\s+/).filter(Boolean);
 
   const result = tasks.filter((t) => {
-    if (!f.showArchived && ctx.isArchived(t)) return false;
+    if (ctx.isArchived(t)) return false;
     if (f.workspace !== "all" && t.workspace !== f.workspace) return false;
     if (f.courseId && t.courseId !== f.courseId) return false;
     if (f.orgId && t.orgId !== f.orgId) return false;

@@ -42,9 +42,9 @@ export function urgencyOf(task, now = Date.now(), settings = DEFAULT_SETTINGS) {
     return { key: "due_today", label: "Due today", icon: "●", text: "Due today" };
   }
   if (diff <= settings.dueSoonHours * HOUR) {
-    return { key: "due_soon", label: "Due soon", icon: "◐", text: days === 1 ? "Due tomorrow" : `Due in ${days} days` };
+    return { key: "due_soon", label: "Due soon", icon: "◐", text: "Due soon" };
   }
-  return { key: "upcoming", label: "Upcoming", icon: "○", text: `Due in ${days} days` };
+  return { key: "upcoming", label: "Upcoming", icon: "○", text: days === 1 ? "Due tomorrow" : `Due in ${days} days` };
 }
 
 /**

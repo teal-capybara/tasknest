@@ -22,6 +22,7 @@ import { hasPendingChanges, forgetAll } from "./sync-status.js";
 import { showScreen, toast } from "./ui/screens.js";
 import { captureInstallPrompt } from "./ui/install.js";
 import { session } from "./session.js";
+import { clearAllDrafts } from "./logic/drafts.js";
 
 import { tasksView } from "./views/tasksView.js";
 import { taskFormView } from "./views/taskFormView.js";
@@ -30,14 +31,16 @@ import { manageView } from "./views/manageView.js";
 import { settingsView } from "./views/settingsView.js";
 
 /* path: the address after #   nav: which menu item to highlight   view: the screen.
+   hideAdd: true hides the floating "Add task" button on that screen.
    Order matters: "/task/new" must come before "/task/:id". */
 const ROUTES = [
   { path: "/tasks",         nav: "tasks",    title: "Tasks",     view: tasksView },
-  { path: "/task/new",      nav: "tasks",    title: "Add task",  view: taskFormView },
-  { path: "/task/:id/edit", nav: "tasks",    title: "Edit task", view: taskFormView },
+  { path: "/task/new",      nav: "tasks",    title: "Add task",  view: taskFormView,  hideAdd: true },
+  { path: "/task/:id/edit", nav: "tasks",    title: "Edit task", view: taskFormView,  hideAdd: true },
   { path: "/task/:id",      nav: "tasks",    title: "Task",      view: taskDetailView },
   { path: "/manage",        nav: "manage",   title: "Manage",    view: manageView },
-  { path: "/settings",      nav: "settings", title: "Settings",  view: settingsView },
+  { path: "/settings",          nav: "settings", title: "Settings", view: settingsView },
+  { path: "/settings/:section", nav: "settings", title: "Settings", view: settingsView },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -147,6 +150,7 @@ async function clearThisDevice() {
     await fb.F.terminate(fb.db);
     await fb.F.clearIndexedDbPersistence(fb.db);
     try { localStorage.removeItem("tasknest.theme"); } catch (e) { /* ignore */ }
+    clearAllDrafts();
   } catch (err) {
     // Usually happens when the app is open in another tab. Close it and retry.
     console.warn("Could not clear local data:", err);

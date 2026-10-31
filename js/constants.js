@@ -21,14 +21,25 @@ export const ORGS = [
 export const ORGANIZATIONS = ORGS; // same list, second name
 
 /* Built-in task types live in code (not the database) and cannot be deleted.
-   Your own custom types are stored in the database (see js/db/taskTypes.js). */
-export const DEFAULT_TYPES = [
-  { id: "project",    name: "Project",    builtIn: true },
-  { id: "assignment", name: "Assignment", builtIn: true },
-  { id: "exam",       name: "Exam",       builtIn: true },
-  { id: "quiz",       name: "Quiz",       builtIn: true },
-  { id: "recitation", name: "Recitation", builtIn: true },
+   Each type belongs to ONE workspace, so the Academics form offers Quiz and Exam
+   while the Organizations form offers Meeting and Event prep.
+   Your own custom types are stored in the database (see js/db/taskTypes.js) and
+   also belong to one workspace. */
+export const ACADEMIC_TYPES = [
+  { id: "project",    name: "Project",    workspace: "academics", builtIn: true },
+  { id: "assignment", name: "Assignment", workspace: "academics", builtIn: true },
+  { id: "exam",       name: "Exam",       workspace: "academics", builtIn: true },
+  { id: "quiz",       name: "Quiz",       workspace: "academics", builtIn: true },
+  { id: "recitation", name: "Recitation", workspace: "academics", builtIn: true },
 ];
+export const ORG_TYPES = [
+  { id: "org-meeting",   name: "Meeting",          workspace: "organizations", builtIn: true },
+  { id: "org-event",     name: "Event prep",       workspace: "organizations", builtIn: true },
+  { id: "org-script",    name: "Script writing",   workspace: "organizations", builtIn: true },
+  { id: "org-content",   name: "Content creation", workspace: "organizations", builtIn: true },
+  { id: "org-other",     name: "Other",            workspace: "organizations", builtIn: true },
+];
+export const DEFAULT_TYPES = [...ACADEMIC_TYPES, ...ORG_TYPES];
 
 export const ARRANGEMENTS = [
   { id: "individual", name: "Individual" },

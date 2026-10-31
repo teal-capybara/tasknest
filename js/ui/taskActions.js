@@ -23,7 +23,7 @@ export function toggleDone(task, checked) {
 export function toggleArchive(task) {
   const archive = !task.archived;
   setTaskArchived(state.fb, state.uid, task, archive);
-  toast(archive ? "Task archived. Find it under Filters, Show archived." : "Task restored.");
+  toast(archive ? "Task archived. Find it under Settings, Archived tasks." : "Task restored.");
 }
 
 /** Archive and delete are separate on purpose: delete is permanent. */

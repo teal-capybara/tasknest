@@ -7,7 +7,8 @@
      #/task/ID             one task's details
      #/task/ID/edit        edit a task
      #/manage              courses and task types
-     #/settings            theme, account, install
+     #/settings            the settings list
+     #/settings/theme      one settings page (theme, view, account, archived, install, offline)
 
    A "view" is a function  (container, params, query) => { update?, destroy? }
      update()  is called when your data changes (so the screen can redraw)
@@ -60,6 +61,11 @@ export function go(path) {
   location.hash = `#${path}`;
 }
 
+/** Draws the current screen again from scratch (used by the form's "Start over"). */
+export function reload() {
+  navigate();
+}
+
 function parseHash() {
   const raw = location.hash.slice(1) || "/tasks";
   const [path, queryString = ""] = raw.split("?");
@@ -82,6 +88,8 @@ function navigate() {
     route.names.forEach((name, i) => { params[name] = decodeURIComponent(m[i + 1]); });
     pending = { route, params, query };
     highlightNav(route.nav);
+    // The floating "Add task" button is only a distraction while you are already on the form.
+    document.body.classList.toggle("hide-fab", Boolean(route.hideAdd));
     document.title = `${route.title} · TaskNest`;
     if (isReady()) mount();
     else showLoading();

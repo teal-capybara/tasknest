@@ -13,7 +13,7 @@ const has = (list, id) => list.some((x) => x.id === id);
 
 /**
  * values : the raw form values (all strings)
- * ctx    : { courseIds: [ids allowed], typeIds: [ids allowed] }
+ * ctx    : { courseIds: [ids allowed], typeIds: { academics: [ids], organizations: [ids] } }
  * Returns { errors: { fieldName: message }, value } (value is null if there are errors)
  */
 export function validateTaskForm(values, ctx) {
@@ -36,7 +36,7 @@ export function validateTaskForm(values, ctx) {
   }
 
   if (!values.typeId) errors.typeId = "Choose a task type.";
-  else if (!ctx.typeIds.includes(values.typeId)) errors.typeId = "That task type no longer exists. Choose another.";
+  else if (!((ctx.typeIds || {})[values.workspace] || []).includes(values.typeId)) errors.typeId = "That task type is not available here. Choose another.";
 
   if (!has(ARRANGEMENTS, values.arrangement)) errors.arrangement = "Choose Individual or Group work.";
   if (!has(STATUSES, values.status)) errors.status = "Choose a status.";

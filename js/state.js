@@ -57,9 +57,18 @@ export function getSettings() {
   return { ...DEFAULT_SETTINGS, ...state.settings };
 }
 
+/** Every task type (built-in + custom), for looking up names. */
 export function allTypes() {
-  const custom = [...state.customTypes].sort((a, b) => a.name.localeCompare(b.name));
-  return [...DEFAULT_TYPES, ...custom];
+  return [...DEFAULT_TYPES, ...sortedCustom()];
+}
+
+/** Types offered for one workspace. Custom types saved before workspaces existed count as Academics. */
+export function typesFor(workspace) {
+  return allTypes().filter((t) => (t.workspace || "academics") === workspace);
+}
+
+function sortedCustom() {
+  return [...state.customTypes].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export function typeName(id) {
