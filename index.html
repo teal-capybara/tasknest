@@ -8,8 +8,8 @@
   <meta name="theme-color" content="#8ED1C4">
 
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" href="icons/favicon-64.png" type="image/png" sizes="64x64">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
   <!--
     Apply the saved theme BEFORE the page paints, so there is no flash of the
@@ -58,7 +58,7 @@
   <!-- Sign in -->
   <main id="screen-signin" class="screen screen-center" hidden>
     <section class="card card-narrow signin-card">
-      <img src="icons/icon.svg" alt="" width="72" height="72" class="signin-logo">
+      <img src="icons/icon-192.png" alt="" width="72" height="72" class="signin-logo">
       <h1>TaskNest</h1>
       <p class="muted">Your school and organization tasks, on every device, even offline.</p>
       <button type="button" class="btn btn-primary btn-large" id="signin-button">Sign in with Google</button>
@@ -73,7 +73,7 @@
     <!-- Desktop sidebar (hidden on phones; the bottom bar is used there) -->
     <aside class="sidebar">
       <div class="brand">
-        <img src="icons/icon.svg" alt="" width="32" height="32">
+        <img src="icons/icon-192.png" alt="" width="32" height="32">
         <span class="brand-name">TaskNest</span>
       </div>
       <a class="btn btn-primary btn-large side-add" href="#/task/new" data-add-task>
@@ -81,6 +81,10 @@
         Add task
       </a>
       <nav class="side-nav" aria-label="Main">
+        <a class="nav-link" href="#/dashboard" data-route="dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>
+          <span>Home</span>
+        </a>
         <a class="nav-link" href="#/tasks" data-route="tasks">
           <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>
           <span>Tasks</span>
@@ -99,7 +103,7 @@
     <div class="app-body">
       <header class="app-header">
         <div class="brand">
-          <img src="icons/icon.svg" alt="" width="32" height="32">
+          <img src="icons/icon-192.png" alt="" width="32" height="32">
           <span class="brand-name">TaskNest</span>
         </div>
         <!-- The sync indicator is filled in by js/sync-status.js -->
@@ -123,6 +127,10 @@
       <span>Add task</span>
     </a>
     <nav class="bottom-nav" aria-label="Main">
+      <a class="nav-link" href="#/dashboard" data-route="dashboard">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>
+        <span>Home</span>
+      </a>
       <a class="nav-link" href="#/tasks" data-route="tasks">
         <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>
         <span>Tasks</span>

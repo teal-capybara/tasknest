@@ -102,3 +102,100 @@
   --meta-theme: #1F2430;
   color-scheme: dark;
 }
+
+/* ==========================================================================
+   Themes 5 to 8 (added in Phase 3). The three main swatches of each came from
+   your palette picture; the other colors (text, borders, status colors) were
+   worked out so that everything stays readable.
+   ========================================================================== */
+
+/* Theme 5: Sakura Mist (light) */
+:root[data-theme="sakura-mist"] {
+  --bg: #F8EEEE;            /* blush white */
+  --surface: #FFFAFA;
+  --surface-2: #F3E3EA;
+  --border: #E1C9D4;
+  --text: #3A2733;
+  --text-muted: #6E5163;
+  --primary: #E4C8D5;       /* dusty pink */
+  --primary-hover: #DBB9CA;
+  --on-primary: #3F2336;
+  --accent: #98788F;        /* mauve */
+  --on-accent: #1F0F18;
+  --link: #7A4F6C;
+  --focus: #7A4F6C;
+  --danger: #B3261E;  --danger-bg: #FCE4E1;
+  --warn: #8A5A00;    --warn-bg: #FFF0C2;
+  --ok: #19704F;      --ok-bg: #DDF3E8;
+  --shadow: 0 1px 2px rgba(58, 39, 51, .08), 0 6px 18px rgba(58, 39, 51, .07);
+  --meta-theme: #E4C8D5;
+}
+
+/* Theme 6: Velvet Dusk (dark) */
+:root[data-theme="velvet-dusk"] {
+  --bg: #302B3D;            /* deep violet-gray */
+  --surface: #3A3348;
+  --surface-2: #40384F;
+  --border: #5A5070;
+  --text: #EEE8F6;
+  --text-muted: #C0B5D0;
+  --primary: #B49ACB;       /* soft lilac */
+  --primary-hover: #C2AAD8;
+  --on-primary: #231830;
+  --accent: #E6C2A0;        /* warm peach */
+  --on-accent: #33200F;
+  --link: #D2BFE8;
+  --focus: #E6C2A0;
+  --danger: #FF9C94;  --danger-bg: #4A2A32;
+  --warn: #F2CB6B;    --warn-bg: #463B22;
+  --ok: #8FD9B4;      --ok-bg: #233F3A;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
+  --meta-theme: #302B3D;
+  color-scheme: dark;
+}
+
+/* Theme 7: Rosé Eclipse (dark) */
+:root[data-theme="rose-eclipse"] {
+  --bg: #352A33;            /* dark plum */
+  --surface: #40303D;
+  --surface-2: #493541;
+  --border: #66505F;
+  --text: #F5EAF0;
+  --text-muted: #CDB7C4;
+  --primary: #C28DA4;       /* dusty rose */
+  --primary-hover: #CE9DB2;
+  --on-primary: #2B1520;
+  --accent: #E6C79C;        /* champagne */
+  --on-accent: #332203;
+  --link: #EBB6CB;
+  --focus: #E6C79C;
+  --danger: #FF9C94;  --danger-bg: #4F2A2E;
+  --warn: #F2CB6B;    --warn-bg: #483C20;
+  --ok: #8FD9B4;      --ok-bg: #26403A;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
+  --meta-theme: #352A33;
+  color-scheme: dark;
+}
+
+/* Theme 8: Abyssal Tide (dark) */
+:root[data-theme="abyssal-tide"] {
+  --bg: #20333A;            /* deep sea blue-green */
+  --surface: #2A4047;
+  --surface-2: #304A51;
+  --border: #4A6B73;
+  --text: #E8F3F1;
+  --text-muted: #AFC8C7;
+  --primary: #82BDB6;       /* seafoam */
+  --primary-hover: #94CBC4;
+  --on-primary: #0C2428;
+  --accent: #E3C98F;        /* sand */
+  --on-accent: #302403;
+  --link: #A9DDD6;
+  --focus: #E3C98F;
+  --danger: #FF9C94;  --danger-bg: #4A2C2F;
+  --warn: #F2CB6B;    --warn-bg: #44401F;
+  --ok: #8FD9B4;      --ok-bg: #1F4538;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
+  --meta-theme: #20333A;
+  color-scheme: dark;
+}

@@ -200,3 +200,40 @@ a.btn { text-decoration: none; }
 .settings-name { grid-area: name; font-weight: 700; }
 .settings-hint { grid-area: hint; font-size: .85rem; color: var(--text-muted); overflow-wrap: anywhere; }
 .settings-chevron { grid-area: chev; font-size: 1.6rem; color: var(--text-muted); }
+
+/* ---- Dashboard ---- */
+.dash-head h1 { margin: 0; }
+.dash-date { margin: .15rem 0 0; }
+.dash-section { margin-top: 1.5rem; }
+.dash-section h2 { margin: 0 0 .6rem; }
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.stat-tile {
+  display: flex; flex-direction: column; gap: .3rem;
+  min-height: 88px; padding: .85rem 1rem;
+  color: var(--text); text-decoration: none;
+  background: var(--surface); border: 1px solid var(--border); border-left: 6px solid var(--border);
+  border-radius: 16px; box-shadow: var(--shadow);
+}
+.stat-tile:hover { background: var(--surface-2); }
+.stat-danger { border-left-color: var(--danger); }
+.stat-warn   { border-left-color: var(--warn); }
+.stat-info   { border-left-color: var(--link); }
+.stat-number { font-size: 2rem; font-weight: 800; line-height: 1; }
+.stat-label { display: inline-flex; align-items: center; gap: .35rem; font-weight: 600; color: var(--text-muted); }
+.stat-tile.is-zero .stat-number { color: var(--text-muted); }
+@media (min-width: 760px) { .stat-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.caught-up p { margin: .25rem 0 0; }
+
+.progress-list { list-style: none; margin: 0; padding: .4rem 1rem; }
+.progress-row { padding: .7rem 0; border-top: 1px solid var(--border); }
+.progress-row:first-child { border-top: 0; }
+.progress-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .3rem .75rem; margin-bottom: .45rem; }
+.bar { height: 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; }
+.bar-fill { display: block; height: 100%; background: var(--link); border-radius: 999px; }
+
+.week-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; list-style: none; margin: .5rem 0; padding: 0; }
+.week-part { display: flex; flex-direction: column; align-items: center; padding: .5rem .25rem; background: var(--surface-2); border-radius: 12px; text-align: center; }
+.week-part strong { font-size: 1.4rem; }
+.dash-section > p { margin: .75rem 0 0; }

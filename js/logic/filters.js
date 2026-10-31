@@ -6,13 +6,15 @@
    when = Next 7 days  ->  group tasks in CS101 due within a week.
    ========================================================================== */
 
-import { SORTS } from "./urgency.js";
+import { SORTS, urgencyOf } from "./urgency.js";
+import { DEFAULT_SETTINGS } from "../constants.js";
 
 const DAY = 24 * 60 * 60 * 1000;
 
 export const WHEN_OPTIONS = [
   { id: "",           name: "Any time" },
   { id: "today",      name: "Due today" },
+  { id: "soon",       name: "Due soon" },
   { id: "week",       name: "Next 7 days" },
   { id: "upcoming",   name: "Upcoming (not overdue)" },
   { id: "overdue",    name: "Overdue" },
@@ -38,7 +40,7 @@ export function hasAnyFilter(f) {
   return countActiveFilters(f) > 0 || f.workspace !== "all" || f.search.trim() !== "";
 }
 
-function matchesWhen(task, when, now) {
+function matchesWhen(task, when, now, settings) {
   const done = task.status === "done";
   switch (when) {
     case "": return true;
@@ -48,17 +50,16 @@ function matchesWhen(task, when, now) {
     case "overdue": return !done && task.dueAt != null && task.dueAt < now;
     case "upcoming": return !done && task.dueAt != null && task.dueAt >= now;
     case "week": return !done && task.dueAt != null && task.dueAt >= now && task.dueAt <= now + 7 * DAY;
-    case "today": {
-      if (done || task.dueAt == null) return false;
-      const start = new Date(now); start.setHours(0, 0, 0, 0);
-      return task.dueAt >= start.getTime() && task.dueAt < start.getTime() + DAY;
-    }
+    // "today" and "soon" use the same rule as the urgency badge, so the Dashboard tiles match the list.
+    // (A deadline earlier today that has already passed counts as overdue, not as due today.)
+    case "today": return urgencyOf(task, now, settings).key === "due_today";
+    case "soon": return urgencyOf(task, now, settings).key === "due_soon";
     default: return true;
   }
 }
 
 /**
- * ctx = { now, isArchived(task), names: { course(id), org(id), type(id), arrangement(id) } }
+ * ctx = { now, settings, isArchived(task), names: { course(id), org(id), type(id), arrangement(id) } }
  * isArchived is true for a task archived itself OR whose course is archived
  * (archiving a course hides its tasks from the active lists but keeps them for reports).
  * Returns a NEW sorted array; the original is not changed.
@@ -74,7 +75,7 @@ export function applyFilters(tasks, f, ctx) {
     if (f.typeId && t.typeId !== f.typeId) return false;
     if (f.arrangement && t.arrangement !== f.arrangement) return false;
     if (f.status && t.status !== f.status) return false;
-    if (!matchesWhen(t, f.when, ctx.now)) return false;
+    if (!matchesWhen(t, f.when, ctx.now, ctx.settings || DEFAULT_SETTINGS)) return false;
 
     if (tokens.length) {
       // Search title, course/organization, type, work arrangement, instructions and notes.

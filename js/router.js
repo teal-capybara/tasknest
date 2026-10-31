@@ -2,7 +2,9 @@
    ROUTER: shows the right screen for the address in the browser bar.
 
    Addresses use a "#" so they work on GitHub Pages and can be bookmarked:
-     #/tasks               the task list
+     #/home                opens your start screen (Dashboard or Tasks, see Settings, View)
+     #/dashboard           the Dashboard
+     #/tasks               the task list (#/tasks?when=overdue opens it already filtered)
      #/task/new            add a task      (#/task/new?from=ID duplicates a task)
      #/task/ID             one task's details
      #/task/ID/edit        edit a task
@@ -67,7 +69,7 @@ export function reload() {
 }
 
 function parseHash() {
-  const raw = location.hash.slice(1) || "/tasks";
+  const raw = location.hash.slice(1) || "/home";
   const [path, queryString = ""] = raw.split("?");
   return { path, query: Object.fromEntries(new URLSearchParams(queryString)) };
 }
@@ -95,7 +97,7 @@ function navigate() {
     else showLoading();
     return;
   }
-  location.replace("#/tasks"); // unknown address: go home
+  location.replace("#/home"); // unknown address: go home
 }
 
 function mount() {

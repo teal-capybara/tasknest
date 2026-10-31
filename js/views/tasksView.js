@@ -10,7 +10,7 @@
 
 import { h, clear, fillSelect } from "../ui/dom.js";
 import { ARRANGEMENTS, ORGS, STATUSES, WORKSPACES } from "../constants.js";
-import { state, allTypes, typesFor, orgName, courseName, typeName, isTaskArchived } from "../state.js";
+import { state, allTypes, typesFor, orgName, courseName, typeName, isTaskArchived, getSettings } from "../state.js";
 import { applyFilters, emptyFilters, countActiveFilters, hasAnyFilter, WHEN_OPTIONS } from "../logic/filters.js";
 import { SORTS } from "../logic/urgency.js";
 import { buildTaskCard, arrangementName } from "../ui/taskCard.js";
@@ -20,7 +20,15 @@ import { loadDraft, clearDraft } from "../logic/drafts.js";
 let filters = emptyFilters();
 let panelOpen = false;
 
-export function tasksView(container) {
+export function tasksView(container, params, query = {}) {
+  // Coming from a Dashboard tile (#/tasks?when=overdue ...): start from exactly that list.
+  if (query.when || query.status || query.ws) {
+    filters = emptyFilters();
+    if (WHEN_OPTIONS.some((o) => o.id && o.id === query.when)) filters.when = query.when;
+    if (STATUSES.some((s) => s.id === query.status)) filters.status = query.status;
+    if (WORKSPACES.some((w) => w.id === query.ws)) filters.workspace = query.ws;
+  }
+
   /* ---------- controls ---------- */
   const tabButtons = [{ id: "all", name: "All" }, ...WORKSPACES].map((tab) =>
     h("button", {
@@ -111,6 +119,7 @@ export function tasksView(container) {
     const now = Date.now();
     const shown = applyFilters(state.tasks, filters, {
       now,
+      settings: getSettings(),
       isArchived: isTaskArchived,
       names: {
         course: courseName, org: orgName, type: typeName,

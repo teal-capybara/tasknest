@@ -15,7 +15,7 @@
    If you add a new file to the app, add it to SHELL_FILES too.
    ========================================================================== */
 
-const VERSION = "v2.5-phase2-5";
+const VERSION = "v3b-dashboard";
 const SHELL_CACHE = `tasknest-shell-${VERSION}`;
 const SDK_CACHE = "tasknest-firebase-sdk"; // Firebase files are versioned by URL, so this one is kept
 
@@ -43,6 +43,7 @@ const SHELL_FILES = [
   "js/logic/drafts.js",
   "js/logic/filters.js",
   "js/logic/format.js",
+  "js/logic/stats.js",
   "js/logic/timing.js",
   "js/logic/urgency.js",
   "js/logic/validate.js",
@@ -59,16 +60,17 @@ const SHELL_FILES = [
   "js/ui/taskActions.js",
   "js/ui/taskCard.js",
   "js/ui/themePicker.js",
+  "js/views/dashboardView.js",
   "js/views/manageView.js",
   "js/views/settingsView.js",
   "js/views/taskDetailView.js",
   "js/views/taskFormView.js",
   "js/views/tasksView.js",
-  "icons/favicon.svg",
+  "icons/apple-touch-icon.png",
+  "icons/favicon-64.png",
   "icons/icon-192.png",
   "icons/icon-512.png",
   "icons/icon-maskable-512.png",
-  "icons/icon.svg",
 ].map((path) => new URL(path, self.registration.scope).href);
 
 const INDEX_URL = new URL("index.html", self.registration.scope).href;

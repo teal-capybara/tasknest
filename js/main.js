@@ -23,7 +23,9 @@ import { showScreen, toast } from "./ui/screens.js";
 import { captureInstallPrompt } from "./ui/install.js";
 import { session } from "./session.js";
 import { clearAllDrafts } from "./logic/drafts.js";
+import { getSettings } from "./state.js";
 
+import { dashboardView } from "./views/dashboardView.js";
 import { tasksView } from "./views/tasksView.js";
 import { taskFormView } from "./views/taskFormView.js";
 import { taskDetailView } from "./views/taskDetailView.js";
@@ -33,7 +35,16 @@ import { settingsView } from "./views/settingsView.js";
 /* path: the address after #   nav: which menu item to highlight   view: the screen.
    hideAdd: true hides the floating "Add task" button on that screen.
    Order matters: "/task/new" must come before "/task/:id". */
+/** "#/home" has no screen of its own: it sends you to the start screen you chose in Settings, View. */
+function homeView() {
+  const target = getSettings().defaultScreen === "tasks" ? "/tasks" : "/dashboard";
+  location.replace(`#${target}`);
+  return {};
+}
+
 const ROUTES = [
+  { path: "/home",          nav: "dashboard", title: "Home",      view: homeView },
+  { path: "/dashboard",     nav: "dashboard", title: "Home",      view: dashboardView },
   { path: "/tasks",         nav: "tasks",    title: "Tasks",     view: tasksView },
   { path: "/task/new",      nav: "tasks",    title: "Add task",  view: taskFormView,  hideAdd: true },
   { path: "/task/:id/edit", nav: "tasks",    title: "Edit task", view: taskFormView,  hideAdd: true },

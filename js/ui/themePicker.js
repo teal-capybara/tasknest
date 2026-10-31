@@ -1,5 +1,5 @@
 /* ==========================================================================
-   THEME PICKER: the four preview buttons.
+   THEME PICKER: one preview button per theme.
    Built with real <button role="radio"> elements so it works with touch,
    keyboard and screen readers.
    ========================================================================== */
@@ -24,6 +24,10 @@ export function renderThemePicker(container, selectedId, onSelect) {
     name.className = "theme-name";
     name.textContent = theme.name + (theme.favorite ? " ★" : "");
 
+    const mode = document.createElement("span");
+    mode.className = "theme-mode";
+    mode.textContent = theme.mode || "";
+
     const dots = document.createElement("span");
     dots.className = "theme-dots";
     for (const color of theme.dots) {
@@ -33,7 +37,7 @@ export function renderThemePicker(container, selectedId, onSelect) {
       dots.appendChild(dot);
     }
 
-    btn.append(name, dots);
+    btn.append(name, mode, dots);
     btn.addEventListener("click", () => onSelect(theme.id));
     container.appendChild(btn);
   }

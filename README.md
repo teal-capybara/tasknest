@@ -1,15 +1,17 @@
-# TaskNest (Phase 2.5: Tasks, polished)
+# TaskNest (Phase 3b: Home dashboard)
 
 A personal school and organization task tracker that installs on your phone and works offline.
 
-**This is Phase 2.5 (halfway to Phase 3).**
+**This is Phase 3b: the second step of Phase 3 (new icon and the Home dashboard).**
 
 | Phase | What you get | Status |
 |---|---|---|
 | 1 | Installable app, Google sign-in, offline storage, sync chip, four themes | Done |
 | 2 | Courses, task types, Add/Edit/Duplicate task, task cards, inline status, urgency sorting, filters, search, archive/delete, task pages, Academics + Organizations | Done |
-| 2.5 | Task types per workspace, form drafts that survive leaving the page, no floating Add button on the form, Settings as a list, Archived tasks in Settings, "Due soon" wording | **This version** |
-| 3 | Dashboard, Calendar, Board view, adjustable urgency settings | Next |
+| 2.5 | Task types per workspace, form drafts that survive leaving the page, no floating Add button on the form, Settings as a list, Archived tasks in Settings, "Due soon" wording | Done |
+| 3a | Four new themes (Sakura Mist, Velvet Dusk, Rosé Eclipse, Abyssal Tide) | Done |
+| 3b | New app icon, Home dashboard, choose your start screen | **This version** |
+| 3c-3d | Calendar with schedule events (exams, meetings), then Board view | Next |
 | 4 | Reports, export/import backup, optional start date, polish | Later |
 | 5 | Recurring tasks | Later |
 
@@ -26,7 +28,7 @@ service-worker.js       Saves the app files so it opens with no internet
 firestore.rules         Database security rules (step 1)
 firestore.rules.locked  Database security rules (step 2: only YOUR account)
 css/
-  themes.css            The four color themes. Edit colors here
+  themes.css            The eight color themes. Edit colors here
   base.css  layout.css  components.css  views.css     Look and layout
 js/
   config.js             YOUR Firebase values (the only file you must edit)
@@ -42,11 +44,12 @@ js/
     courses.js  taskTypes.js  tasks.js  settings.js  helpers.js  syncTest.js
   logic/                Pure rules, no screens: urgency.js, filters.js, validate.js,
                         timing.js (early/on time/late), format.js (dates),
-                        drafts.js (saves the half-filled task form)
+                        drafts.js (saves the half-filled task form),
+                        stats.js (the Dashboard's numbers)
   ui/                   Reusable pieces: dom.js, dialogs.js, taskCard.js, taskActions.js ...
-  views/                One file per screen: tasksView, taskFormView, taskDetailView,
+  views/                One file per screen: dashboardView, tasksView, taskFormView, taskDetailView,
                         manageView, settingsView (the Settings list and all its pages)
-icons/                  Original app icon (SVG + PNG sizes)
+icons/                  The app icon (PNG sizes: browser tab, home screen, Android adaptive, iPhone)
 ```
 
 Technologies: plain HTML, CSS and JavaScript (no build step, nothing to install), Firebase Authentication and Cloud Firestore (free "Spark" plan), GitHub Pages for hosting. The Firebase code is loaded from Google's CDN.
@@ -95,7 +98,14 @@ New **public** repository, upload the files (including the `css`, `js`, `icons` 
 
 ## Using the app
 
-**Navigation.** Phone: bottom bar (Tasks, Manage, Settings) and the **Add task** button (it hides itself on the Add/Edit form, where it would only be in the way). Computer: the sidebar.
+**Home (dashboard).** The app opens here (you can change that under Settings, View). It shows a greeting, then four tiles: **Overdue**, **Due today**, **Due soon** and **In progress**. Tap a tile to open the Tasks list showing exactly those tasks. Under the tiles:
+- **Needs attention**: your most urgent tasks (up to 5; overdue first, then today, then soon). You can tick them off or change their status right there.
+- **Progress**: for each course and organization, how many of its tasks are done.
+- **Last 7 days**: how many tasks you finished, and whether early, on time or late.
+
+Archived tasks are never counted. "Due today" means a deadline later today; a deadline that already passed today counts as overdue.
+
+**Navigation.** Phone: bottom bar (Home, Tasks, Manage, Settings) and the **Add task** button (it hides itself on the Add/Edit form, where it would only be in the way). Computer: the sidebar.
 
 **First time:**
 1. **Manage**, add your courses (for example `CS 101`). Add any custom task types you want, in the Academics list or the Organizations list.
@@ -134,8 +144,8 @@ New **public** repository, upload the files (including the `css`, `js`, `icons` 
 
 | Word | What is inside |
 |---|---|
-| Theme | The four color themes |
-| View | The "Due soon" window and the "Early" window (hours). The default screen (list, calendar, board) arrives in Phase 3 |
+| Theme | The eight color themes (four light, four dark) |
+| View | The screen the app starts on (Dashboard or Tasks list; Calendar and Board join later), and the "Due soon" and "Early" windows (hours) |
 | Account | Your name, email, Account ID, Sign out |
 | Archived tasks | Tasks you archived |
 | Install the app | Install on your phone |
@@ -189,10 +199,11 @@ If you add a new file, also add it to `SHELL_FILES` in `service-worker.js`.
 | Add or rename an organization | `ORGS` in `js/constants.js` (never change an existing `id`) |
 | Built-in task types | `ACADEMIC_TYPES` and `ORG_TYPES` in `js/constants.js` (never change an existing `id`) |
 | "Due soon" window (48 h) / "early" window (24 h) | Settings, View in the app. The starting values are `DEFAULT_SETTINGS` in `js/constants.js` |
+| The Home dashboard numbers / layout | `js/logic/stats.js` (numbers), `js/views/dashboardView.js` (layout) |
 | Which screens hide the floating Add task button | `hideAdd: true` on the route in `js/main.js` |
 | What the Settings list says | `SECTION_ORDER`, `SUMMARY` and `SECTIONS` in `js/views/settingsView.js` |
 | Default time when you pick only a date | `DEFAULT_DUE_TIME` in `js/constants.js` |
-| Colors of a theme | `css/themes.css` |
+| Colors of a theme | `css/themes.css` (to add one, also add it to `THEMES` in `js/theme.js`) |
 | What the urgency labels say | `js/logic/urgency.js` |
 | What counts as a filter match | `js/logic/filters.js` |
 | Form rules / error messages | `js/logic/validate.js` |
@@ -211,6 +222,7 @@ If you add a new file, also add it to `SHELL_FILES` in `service-worker.js`.
 | Blank page on GitHub Pages | You uploaded the `tasknest` folder itself instead of what is inside it |
 | After the update, sign-in screen asks for Firebase values | `config.js` was overwritten with the placeholder. Paste your values in again |
 | A course or type shows "Unknown" | It was deleted on another device and this one has not synced yet |
+| The home-screen icon is still the old one after updating | Android keeps the old icon until the app is reinstalled: remove TaskNest from your home screen, then install it again from the browser menu |
 | The form shows old text I didn't expect | It is a saved draft. Tap **Start over** (or **Cancel**) to remove it |
 | I can't find my archived task | Settings, Archived tasks. (If its course is archived, restore the course in Manage) |
 

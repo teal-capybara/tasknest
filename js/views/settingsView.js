@@ -3,7 +3,7 @@
 
      #/settings            the list
      #/settings/theme      pick a color theme
-     #/settings/view       how "due soon" and "early" are worked out
+     #/settings/view       the screen the app starts on, and how "due soon" and "early" are worked out
      #/settings/account    who you are signed in as, sign out
      #/settings/archived   tasks you archived (restore or delete them here)
      #/settings/install    install the app on your phone
@@ -11,7 +11,7 @@
 
    To add a page: write a function below that returns { title, build }, add it
    to SECTIONS, and add a row for it in SECTION_ORDER.
-   (Phase 3 adds more choices to View, such as the default screen.)
+   (Calendar and Board will be added to the start screen choices in the next Phase 3 steps.)
    ========================================================================== */
 
 import { h, clear } from "../ui/dom.js";
@@ -48,7 +48,7 @@ const SECTION_ORDER = ["theme", "view", "account", "archived", "install", "offli
 /** One short line under each word, so you can see the current state without opening it. */
 const SUMMARY = {
   theme: () => (THEMES.find((t) => t.id === currentTheme()) || THEMES[0]).name,
-  view: () => `Due soon: ${getSettings().dueSoonHours} hours`,
+  view: () => `Starts on ${getSettings().defaultScreen === "tasks" ? "Tasks" : "Dashboard"} · due soon ${getSettings().dueSoonHours} h`,
   account: () => ((state.fb && state.fb.auth.currentUser) || {}).email || "Signed in",
   archived: () => plural(state.tasks.filter((t) => t.archived).length, "archived task"),
   install: () => "Add TaskNest to your home screen",
@@ -131,10 +131,20 @@ const SECTIONS = {
           } }, "Use defaults"),
           h("button", { type: "submit", class: "btn btn-primary" }, "Save")));
 
+      const startScreen = h("select", { class: "select", id: "set-start", value: settings.defaultScreen === "tasks" ? "tasks" : "dashboard", onChange: (e) => {
+        guard(saveSettings(state.fb, state.uid, { defaultScreen: e.target.value }), "Settings not saved");
+        toast("Saved.");
+      } },
+        h("option", { value: "dashboard" }, "Dashboard"),
+        h("option", { value: "tasks" }, "Tasks list"));
+
       container.append(
-        h("section", { class: "card" }, h("h2", {}, "Deadlines"), form),
-        h("section", { class: "card" }, h("h2", {}, "Coming in Phase 3"),
-          h("p", { class: "muted" }, "Choosing your default screen (list, calendar or board) will be added here.")));
+        h("section", { class: "card" }, h("h2", {}, "Start screen"),
+          h("div", { class: "field" },
+            h("label", { class: "label", for: "set-start" }, "When I open the app, show"),
+            startScreen,
+            h("p", { class: "hint" }, "Calendar and Board will be added to this list soon."))),
+        h("section", { class: "card" }, h("h2", {}, "Deadlines"), form));
     },
   },
 
