@@ -7,17 +7,18 @@
    in instantly and offline.
    ========================================================================== */
 
-import { DEFAULT_TYPES, DEFAULT_SETTINGS, ORGS } from "./constants.js";
+import { DEFAULT_TYPES, DEFAULT_SETTINGS, EVENT_KINDS, ORGS } from "./constants.js";
 
 export const state = {
   fb: null,            // Firebase handles (set by main.js)
   uid: null,           // signed-in user id
   courses: [],
   customTypes: [],
+  customEventTypes: [],
   tasks: [],
   events: [],
   settings: {},
-  ready: { courses: false, types: false, tasks: false, events: false, settings: false },
+  ready: { courses: false, types: false, eventTypes: false, tasks: false, events: false, settings: false },
 };
 
 const subscribers = new Set();
@@ -47,8 +48,8 @@ export function setReady(key) {
 
 export function resetState() {
   Object.assign(state, {
-    fb: null, uid: null, courses: [], customTypes: [], tasks: [], events: [], settings: {},
-    ready: { courses: false, types: false, tasks: false, events: false, settings: false },
+    fb: null, uid: null, courses: [], customTypes: [], customEventTypes: [], tasks: [], events: [], settings: {},
+    ready: { courses: false, types: false, eventTypes: false, tasks: false, events: false, settings: false },
   });
 }
 
@@ -114,4 +115,22 @@ export function eventById(id) {
 export function eventGroupName(event) {
   if (event.workspace === "academics") return event.courseId ? courseName(event.courseId) : "";
   return event.orgId ? orgName(event.orgId) : "";
+}
+
+/* ---- Event kinds (built-in + your own) ---- */
+
+/** Every kind of event, for looking up names. */
+export function allEventKinds() {
+  const custom = [...state.customEventTypes].sort((a, b) => a.name.localeCompare(b.name));
+  return [...EVENT_KINDS, ...custom];
+}
+
+/** Kinds offered for one workspace. */
+export function eventKindsFor(workspace) {
+  return allEventKinds().filter((k) => (k.workspace || "academics") === workspace);
+}
+
+export function eventKindName(id) {
+  const k = allEventKinds().find((x) => x.id === id);
+  return k ? k.name : "Event";
 }

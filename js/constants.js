@@ -63,13 +63,23 @@ export const DEFAULT_SETTINGS = { dueSoonHours: 48, earlyHours: 24 };
 /* If you pick a due date but no time, this time is used. */
 export const DEFAULT_DUE_TIME = { hours: 23, minutes: 59 };
 
-/* Schedule events (exams, meetings, classes). Stored in the database as plain text ids. */
-export const EVENT_KINDS = [
-  { id: "exam",    name: "Exam" },
-  { id: "meeting", name: "Meeting" },
-  { id: "class",   name: "Class" },
-  { id: "other",   name: "Other" },
+/* Schedule events. Like task types, each kind of event belongs to ONE workspace,
+   and you can add your own under Manage. The ids are saved in the database, so
+   never change an existing id. ("exam" is special: it offers "Create review task".)
+   Events saved before this change keep working: a kind that is not offered for an
+   event's workspace is still shown by name. */
+export const ACADEMIC_EVENT_KINDS = [
+  { id: "exam",     name: "Exam",          workspace: "academics", builtIn: true },
+  { id: "class",    name: "Class",         workspace: "academics", builtIn: true },
+  { id: "ev-study", name: "Study session", workspace: "academics", builtIn: true },
+  { id: "other",    name: "Other",         workspace: "academics", builtIn: true },
 ];
+export const ORG_EVENT_KINDS = [
+  { id: "meeting",      name: "Meeting",          workspace: "organizations", builtIn: true },
+  { id: "ev-org-event", name: "Event / activity", workspace: "organizations", builtIn: true },
+  { id: "ev-org-other", name: "Other",            workspace: "organizations", builtIn: true },
+];
+export const EVENT_KINDS = [...ACADEMIC_EVENT_KINDS, ...ORG_EVENT_KINDS];
 
 /* The calendar's first day of the week: 0 = Sunday, 1 = Monday. */
 export const WEEK_START = 0;

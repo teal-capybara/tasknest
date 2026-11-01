@@ -10,9 +10,9 @@
    waits for the internet.
    ========================================================================== */
 
-import { h, optionEls } from "../ui/dom.js";
-import { EVENT_KINDS, LIMITS, ORGS, WORKSPACES } from "../constants.js";
-import { state, eventById } from "../state.js";
+import { h, optionEls, clear } from "../ui/dom.js";
+import { LIMITS, ORGS, WORKSPACES } from "../constants.js";
+import { state, eventById, allEventKinds, eventKindsFor } from "../state.js";
 import { validateEventForm } from "../logic/validate.js";
 import { toInputDate, toInputTime } from "../logic/format.js";
 import { parseDayKey, dayKey } from "../logic/calendar.js";
@@ -53,7 +53,7 @@ export function eventFormView(container, params, query) {
   /* ---------- controls ---------- */
   const el = {
     title: h("input", { type: "text", class: "input", id: "f-title", name: "title", value: initial.title, maxlength: LIMITS.title, autocomplete: "off", "aria-describedby": "f-title-error" }),
-    kind: h("select", { class: "select", id: "f-kind", name: "kind", "aria-describedby": "f-kind-error", value: initial.kind }, optionEls(EVENT_KINDS, initial.kind)),
+    kind: h("select", { class: "select", id: "f-kind", name: "kind", "aria-describedby": "f-kind-error", value: initial.kind }),
     courseId: h("select", { class: "select", id: "f-courseId", name: "courseId", "aria-describedby": "f-courseId-error", value: initial.courseId },
       h("option", { value: "" }, "No course"), courses.map((c) => h("option", { value: c.id }, c.archived ? `${c.name} (archived)` : c.name))),
     orgId: h("select", { class: "select", id: "f-orgId", name: "orgId", "aria-describedby": "f-orgId-error", value: initial.orgId },
@@ -76,7 +76,7 @@ export function eventFormView(container, params, query) {
     h("legend", { class: "label" }, "Workspace"),
     h("div", { class: "seg seg-form", role: "radiogroup" }, WORKSPACES.map((w) =>
       h("label", { class: "seg-radio" },
-        h("input", { type: "radio", name: "workspace", value: w.id, checked: w.id === initial.workspace, onChange: () => syncWorkspace() }),
+        h("input", { type: "radio", name: "workspace", value: w.id, checked: w.id === initial.workspace, onChange: () => syncWorkspace(true) }),
         h("span", {}, w.name)))),
     errorLine("workspace"));
 
@@ -110,8 +110,18 @@ export function eventFormView(container, params, query) {
   container.append(form);
 
   /* ---------- behaviors ---------- */
-  function syncWorkspace() {
+  /** The kinds offered follow the workspace. A kind this event already has stays in the list. */
+  function fillKinds(keep, allowLegacy) {
+    const ws = form.elements.workspace.value;
+    const list = eventKindsFor(ws);
+    const current = allEventKinds().find((k) => k.id === keep);
+    if (allowLegacy && current && !list.some((k) => k.id === keep)) list.push(current);
+    clear(el.kind).append(...optionEls(list, keep));
+    el.kind.value = list.some((k) => k.id === keep) ? keep : (list[0] ? list[0].id : "");
+  }
+  function syncWorkspace(fromUser) {
     const academics = form.elements.workspace.value === "academics";
+    fillKinds(fromUser ? el.kind.value : initial.kind, !fromUser && Boolean(editing));
     courseField.hidden = !academics;
     orgField.hidden = academics;
   }
@@ -147,7 +157,7 @@ export function eventFormView(container, params, query) {
     form.querySelectorAll("[aria-invalid]").forEach((i) => i.removeAttribute("aria-invalid"));
 
     const values = currentValues();
-    const { errors, value } = validateEventForm(values, { courseIds });
+    const { errors, value } = validateEventForm(values, { courseIds, kindIds: allEventKinds().map((k) => k.id) });
     const names = Object.keys(errors);
     if (names.length) {
       for (const name of names) {
@@ -186,7 +196,7 @@ function readDraft(uid, key, baseline) {
   const clean = {};
   for (const f of EVENT_DRAFT_FIELDS) if (typeof saved[f] === "string") clean[f] = saved[f];
   if (clean.workspace && !WORKSPACES.some((w) => w.id === clean.workspace)) delete clean.workspace;
-  if (clean.kind && !EVENT_KINDS.some((k) => k.id === clean.kind)) delete clean.kind;
+  if (clean.kind && !allEventKinds().some((k) => k.id === clean.kind)) delete clean.kind;
   if (clean.orgId && !ORGS.some((o) => o.id === clean.orgId)) clean.orgId = "";
   if (clean.allDay && clean.allDay !== "1") clean.allDay = "";
   const merged = { ...baseline, ...clean };

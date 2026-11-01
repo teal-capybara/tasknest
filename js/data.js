@@ -1,8 +1,8 @@
 /* ==========================================================================
    DATA: starts all the database listeners after sign-in.
 
-   Five listeners keep js/state.js up to date:
-     courses, taskTypes (your custom ones), tasks, events, settings
+   Six listeners keep js/state.js up to date:
+     courses, taskTypes and eventTypes (your custom ones), tasks, events, settings
    Each one first delivers the copy stored on this device (instant, works
    offline), then updates when the cloud changes.
 
@@ -13,6 +13,7 @@ import { state, setState, setReady, resetState } from "./state.js";
 import { watchCollection } from "./db/helpers.js";
 import { watchCourses } from "./db/courses.js";
 import { watchTaskTypes } from "./db/taskTypes.js";
+import { watchEventTypes } from "./db/eventTypes.js";
 import { watchSettings } from "./db/settings.js";
 import { watchEvents } from "./db/events.js";
 import { applyTheme, currentTheme, isValidTheme } from "./theme.js";
@@ -31,6 +32,10 @@ export function startData(fb, uid) {
     watchTaskTypes(fb, uid, (types) => {
       setReady("types");
       setState({ customTypes: types.sort(byName) });
+    }),
+    watchEventTypes(fb, uid, (types) => {
+      setReady("eventTypes");
+      setState({ customEventTypes: types.sort(byName) });
     }),
     watchCollection(fb, uid, "tasks", (tasks) => {
       setReady("tasks");

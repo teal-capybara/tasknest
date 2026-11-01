@@ -66,7 +66,7 @@ export function validateTaskForm(values, ctx) {
 /**
  * Checks the Add/Edit event form.
  * values: all strings. allDay is "1" when the box is ticked.
- * ctx: { courseIds }
+ * ctx: { courseIds, kindIds }  (kindIds = every valid kind id, built-in and custom)
  * Returns { errors, value }. value has startAt / endAt as numbers, ready to save.
  */
 export function validateEventForm(values, ctx) {
@@ -76,7 +76,7 @@ export function validateEventForm(values, ctx) {
   if (!title) errors.title = "Give the event a title.";
   else if (title.length > LIMITS.title) errors.title = `Keep the title under ${LIMITS.title} characters.`;
 
-  if (!has(EVENT_KINDS, values.kind)) errors.kind = "Choose what kind of event this is.";
+  if (!(ctx.kindIds || EVENT_KINDS.map((k) => k.id)).includes(values.kind)) errors.kind = "Choose what kind of event this is.";
   if (!has(WORKSPACES, values.workspace)) errors.workspace = "Choose Academics or Organizations.";
 
   let courseId = null, orgId = null;

@@ -92,12 +92,22 @@ function navigate() {
     highlightNav(route.nav);
     // The floating "Add task" button is only a distraction while you are already on the form.
     document.body.classList.toggle("hide-fab", Boolean(route.hideAdd));
+    setAddButton(route.add === "event");
     document.title = `${route.title} · TaskNest`;
     if (isReady()) mount();
     else showLoading();
     return;
   }
   location.replace("#/home"); // unknown address: go home
+}
+
+/** The big "Add" buttons say "Add task" everywhere except the Calendar, where they say "Add event". */
+function setAddButton(forEvents) {
+  document.querySelectorAll("[data-add-task]").forEach((a) => {
+    a.setAttribute("href", forEvents ? "#/event/new" : "#/task/new");
+    const label = a.querySelector(".add-label");
+    if (label) label.textContent = forEvents ? "Add event" : "Add task";
+  });
 }
 
 function mount() {

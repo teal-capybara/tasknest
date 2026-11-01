@@ -1,23 +1,25 @@
 /* ==========================================================================
-   MANAGE: your courses and your task types.
+   MANAGE: your courses, and the task types and event types of each workspace.
 
-   COURSES
-   - Add, rename, archive (hide but keep everything) or delete.
-   - Delete also deletes every task in the course, so it always shows a clear
-     warning with the number of tasks and asks you to confirm. Archive is the
-     safer choice and is offered first.
-   TASK TYPES (one list for Academics, one for Organizations)
-   - The built-in types are fixed. Your own types can be renamed or deleted.
-   - Deleting a type asks where to move its tasks first (to another type of the
-     SAME workspace), so no task ever ends up without a type.
+   The page is a few collapsible groups (tap a heading to open it), so you see
+   the headings first instead of everything at once:
+     Courses          add, rename, archive or delete (delete also deletes the
+                      course's tasks, so it warns and asks you to confirm;
+                      archive is the safer choice and is offered first)
+     Academics        task types + event types
+     Organizations    task types + event types
+   The built-in types are fixed. Your own can be renamed or deleted. Deleting one
+   asks where to move its tasks / events first (to another type of the SAME
+   workspace), so nothing ever ends up without a type.
    ========================================================================== */
 
 import { h, clear } from "../ui/dom.js";
-import { DEFAULT_TYPES, WORKSPACES } from "../constants.js";
-import { state, typesFor } from "../state.js";
+import { DEFAULT_TYPES, EVENT_KINDS, WORKSPACES } from "../constants.js";
+import { state, typesFor, eventKindsFor } from "../state.js";
 import { validateName } from "../logic/validate.js";
 import { addCourse, renameCourse, setCourseArchived, deleteCourse } from "../db/courses.js";
 import { addTaskType, renameTaskType, deleteTaskType } from "../db/taskTypes.js";
+import { addEventType, renameEventType, deleteEventType } from "../db/eventTypes.js";
 import { confirmDialog, promptDialog } from "../ui/dialogs.js";
 import { toast } from "../ui/screens.js";
 
@@ -106,103 +108,141 @@ export function manageView(container) {
     toast(n ? `Course and ${plural(n, "task")} deleted.` : "Course deleted.");
   }
 
-  /* ---------- task types (one block per workspace) ---------- */
-  const typeBlocks = WORKSPACES.map((ws) => {
-    const builtIn = h("ul", { class: "chips" }, DEFAULT_TYPES.filter((t) => t.workspace === ws.id).map((t) => h("li", { class: "chip" }, t.name)));
+  /* ---------- task types and event types (one block per workspace and per thing) ---------- */
+  const KINDS = {
+    task: {
+      noun: "task", Title: "Task types",
+      builtIn: (ws) => DEFAULT_TYPES.filter((t) => t.workspace === ws),
+      custom: (ws) => state.customTypes.filter((t) => (t.workspace || "academics") === ws),
+      all: (ws) => typesFor(ws),
+      usedBy: (type) => state.tasks.filter((t) => t.typeId === type.id),
+      add: (name, ws) => addTaskType(state.fb, state.uid, name, ws),
+      rename: (id, name) => renameTaskType(state.fb, state.uid, id, name),
+      remove: (type, to, used) => deleteTaskType(state.fb, state.uid, type.id, to, used.map((x) => x.id)),
+      example: { academics: "e.g. Laboratory", organizations: "e.g. Fundraising" },
+    },
+    event: {
+      noun: "event", Title: "Event types",
+      builtIn: (ws) => EVENT_KINDS.filter((t) => t.workspace === ws),
+      custom: (ws) => state.customEventTypes.filter((t) => (t.workspace || "academics") === ws),
+      all: (ws) => eventKindsFor(ws),
+      usedBy: (type) => state.events.filter((e) => e.kind === type.id),
+      add: (name, ws) => addEventType(state.fb, state.uid, name, ws),
+      rename: (id, name) => renameEventType(state.fb, state.uid, id, name),
+      remove: (type, to, used) => deleteEventType(state.fb, state.uid, type.id, to, used.map((x) => x.id)),
+      example: { academics: "e.g. Defense", organizations: "e.g. Rehearsal" },
+    },
+  };
+
+  const typeBlocks = [];
+  function typeBlock(ws, kindKey) {
+    const K = KINDS[kindKey];
     const list = h("ul", { class: "row-list" });
     const form = addForm({
-      label: `New ${ws.name} task type name`,
-      placeholder: ws.id === "academics" ? "e.g. Laboratory" : "e.g. Fundraising",
+      label: `New ${ws.name} ${K.noun} type name`,
+      placeholder: K.example[ws.id],
       button: "Add type",
-      existingNames: () => typesFor(ws.id).map((t) => t.name),
-      onAdd: (name) => { addTaskType(state.fb, state.uid, name, ws.id); toast("Task type added."); },
+      existingNames: () => K.all(ws.id).map((t) => t.name),
+      onAdd: (name) => { K.add(name, ws.id); toast(`${K.noun === "task" ? "Task" : "Event"} type added.`); },
     });
-    const node = h("section", { class: "type-block" },
-      h("h3", {}, `${ws.name} task types`),
-      h("p", { class: "muted small" }, "Built-in (fixed):"),
-      builtIn,
+    const node = h("div", { class: "type-block" },
+      h("h3", {}, K.Title),
+      h("ul", { class: "chips", "aria-label": "Built-in (fixed)" }, K.builtIn(ws.id).map((t) => h("li", { class: "chip" }, t.name))),
       h("p", { class: "muted small" }, "Your own:"),
       form, list);
-    return { ws, list, node };
-  });
-
-  const customOf = (wsId) => state.customTypes
-    .filter((t) => (t.workspace || "academics") === wsId)
-    .sort((a, b) => a.name.localeCompare(b.name));
+    typeBlocks.push({ ws, K, list });
+    return node;
+  }
 
   function renderTypes() {
-    for (const block of typeBlocks) {
-      clear(block.list);
-      const custom = customOf(block.ws.id);
-      if (!custom.length) {
-        block.list.append(h("li", { class: "row empty-row muted" }, "No custom types yet."));
-        continue;
-      }
+    for (const { ws, K, list } of typeBlocks) {
+      clear(list);
+      const custom = K.custom(ws.id).sort((a, b) => a.name.localeCompare(b.name));
+      if (!custom.length) { list.append(h("li", { class: "row empty-row muted" }, "None of your own yet.")); continue; }
       for (const type of custom) {
-        const count = state.tasks.filter((t) => t.typeId === type.id).length;
-        block.list.append(h("li", { class: "row" },
-          h("div", { class: "row-main" }, h("strong", {}, type.name), h("span", { class: "muted small" }, plural(count, "task"))),
+        const count = K.usedBy(type).length;
+        list.append(h("li", { class: "row" },
+          h("div", { class: "row-main" }, h("strong", {}, type.name), h("span", { class: "muted small" }, plural(count, K.noun))),
           h("div", { class: "row-actions" },
-            h("button", { type: "button", class: "btn btn-small", onClick: () => onRenameType(type) }, "Rename"),
-            h("button", { type: "button", class: "btn btn-small btn-danger-outline", onClick: () => onDeleteType(type) }, "Delete…"))));
+            h("button", { type: "button", class: "btn btn-small", onClick: () => onRenameType(K, ws, type) }, "Rename"),
+            h("button", { type: "button", class: "btn btn-small btn-danger-outline", onClick: () => onDeleteType(K, ws, type) }, "Delete…"))));
       }
     }
   }
 
-  async function onRenameType(type) {
-    const workspace = type.workspace || "academics";
-    const others = typesFor(workspace).map((t) => t.name);
+  async function onRenameType(K, ws, type) {
+    const others = K.all(ws.id).map((t) => t.name);
     const name = await promptDialog({
-      title: "Rename task type", label: "Type name", value: type.name,
+      title: `Rename ${K.noun} type`, label: "Type name", value: type.name,
       validate: (text) => validateName(text, others, { ignore: type.name }).error || "",
     });
     if (name === null) return;
-    renameTaskType(state.fb, state.uid, type.id, name);
+    K.rename(type.id, name);
     toast("Type renamed.");
   }
 
-  async function onDeleteType(type) {
-    const workspace = type.workspace || "academics";
-    const affected = state.tasks.filter((t) => t.typeId === type.id);
-    const replacements = typesFor(workspace).filter((t) => t.id !== type.id);
-    const picker = h("select", { class: "select", "aria-label": "Move tasks to this type" },
+  async function onDeleteType(K, ws, type) {
+    const used = K.usedBy(type);
+    const replacements = K.all(ws.id).filter((t) => t.id !== type.id);
+    const picker = h("select", { class: "select", "aria-label": `Move ${K.noun}s to this type` },
       replacements.map((t) => h("option", { value: t.id }, t.name)));
-
     const ok = await confirmDialog({
       title: `Delete the type "${type.name}"?`,
-      message: affected.length
-        ? `${plural(affected.length, "task")} use this type. Choose a type to move them to. Only the type is deleted; no tasks are lost.`
-        : "No tasks use this type.",
-      body: affected.length ? h("label", { class: "label" }, "Move tasks to", picker) : null,
+      message: used.length
+        ? `${plural(used.length, K.noun)} use this type. Choose a type to move them to. Only the type is deleted; nothing else is lost.`
+        : `No ${K.noun}s use this type.`,
+      body: used.length ? h("label", { class: "label" }, `Move ${K.noun}s to`, picker) : null,
       confirmLabel: "Delete type",
       danger: true,
     });
     if (!ok) return;
-    deleteTaskType(state.fb, state.uid, type.id, picker.value, affected.map((t) => t.id));
-    toast(affected.length ? `Type deleted. ${plural(affected.length, "task")} moved.` : "Type deleted.");
+    K.remove(type, picker.value, used);
+    toast(used.length ? `Type deleted. ${plural(used.length, K.noun)} moved.` : "Type deleted.");
+  }
+
+  /* ---------- a collapsible group ---------- */
+  function fold(title, subtitle, ...children) {
+    const sub = h("span", { class: "muted small" }, subtitle);
+    const node = h("details", { class: "fold" },
+      h("summary", {}, h("span", { class: "fold-title" }, h("strong", {}, title), sub), h("span", { class: "fold-chevron", "aria-hidden": "true" }, "›")),
+      h("div", { class: "fold-body" }, children));
+    return { node, sub };
   }
 
   /* ---------- page ---------- */
+  const coursesFold = fold("Courses", "",
+    h("p", { class: "muted" }, "Each academic task belongs to a course. Renaming a course updates all its tasks."),
+    addForm({
+      label: "New course name", placeholder: "e.g. CS 101 Data Structures", button: "Add course",
+      existingNames: () => state.courses.map((c) => c.name),
+      onAdd: (name) => { addCourse(state.fb, state.uid, name); toast("Course added."); },
+    }),
+    h("label", { class: "check" }, archivedBox, h("span", {}, "Show archived courses")),
+    courseList);
+
+  const wsFolds = WORKSPACES.map((ws) => ({
+    ws,
+    ...fold(ws.name, "",
+      h("p", { class: "muted" }, ws.id === "academics"
+        ? "Types you can pick on the Add task and Add event forms for Academics."
+        : "Types you can pick on the Add task and Add event forms for Organizations."),
+      typeBlock(ws, "task"), typeBlock(ws, "event")),
+  }));
+
   container.append(
     h("div", { class: "page-head" }, h("h1", {}, "Manage")),
+    h("p", { class: "muted" }, "Tap a group to open it."),
+    coursesFold.node, ...wsFolds.map((f) => f.node));
 
-    h("section", { class: "card" },
-      h("h2", {}, "Courses"),
-      h("p", { class: "muted" }, "Each academic task belongs to a course. Renaming a course updates all its tasks."),
-      addForm({
-        label: "New course name", placeholder: "e.g. CS 101 Data Structures", button: "Add course",
-        existingNames: () => state.courses.map((c) => c.name),
-        onAdd: (name) => { addCourse(state.fb, state.uid, name); toast("Course added."); },
-      }),
-      h("label", { class: "check" }, archivedBox, h("span", {}, "Show archived courses")),
-      courseList),
-
-    h("section", { class: "card" },
-      h("h2", {}, "Task types"),
-      h("p", { class: "muted" }, "Each workspace has its own task types. The Add task form shows the ones for the workspace you pick."),
-      typeBlocks.map((b) => b.node)));
-
-  function refresh() { renderCourses(); renderTypes(); }
+  function refresh() {
+    renderCourses(); renderTypes();
+    const live = state.courses.filter((c) => !c.archived).length;
+    coursesFold.sub.textContent = live ? `${plural(live, "course")}` : "No courses yet";
+    for (const f of wsFolds) {
+      const t = KINDS.task.custom(f.ws.id).length, e = KINDS.event.custom(f.ws.id).length;
+      f.sub.textContent = `Task types and event types${t + e ? ` · ${t + e} of your own` : ""}`;
+    }
+  }
   refresh();
   return { update: refresh };
 }

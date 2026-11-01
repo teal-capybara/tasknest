@@ -1,8 +1,8 @@
-# TaskNest (Phase 3c: Calendar and events)
+# TaskNest (Phase 3.5: Polish)
 
 A personal school and organization task tracker that installs on your phone and works offline.
 
-**This is Phase 3c: the third step of Phase 3 (Calendar and schedule events).**
+**This is Phase 3.5: a polish pass on Phase 3c (Home, Calendar and Manage).**
 
 | Phase | What you get | Status |
 |---|---|---|
@@ -11,7 +11,8 @@ A personal school and organization task tracker that installs on your phone and 
 | 2.5 | Task types per workspace, form drafts that survive leaving the page, no floating Add button on the form, Settings as a list, Archived tasks in Settings, "Due soon" wording | Done |
 | 3a | Four new themes (Sakura Mist, Velvet Dusk, Rosé Eclipse, Abyssal Tide) | Done |
 | 3b | New app icon, Home dashboard, choose your start screen | Done |
-| 3c | Calendar (month, week, day) with schedule events (exams, meetings, classes), "Create review task" | **This version** |
+| 3c | Calendar (month, week, day) with schedule events (exams, meetings, classes), "Create review task" | Done |
+| 3.5 | Heart/flower calendar markers, "Add event" button on the Calendar, redesigned Home (greeting card, small counters, clear sections, Academics and Organizations progress apart), event types per workspace with your own, Manage in collapsible groups, capybara decorations | **This version** |
 | 3d | Board view | Next |
 | 4 | Reports, export/import backup, optional start date, polish | Later |
 | 5 | Recurring tasks | Later |
@@ -175,7 +176,8 @@ Everything lives under your account: `users/{your-id}/...`
 | `courses` | name, archived, createdAt, updatedAt |
 | `taskTypes` | your custom types only: name, workspace (`academics` or `organizations`), createdAt, updatedAt |
 | `tasks` | title, workspace, courseId or orgId, typeId, arrangement, status, dueAt, instructions, notes, eventId (optional), createdAt, updatedAt, inProgressAt, completedAt, archived, archivedAt, deadlineHistory |
-| `events` | title, kind (`exam`/`meeting`/`class`/`other`), workspace, courseId or orgId (optional), allDay, startAt, endAt (or null), location, notes, createdAt, updatedAt |
+| `eventTypes` | your custom event types only: name, workspace, createdAt, updatedAt |
+| `events` | title, kind (a built-in id such as `exam`, or the id of one of your `eventTypes`), workspace, courseId or orgId (optional), allDay, startAt, endAt (or null), location, notes, createdAt, updatedAt |
 | `settings/main` | theme, defaultScreen, dueSoonHours, earlyHours |
 | `meta/syncTest` | the little counter on the Settings page. Safe to ignore |
 

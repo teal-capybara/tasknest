@@ -37,6 +37,7 @@ import { settingsView } from "./views/settingsView.js";
 
 /* path: the address after #   nav: which menu item to highlight   view: the screen.
    hideAdd: true hides the floating "Add task" button on that screen.
+   add: "event" makes the big Add buttons say "Add event" (used by the Calendar).
    Order matters: "/task/new" must come before "/task/:id". */
 /** "#/home" has no screen of its own: it sends you to the start screen you chose in Settings, View. */
 function homeView() {
@@ -53,7 +54,7 @@ const ROUTES = [
   { path: "/task/new",      nav: "tasks",    title: "Add task",  view: taskFormView,  hideAdd: true },
   { path: "/task/:id/edit", nav: "tasks",    title: "Edit task", view: taskFormView,  hideAdd: true },
   { path: "/task/:id",      nav: "tasks",    title: "Task",      view: taskDetailView },
-  { path: "/calendar",      nav: "calendar", title: "Calendar",   view: calendarView },
+  { path: "/calendar",      nav: "calendar", title: "Calendar",   view: calendarView, add: "event" },
   { path: "/event/new",     nav: "calendar", title: "Add event",  view: eventFormView,   hideAdd: true },
   { path: "/event/:id/edit", nav: "calendar", title: "Edit event", view: eventFormView,  hideAdd: true },
   { path: "/event/:id",     nav: "calendar", title: "Event",      view: eventDetailView },

@@ -11,23 +11,24 @@
      events    exams, meetings, classes (tap to open; add them with "Add event")
      deadlines your tasks, on the day they are due (tasks without a deadline
                and archived tasks are not shown)
-   Shapes tell them apart as well as color: events are diamonds ◆, deadlines are
-   circles ●.
+   Shapes tell them apart as well as color: events are hearts, deadlines are
+   flowers. Both use your theme's colors.
 
    The view you were on is remembered while the app is open. Addresses like
    #/calendar?view=week&date=2026-11-03 open a specific view.
    ========================================================================== */
 
 import { h, clear } from "../ui/dom.js";
-import { EVENT_KINDS, WEEK_START } from "../constants.js";
-import { state, isTaskArchived, eventGroupName, taskGroupName } from "../state.js";
+import { capybara } from "../ui/capybara.js";
+import { WEEK_START } from "../constants.js";
+import { state, isTaskArchived, eventGroupName, taskGroupName, eventKindName } from "../state.js";
 import {
   dayKey, parseDayKey, noonOf, addDays, addMonths, weekDays, monthGrid, weekdayNames,
   monthLabel, dayLabel, weekLabel, formatClock, itemsByDay,
 } from "../logic/calendar.js";
 
 const VIEWS = [{ id: "month", name: "Month" }, { id: "week", name: "Week" }, { id: "day", name: "Day" }];
-const kindName = (id) => (EVENT_KINDS.find((k) => k.id === id) || { name: "Event" }).name;
+const kindName = eventKindName;
 
 // Remembered while you move between screens (reset when you close the app).
 let memory = { view: "month", cursor: noonOf(Date.now()) };
@@ -50,7 +51,9 @@ export function calendarView(container, params, query = {}) {
   const body = h("div", { class: "cal-body" });
 
   container.append(
-    h("div", { class: "page-head" }, h("h1", {}, "Calendar"), addEvent),
+    h("div", { class: "cal-head" },
+      h("div", { class: "page-head" }, h("h1", {}, "Calendar"), addEvent),
+      h("div", { class: "cal-peek" }, capybara("peek"))),
     h("div", { class: "seg", role: "group", "aria-label": "Calendar view" }, viewButtons),
     h("div", { class: "cal-nav" }, prev, label, next, todayButton),
     body);
@@ -73,6 +76,8 @@ export function calendarView(container, params, query = {}) {
     prev.setAttribute("aria-label", `Previous ${unit}`);
     next.setAttribute("aria-label", `Next ${unit}`);
     addEvent.setAttribute("href", `#/event/new?date=${dayKey(cursor)}`);
+    // the big floating / sidebar button follows the day you are looking at
+    document.querySelectorAll("[data-add-task]").forEach((a) => a.setAttribute("href", `#/event/new?date=${dayKey(cursor)}`));
 
     clear(body);
     if (view === "month") {
@@ -100,8 +105,8 @@ export function calendarView(container, params, query = {}) {
         const parts = [];
         if (events.length) parts.push(`${events.length} event${events.length === 1 ? "" : "s"}`);
         if (tasks.length) parts.push(`${tasks.length} task${tasks.length === 1 ? "" : "s"} due`);
-        const markers = list.slice(0, 4).map((i) => h("span", {
-          class: i.type === "event" ? `cal-mark cal-mark-event kind-${i.event.kind}` : "cal-mark cal-mark-task", "aria-hidden": "true",
+        const markers = list.slice(0, 3).map((i) => h("span", {
+          class: i.type === "event" ? "cal-mark cal-mark-event" : "cal-mark cal-mark-task", "aria-hidden": "true",
         }));
         cells.push(h("button", {
           type: "button",
@@ -111,7 +116,7 @@ export function calendarView(container, params, query = {}) {
           "aria-label": `${dayLabel(date)}${key === todayKey ? " (today)" : ""}: ${parts.length ? parts.join(", ") : "nothing scheduled"}`,
           onClick: () => { memory.cursor = date; render(); },
         }, h("span", { class: "cal-num" }, String(date.getDate())),
-           h("span", { class: "cal-marks" }, markers, list.length > 4 ? h("span", { class: "cal-more", "aria-hidden": "true" }, "+") : null)));
+           h("span", { class: "cal-marks" }, markers, list.length > 3 ? h("span", { class: "cal-more", "aria-hidden": "true" }, "+") : null)));
       }
     }
     return h("div", { class: "cal-grid" }, head, cells);
@@ -133,7 +138,9 @@ export function calendarView(container, params, query = {}) {
         isToday ? h("span", { class: "chip" }, "Today") : null) : null,
       list.length
         ? h("ul", { class: "cal-items" }, list.map((item) => itemRow(item)))
-        : h("p", { class: "muted cal-empty" }, "Nothing scheduled."),
+        : compact
+          ? h("p", { class: "muted cal-empty" }, "Nothing scheduled.")
+          : h("div", { class: "cal-empty-art" }, capybara("sit"), h("p", { class: "muted" }, "Nothing scheduled. A free day!")),
       withAdd || !compact ? h("p", {}, h("a", { class: "btn btn-small", href: `#/event/new?date=${key}` }, "Add event on this day")) : null);
   }
 

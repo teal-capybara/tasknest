@@ -8,8 +8,8 @@
    ========================================================================== */
 
 import { h, clear } from "../ui/dom.js";
-import { EVENT_KINDS, WORKSPACES } from "../constants.js";
-import { state, eventById, eventGroupName, isTaskArchived } from "../state.js";
+import { WORKSPACES } from "../constants.js";
+import { state, eventById, eventKindName, eventGroupName, isTaskArchived } from "../state.js";
 import { eventWhen, dayKey, relativeDay } from "../logic/calendar.js";
 import { buildTaskCard } from "../ui/taskCard.js";
 import { confirmDialog } from "../ui/dialogs.js";
@@ -42,7 +42,7 @@ export function eventDetailView(container, params) {
 
     const now = Date.now();
     const id = encodeURIComponent(event.id);
-    const kind = (EVENT_KINDS.find((k) => k.id === event.kind) || {}).name || "Event";
+    const kind = eventKindName(event.kind);
     const group = eventGroupName(event);
     const workspaceName = (WORKSPACES.find((w) => w.id === event.workspace) || {}).name;
     const linked = state.tasks.filter((t) => t.eventId === event.id && !isTaskArchived(t))

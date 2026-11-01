@@ -48,6 +48,17 @@ export function dashboardStats(tasks, ctx) {
   const progress = [...groups.values()].sort((a, b) =>
     (b.total - b.done) - (a.total - a.done) || a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
 
+  /* ---- the same progress, split into Academics and Organizations (each with a total) ---- */
+  const byWorkspace = {};
+  for (const ws of ["academics", "organizations"]) {
+    const list = progress.filter((g) => g.workspace === ws);
+    byWorkspace[ws] = {
+      groups: list,
+      total: list.reduce((n, g) => n + g.total, 0),
+      done: list.reduce((n, g) => n + g.done, 0),
+    };
+  }
+
   /* ---- finished in the last 7 days, and how (early / on time / late) ---- */
   const since = now - 7 * DAY;
   const week = { done: 0, early: 0, ontime: 0, late: 0, nodeadline: 0 };
@@ -58,5 +69,5 @@ export function dashboardStats(tasks, ctx) {
     if (timing) week[timing.key]++;
   }
 
-  return { counts, attention, progress, week, totalActive: active.length, openCount: open.length };
+  return { counts, attention, progress, byWorkspace, week, totalActive: active.length, openCount: open.length };
 }
