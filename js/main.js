@@ -21,6 +21,7 @@ import { defineRoutes, startRouter, stopRouter } from "./router.js";
 import { hasPendingChanges, forgetAll } from "./sync-status.js";
 import { showScreen, toast } from "./ui/screens.js";
 import { captureInstallPrompt } from "./ui/install.js";
+import "./ui/sidebar.js";
 import { session } from "./session.js";
 import { clearAllDrafts } from "./logic/drafts.js";
 import { getSettings } from "./state.js";

@@ -1,8 +1,8 @@
-# TaskNest (Phase 3.5: Polish)
+# TaskNest (Phase 3.6: Day window, diary and navigation)
 
 A personal school and organization task tracker that installs on your phone and works offline.
 
-**This is Phase 3.5: a polish pass on Phase 3c (Home, Calendar and Manage).**
+**This is Phase 3.6: a second polish pass (navigation, Home tiles, Calendar day window and the secret capybara diary).**
 
 | Phase | What you get | Status |
 |---|---|---|
@@ -12,7 +12,8 @@ A personal school and organization task tracker that installs on your phone and 
 | 3a | Four new themes (Sakura Mist, Velvet Dusk, Rosé Eclipse, Abyssal Tide) | Done |
 | 3b | New app icon, Home dashboard, choose your start screen | Done |
 | 3c | Calendar (month, week, day) with schedule events (exams, meetings, classes), "Create review task" | Done |
-| 3.5 | Heart/flower calendar markers, "Add event" button on the Calendar, redesigned Home (greeting card, small counters, clear sections, Academics and Organizations progress apart), event types per workspace with your own, Manage in collapsible groups, capybara decorations | **This version** |
+| 3.5 | Heart/flower calendar markers, "Add event" button on the Calendar, redesigned Home (greeting card, small counters, clear sections, Academics and Organizations progress apart), event types per workspace with your own, Manage in collapsible groups, capybara decorations | Done |
+| 3.6 | Floating pill navigation on phones, collapsible sidebar on desktop, shorter 2x2 Home tiles, tap a day for a floating window, desktop Calendar with side panels, secret capybara diary (one private note per day) | **This version** |
 | 3d | Board view | Next |
 | 4 | Reports, export/import backup, optional start date, polish | Later |
 | 5 | Recurring tasks | Later |
@@ -178,6 +179,7 @@ Everything lives under your account: `users/{your-id}/...`
 | `tasks` | title, workspace, courseId or orgId, typeId, arrangement, status, dueAt, instructions, notes, eventId (optional), createdAt, updatedAt, inProgressAt, completedAt, archived, archivedAt, deadlineHistory |
 | `eventTypes` | your custom event types only: name, workspace, createdAt, updatedAt |
 | `events` | title, kind (a built-in id such as `exam`, or the id of one of your `eventTypes`), workspace, courseId or orgId (optional), allDay, startAt, endAt (or null), location, notes, createdAt, updatedAt |
+| `diary` | one private note per day, document id is the day (for example `2026-11-03`): text, updatedAt. Only ever read one day at a time, from the capybara in the Calendar day window |
 | `settings/main` | theme, defaultScreen, dueSoonHours, earlyHours |
 | `meta/syncTest` | the little counter on the Settings page. Safe to ignore |
 
