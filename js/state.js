@@ -15,8 +15,9 @@ export const state = {
   courses: [],
   customTypes: [],
   tasks: [],
+  events: [],
   settings: {},
-  ready: { courses: false, types: false, tasks: false, settings: false },
+  ready: { courses: false, types: false, tasks: false, events: false, settings: false },
 };
 
 const subscribers = new Set();
@@ -46,8 +47,8 @@ export function setReady(key) {
 
 export function resetState() {
   Object.assign(state, {
-    fb: null, uid: null, courses: [], customTypes: [], tasks: [], settings: {},
-    ready: { courses: false, types: false, tasks: false, settings: false },
+    fb: null, uid: null, courses: [], customTypes: [], tasks: [], events: [], settings: {},
+    ready: { courses: false, types: false, tasks: false, events: false, settings: false },
   });
 }
 
@@ -103,4 +104,14 @@ export function isTaskArchived(task) {
 /** "CS 101" for academic tasks, "GDGoC-TUPM" for organization tasks. */
 export function taskGroupName(task) {
   return task.workspace === "academics" ? courseName(task.courseId) : orgName(task.orgId);
+}
+
+export function eventById(id) {
+  return state.events.find((e) => e.id === id) || null;
+}
+
+/** "CS 101" / "COMPASS", or "" for an event with no course or organization. */
+export function eventGroupName(event) {
+  if (event.workspace === "academics") return event.courseId ? courseName(event.courseId) : "";
+  return event.orgId ? orgName(event.orgId) : "";
 }

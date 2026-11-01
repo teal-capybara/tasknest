@@ -88,19 +88,21 @@ export function manageView(container) {
 
   async function onDeleteCourse(course, tasks) {
     const n = tasks.length;
+    const events = state.events.filter((e) => e.courseId === course.id);
     const ok = await confirmDialog({
       title: `Delete "${course.name}"?`,
       message: [
         n
           ? `This will also permanently delete ${plural(n, "task")} that belong to this course, with their notes and history. This cannot be undone.`
           : "This course has no tasks. This cannot be undone.",
+        events.length ? `Its ${plural(events.length, "event")} will stay on your calendar, without a course.` : null,
         "Not sure? Archive the course instead. It disappears from your lists but nothing is lost, and you can restore it any time.",
       ],
       confirmLabel: n ? `Delete course and ${plural(n, "task")}` : "Delete course",
       danger: true,
     });
     if (!ok) return;
-    deleteCourse(state.fb, state.uid, course.id, tasks.map((t) => t.id));
+    deleteCourse(state.fb, state.uid, course.id, tasks.map((t) => t.id), events.map((e) => e.id));
     toast(n ? `Course and ${plural(n, "task")} deleted.` : "Course deleted.");
   }
 

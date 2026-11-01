@@ -15,7 +15,7 @@
    If you add a new file to the app, add it to SHELL_FILES too.
    ========================================================================== */
 
-const VERSION = "v3b-dashboard";
+const VERSION = "v3c-calendar";
 const SHELL_CACHE = `tasknest-shell-${VERSION}`;
 const SDK_CACHE = "tasknest-firebase-sdk"; // Firebase files are versioned by URL, so this one is kept
 
@@ -34,12 +34,14 @@ const SHELL_FILES = [
   "js/constants.js",
   "js/data.js",
   "js/db/courses.js",
+  "js/db/events.js",
   "js/db/helpers.js",
   "js/db/settings.js",
   "js/db/syncTest.js",
   "js/db/taskTypes.js",
   "js/db/tasks.js",
   "js/firebase.js",
+  "js/logic/calendar.js",
   "js/logic/drafts.js",
   "js/logic/filters.js",
   "js/logic/format.js",
@@ -60,17 +62,20 @@ const SHELL_FILES = [
   "js/ui/taskActions.js",
   "js/ui/taskCard.js",
   "js/ui/themePicker.js",
+  "js/views/calendarView.js",
   "js/views/dashboardView.js",
+  "js/views/eventDetailView.js",
+  "js/views/eventFormView.js",
   "js/views/manageView.js",
   "js/views/settingsView.js",
   "js/views/taskDetailView.js",
   "js/views/taskFormView.js",
   "js/views/tasksView.js",
-  "icons/apple-touch-icon.png",
-  "icons/favicon-64.png",
-  "icons/icon-192.png",
-  "icons/icon-512.png",
-  "icons/icon-maskable-512.png",
+  "icons/tasknest-apple-180.png",
+  "icons/tasknest-favicon-64.png",
+  "icons/tasknest-192.png",
+  "icons/tasknest-512.png",
+  "icons/tasknest-maskable-512.png",
 ].map((path) => new URL(path, self.registration.scope).href);
 
 const INDEX_URL = new URL("index.html", self.registration.scope).href;

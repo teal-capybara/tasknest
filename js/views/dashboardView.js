@@ -5,6 +5,8 @@
      1. A greeting and today's date.
      2. Four tiles: Overdue, Due today, Due soon, In progress. Tap one to see
         exactly those tasks on the Tasks list.
+     2b. "Coming up": your next events (exams, meetings, classes) in the next 14 days.
+         An exam with no task yet gets a shortcut to create a review task.
      3. "Needs attention": the most urgent tasks (up to 5), with the same
         controls as the Tasks list (tick them off right here).
      4. Progress per course / organization (how many tasks are done).
@@ -16,9 +18,11 @@
    ========================================================================== */
 
 import { h, clear } from "../ui/dom.js";
-import { state, getSettings, isTaskArchived, taskGroupName } from "../state.js";
+import { state, getSettings, isTaskArchived, taskGroupName, eventGroupName } from "../state.js";
 import { dashboardStats } from "../logic/stats.js";
 import { buildTaskCard } from "../ui/taskCard.js";
+import { upcomingEvents, relativeDay, formatClock } from "../logic/calendar.js";
+import { EVENT_KINDS } from "../constants.js";
 
 const MAX_ATTENTION = 5;
 
@@ -46,7 +50,9 @@ export function dashboardView(container) {
     dateLine.textContent = new Date(now).toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" });
     clear(body);
 
-    if (!stats.totalActive) {
+    const upcoming = upcomingEvents(state.events, now, 14, 5);
+
+    if (!stats.totalActive && !upcoming.length) {
       body.append(h("div", { class: "empty card" },
         h("h2", {}, "Nothing here yet"),
         h("p", { class: "muted" }, state.courses.length
@@ -57,7 +63,7 @@ export function dashboardView(container) {
     }
 
     // (append(null) would print the word "null", so leave out sections that have nothing to show)
-    body.append(...[tiles(stats), attentionSection(stats, now), progressSection(stats), weekSection(stats, settings)].filter(Boolean));
+    body.append(...[tiles(stats), eventsSection(upcoming, now), attentionSection(stats, now), progressSection(stats), weekSection(stats, settings)].filter(Boolean));
   }
 
   render();
@@ -81,6 +87,27 @@ function tiles(stats) {
       h("span", { class: "stat-number" }, String(n)),
       h("span", { class: "stat-label" }, h("span", { class: "badge-icon", "aria-hidden": "true" }, tile.icon), tile.label));
   }));
+}
+
+function eventsSection(upcoming, now) {
+  if (!upcoming.length) return null;
+  return h("section", { class: "dash-section" },
+    h("h2", {}, "Coming up"),
+    h("ul", { class: "event-list card" }, upcoming.map((e) => {
+      const kind = (EVENT_KINDS.find((k) => k.id === e.kind) || {}).name || "Event";
+      const group = eventGroupName(e);
+      const hasTask = state.tasks.some((t) => t.eventId === e.id && !t.archived);
+      return h("li", { class: "event-row" },
+        h("a", { class: "event-link", href: `#/event/${encodeURIComponent(e.id)}` },
+          h("span", { class: "event-when" }, h("strong", {}, relativeDay(e.startAt, now)), h("span", { class: "muted small" }, e.allDay ? "All day" : formatClock(e.startAt))),
+          h("span", { class: "event-main" },
+            h("span", { class: "event-title" }, e.title),
+            h("span", { class: "cal-meta" }, h("span", { class: `chip chip-kind kind-${e.kind}` }, kind), group ? h("span", { class: "muted small" }, group) : null))),
+        e.kind === "exam" && !hasTask
+          ? h("a", { class: "btn btn-small", href: `#/task/new?event=${encodeURIComponent(e.id)}` }, "Add review task")
+          : null);
+    })),
+    h("p", {}, h("a", { href: "#/calendar" }, "Open the calendar")));
 }
 
 function attentionSection(stats, now) {

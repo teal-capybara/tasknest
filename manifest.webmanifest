@@ -10,8 +10,8 @@
   "background_color": "#FDF9E3",
   "theme_color": "#8ED1C4",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "icons/tasknest-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/tasknest-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/tasknest-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

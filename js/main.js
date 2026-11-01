@@ -26,6 +26,9 @@ import { clearAllDrafts } from "./logic/drafts.js";
 import { getSettings } from "./state.js";
 
 import { dashboardView } from "./views/dashboardView.js";
+import { calendarView } from "./views/calendarView.js";
+import { eventFormView } from "./views/eventFormView.js";
+import { eventDetailView } from "./views/eventDetailView.js";
 import { tasksView } from "./views/tasksView.js";
 import { taskFormView } from "./views/taskFormView.js";
 import { taskDetailView } from "./views/taskDetailView.js";
@@ -37,7 +40,8 @@ import { settingsView } from "./views/settingsView.js";
    Order matters: "/task/new" must come before "/task/:id". */
 /** "#/home" has no screen of its own: it sends you to the start screen you chose in Settings, View. */
 function homeView() {
-  const target = getSettings().defaultScreen === "tasks" ? "/tasks" : "/dashboard";
+  const screen = getSettings().defaultScreen;
+  const target = screen === "tasks" ? "/tasks" : screen === "calendar" ? "/calendar" : "/dashboard";
   location.replace(`#${target}`);
   return {};
 }
@@ -49,6 +53,10 @@ const ROUTES = [
   { path: "/task/new",      nav: "tasks",    title: "Add task",  view: taskFormView,  hideAdd: true },
   { path: "/task/:id/edit", nav: "tasks",    title: "Edit task", view: taskFormView,  hideAdd: true },
   { path: "/task/:id",      nav: "tasks",    title: "Task",      view: taskDetailView },
+  { path: "/calendar",      nav: "calendar", title: "Calendar",   view: calendarView },
+  { path: "/event/new",     nav: "calendar", title: "Add event",  view: eventFormView,   hideAdd: true },
+  { path: "/event/:id/edit", nav: "calendar", title: "Edit event", view: eventFormView,  hideAdd: true },
+  { path: "/event/:id",     nav: "calendar", title: "Event",      view: eventDetailView },
   { path: "/manage",        nav: "manage",   title: "Manage",    view: manageView },
   { path: "/settings",          nav: "settings", title: "Settings", view: settingsView },
   { path: "/settings/:section", nav: "settings", title: "Settings", view: settingsView },

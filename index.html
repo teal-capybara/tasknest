@@ -8,8 +8,8 @@
   <meta name="theme-color" content="#8ED1C4">
 
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icons/favicon-64.png" type="image/png" sizes="64x64">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" href="icons/tasknest-favicon-64.png" type="image/png" sizes="64x64">
+  <link rel="apple-touch-icon" href="icons/tasknest-apple-180.png">
 
   <!--
     Apply the saved theme BEFORE the page paints, so there is no flash of the
@@ -58,7 +58,7 @@
   <!-- Sign in -->
   <main id="screen-signin" class="screen screen-center" hidden>
     <section class="card card-narrow signin-card">
-      <img src="icons/icon-192.png" alt="" width="72" height="72" class="signin-logo">
+      <img src="icons/tasknest-192.png" alt="" width="72" height="72" class="signin-logo">
       <h1>TaskNest</h1>
       <p class="muted">Your school and organization tasks, on every device, even offline.</p>
       <button type="button" class="btn btn-primary btn-large" id="signin-button">Sign in with Google</button>
@@ -73,7 +73,7 @@
     <!-- Desktop sidebar (hidden on phones; the bottom bar is used there) -->
     <aside class="sidebar">
       <div class="brand">
-        <img src="icons/icon-192.png" alt="" width="32" height="32">
+        <img src="icons/tasknest-192.png" alt="" width="32" height="32">
         <span class="brand-name">TaskNest</span>
       </div>
       <a class="btn btn-primary btn-large side-add" href="#/task/new" data-add-task>
@@ -89,6 +89,10 @@
           <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>
           <span>Tasks</span>
         </a>
+        <a class="nav-link" href="#/calendar" data-route="calendar">
+          <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
+          <span>Calendar</span>
+        </a>
         <a class="nav-link" href="#/manage" data-route="manage">
           <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
           <span>Manage</span>
@@ -103,7 +107,7 @@
     <div class="app-body">
       <header class="app-header">
         <div class="brand">
-          <img src="icons/icon-192.png" alt="" width="32" height="32">
+          <img src="icons/tasknest-192.png" alt="" width="32" height="32">
           <span class="brand-name">TaskNest</span>
         </div>
         <!-- The sync indicator is filled in by js/sync-status.js -->
@@ -134,6 +138,10 @@
       <a class="nav-link" href="#/tasks" data-route="tasks">
         <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>
         <span>Tasks</span>
+      </a>
+      <a class="nav-link" href="#/calendar" data-route="calendar">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
+        <span>Calendar</span>
       </a>
       <a class="nav-link" href="#/manage" data-route="manage">
         <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>

@@ -37,9 +37,15 @@ export function setCourseArchived(fb, uid, id, archived) {
     { archived, updatedAt: Date.now() }, { merge: true }));
 }
 
-/** Permanently deletes the course and every task that belongs to it. */
-export function deleteCourse(fb, uid, courseId, taskIds) {
+/**
+ * Permanently deletes the course and every task that belongs to it.
+ * Events of the course are NOT deleted: they stay on the calendar, just without a course.
+ */
+export function deleteCourse(fb, uid, courseId, taskIds, eventIds = []) {
   const ops = taskIds.map((tid) => (batch) => batch.delete(docRef(fb, uid, "tasks", tid)));
+  for (const eid of eventIds) {
+    ops.push((batch) => batch.set(docRef(fb, uid, "events", eid), { courseId: null, updatedAt: Date.now() }, { merge: true }));
+  }
   ops.push((batch) => batch.delete(docRef(fb, uid, "courses", courseId)));
   runBatched(fb, ops);
 }

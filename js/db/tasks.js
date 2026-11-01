@@ -11,6 +11,7 @@
      createdAt, updatedAt            set automatically
      inProgressAt                    the FIRST time it was marked In progress
      completedAt                     when it was marked Done (null if not done)
+     eventId          the schedule event this task is for (optional, see js/db/events.js)
      archived, archivedAt
      deadlineHistory                 list of { from, to, changedAt }
 
@@ -38,6 +39,7 @@ function toFields(input) {
     dueAt: input.dueAt == null ? null : input.dueAt,
     instructions: (input.instructions || "").trim(),
     notes: (input.notes || "").trim(),
+    eventId: input.eventId || null,
   };
 }
 

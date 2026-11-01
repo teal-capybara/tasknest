@@ -19,9 +19,10 @@
 
 import { h, clear, optionEls } from "../ui/dom.js";
 import { ARRANGEMENTS, LIMITS, ORGS, STATUSES, WORKSPACES } from "../constants.js";
-import { state, typesFor } from "../state.js";
+import { state, typesFor, eventById, eventGroupName } from "../state.js";
 import { validateTaskForm } from "../logic/validate.js";
-import { fromInputs, toInputDate, toInputTime } from "../logic/format.js";
+import { fromInputs, toInputDate, toInputTime, startOfDay } from "../logic/format.js";
+import { eventWhen, addDays, dayKey as dayKeyOf } from "../logic/calendar.js";
 import { createTask, updateTask } from "../db/tasks.js";
 import { toast } from "../ui/screens.js";
 import { go, reload } from "../router.js";
@@ -34,6 +35,8 @@ export function taskFormView(container, params, query) {
   const copyOf = !editing && query.from ? state.tasks.find((t) => t.id === query.from) : null;
   const base = editing || copyOf;
   const mode = editing ? "edit" : "create";
+  // "Create review task" on an event page opens this form already filled in (#/task/new?event=ID).
+  const forEvent = !base && query.event ? eventById(query.event) : null;
 
   /* ---------- choices for the dropdowns ---------- */
   // Archived courses can't be picked for NEW work, but keep the one this task already uses.
@@ -59,6 +62,7 @@ export function taskFormView(container, params, query) {
         status: copyOf ? "not_started" : base.status,
         instructions: base.instructions || "", notes: base.notes || "",
       }
+    : forEvent ? fromEvent(forEvent)
     : {
         title: "",
         workspace: query.ws === "organizations" ? "organizations" : "academics",
@@ -70,7 +74,8 @@ export function taskFormView(container, params, query) {
   const baseline = normalize(fresh);
   const typeWasReset = Boolean(base) && fresh.typeId !== "" && baseline.typeId === "";
 
-  const draftKey = editing ? `edit:${editing.id}` : copyOf ? `copy:${copyOf.id}` : "new";
+  const draftKey = editing ? `edit:${editing.id}` : copyOf ? `copy:${copyOf.id}` : forEvent ? `eventtask:${forEvent.id}` : "new";
+  const eventId = (base && base.eventId) || (forEvent && forEvent.id) || "";
   const draft = readDraft(state.uid, draftKey, baseline);
   const initial = draft ? normalize({ ...baseline, ...draft }) : baseline;
 
@@ -126,6 +131,7 @@ export function taskFormView(container, params, query) {
   const summary = h("div", { class: "form-summary error-text", role: "alert", hidden: true, tabindex: "-1" });
 
   const form = h("form", { class: "task-form", novalidate: true, onSubmit: onSubmit },
+    h("input", { type: "hidden", name: "eventId", value: eventId }),   // links the task to its event (see js/db/events.js)
     summary,
     field("title", "Task title", el.title, { required: true }),
     workspaceGroup,
@@ -147,6 +153,7 @@ export function taskFormView(container, params, query) {
   container.append(h("div", { class: "page-head" }, h("h1", {}, heading)));
   // (append(null) would print the word "null", so only add the note when there is one)
   if (copyOf) container.append(h("p", { class: "muted" }, "This is a copy. Change whatever is different, then save."));
+  if (forEvent) container.append(h("p", { class: "muted" }, `This task is for “${forEvent.title}”. Change anything you like, then save.`));
   if (draft) {
     container.append(h("div", { class: "banner banner-inline", role: "status" },
       h("span", {}, "Your unsaved entries were restored."),
@@ -238,7 +245,7 @@ export function taskFormView(container, params, query) {
 
     const data = new FormData(form);
     const values = Object.fromEntries([...data.entries()].map(([k, v]) => [k, String(v)]));
-    const { errors, value } = validateTaskForm(values, { courseIds, typeIds: typeIdsByWorkspace });
+    const { errors, value } = validateTaskForm(values, { courseIds, typeIds: typeIdsByWorkspace, eventIds: state.events.map((e) => e.id) });
 
     const names = Object.keys(errors);
     if (names.length) {
@@ -273,6 +280,25 @@ export function taskFormView(container, params, query) {
       document.removeEventListener("visibilitychange", onVisibility);
       persist();
     },
+  };
+}
+
+/**
+ * Starting values for a task made from an event:
+ *   title      "Review for Midterm" (exams) or "Prepare for ..." (everything else)
+ *   deadline   the day before the event (or today, if that day has passed); time left empty = 11:59 PM
+ *   type       Exam for an exam, Meeting for an organization meeting (otherwise you choose)
+ */
+function fromEvent(event) {
+  const dayBefore = addDays(new Date(event.startAt), -1);
+  const due = startOfDay(dayBefore.getTime()) < startOfDay(Date.now()) ? new Date() : dayBefore;
+  const academics = event.workspace === "academics";
+  return {
+    title: `${event.kind === "exam" ? "Review for" : "Prepare for"} ${event.title}`,
+    workspace: event.workspace, courseId: academics ? (event.courseId || "") : "", orgId: academics ? "" : (event.orgId || ""),
+    typeId: event.kind === "exam" && academics ? "exam" : event.kind === "meeting" && !academics ? "org-meeting" : "",
+    arrangement: "individual", dueDate: dayKeyOf(due), dueTime: "", status: "not_started",
+    instructions: `For ${event.title} (${eventWhen(event)}).`, notes: "",
   };
 }
 

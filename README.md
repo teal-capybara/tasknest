@@ -1,8 +1,8 @@
-# TaskNest (Phase 3b: Home dashboard)
+# TaskNest (Phase 3c: Calendar and events)
 
 A personal school and organization task tracker that installs on your phone and works offline.
 
-**This is Phase 3b: the second step of Phase 3 (new icon and the Home dashboard).**
+**This is Phase 3c: the third step of Phase 3 (Calendar and schedule events).**
 
 | Phase | What you get | Status |
 |---|---|---|
@@ -10,8 +10,9 @@ A personal school and organization task tracker that installs on your phone and 
 | 2 | Courses, task types, Add/Edit/Duplicate task, task cards, inline status, urgency sorting, filters, search, archive/delete, task pages, Academics + Organizations | Done |
 | 2.5 | Task types per workspace, form drafts that survive leaving the page, no floating Add button on the form, Settings as a list, Archived tasks in Settings, "Due soon" wording | Done |
 | 3a | Four new themes (Sakura Mist, Velvet Dusk, Rosé Eclipse, Abyssal Tide) | Done |
-| 3b | New app icon, Home dashboard, choose your start screen | **This version** |
-| 3c-3d | Calendar with schedule events (exams, meetings), then Board view | Next |
+| 3b | New app icon, Home dashboard, choose your start screen | Done |
+| 3c | Calendar (month, week, day) with schedule events (exams, meetings, classes), "Create review task" | **This version** |
+| 3d | Board view | Next |
 | 4 | Reports, export/import backup, optional start date, polish | Later |
 | 5 | Recurring tasks | Later |
 
@@ -41,15 +42,16 @@ js/
   sync-status.js        The "Synced / Waiting to sync / Offline" chip
   theme.js  session.js  Theme list; tiny shared helper
   db/                   Everything that reads/writes the database
-    courses.js  taskTypes.js  tasks.js  settings.js  helpers.js  syncTest.js
+    courses.js  taskTypes.js  tasks.js  events.js  settings.js  helpers.js  syncTest.js
   logic/                Pure rules, no screens: urgency.js, filters.js, validate.js,
                         timing.js (early/on time/late), format.js (dates),
                         drafts.js (saves the half-filled task form),
-                        stats.js (the Dashboard's numbers)
+                        stats.js (the Dashboard's numbers),
+                        calendar.js (dates, month grids, what is on each day)
   ui/                   Reusable pieces: dom.js, dialogs.js, taskCard.js, taskActions.js ...
-  views/                One file per screen: dashboardView, tasksView, taskFormView, taskDetailView,
+  views/                One file per screen: dashboardView, calendarView, eventFormView, eventDetailView, tasksView, taskFormView, taskDetailView,
                         manageView, settingsView (the Settings list and all its pages)
-icons/                  The app icon (PNG sizes: browser tab, home screen, Android adaptive, iPhone)
+icons/                  The app icon (tasknest-*.png: browser tab, home screen, Android adaptive, iPhone)
 ```
 
 Technologies: plain HTML, CSS and JavaScript (no build step, nothing to install), Firebase Authentication and Cloud Firestore (free "Spark" plan), GitHub Pages for hosting. The Firebase code is loaded from Google's CDN.
@@ -105,7 +107,18 @@ New **public** repository, upload the files (including the `css`, `js`, `icons` 
 
 Archived tasks are never counted. "Due today" means a deadline later today; a deadline that already passed today counts as overdue.
 
-**Navigation.** Phone: bottom bar (Home, Tasks, Manage, Settings) and the **Add task** button (it hides itself on the Add/Edit form, where it would only be in the way). Computer: the sidebar.
+**Calendar.** Open it from the bottom bar (Calendar). It shows your **schedule events** and your **task deadlines** together.
+- **Month**: a grid of the month. Each day shows small shapes: a diamond ◆ for an event (red for an exam) and a circle ● for a task deadline. Tap a day and everything on it is listed under the grid.
+- **Week**: the 7 days with everything listed. **Day**: one day. Use the arrows to move and **Today** to jump back. The view you last used is remembered while the app is open.
+- Tasks without a deadline, and archived tasks, are not on the calendar. Finished tasks show crossed out with "Task done".
+- Tap anything in the list to open it.
+
+**Events** are things you attend: an exam, a meeting, a class, anything else. An event is **not** a task. Tap **Add event** (on the Calendar), fill in the title, kind (Exam, Meeting, Class, Other), workspace, optional course or organization, the date, the start and end time (or tick **All day**), and an optional location and notes. Events last one day. Like the task form, the event form keeps your entries if you leave it.
+- **Create review task**: on an exam's page this opens the Add task form already filled in: "Review for Midterm", the same course, type Exam, and a deadline the day before the exam (or today if the exam is today or tomorrow). For other events the button says "Create task for this event" and the title starts with "Prepare for". The task stays linked: it is listed on the event's page, and the task's page links back to the event.
+- On **Home**, **Coming up** lists your events in the next 14 days. An exam that has no task yet shows an **Add review task** shortcut.
+- Deleting an event never deletes its tasks. Deleting a course never deletes its events (they stay on the calendar, without a course).
+
+**Navigation.** Phone: bottom bar (Home, Tasks, Calendar, Manage, Settings) and the **Add task** button (it hides itself on the Add/Edit form, where it would only be in the way). Computer: the sidebar.
 
 **First time:**
 1. **Manage**, add your courses (for example `CS 101`). Add any custom task types you want, in the Academics list or the Organizations list.
@@ -145,7 +158,7 @@ Archived tasks are never counted. "Due today" means a deadline later today; a de
 | Word | What is inside |
 |---|---|
 | Theme | The eight color themes (four light, four dark) |
-| View | The screen the app starts on (Dashboard or Tasks list; Calendar and Board join later), and the "Due soon" and "Early" windows (hours) |
+| View | The screen the app starts on (Dashboard, Tasks list or Calendar; Board joins later), and the "Due soon" and "Early" windows (hours) |
 | Account | Your name, email, Account ID, Sign out |
 | Archived tasks | Tasks you archived |
 | Install the app | Install on your phone |
@@ -161,8 +174,9 @@ Everything lives under your account: `users/{your-id}/...`
 |---|---|
 | `courses` | name, archived, createdAt, updatedAt |
 | `taskTypes` | your custom types only: name, workspace (`academics` or `organizations`), createdAt, updatedAt |
-| `tasks` | title, workspace, courseId or orgId, typeId, arrangement, status, dueAt, instructions, notes, createdAt, updatedAt, inProgressAt, completedAt, archived, archivedAt, deadlineHistory |
-| `settings/main` | theme, dueSoonHours, earlyHours (more in Phase 3) |
+| `tasks` | title, workspace, courseId or orgId, typeId, arrangement, status, dueAt, instructions, notes, eventId (optional), createdAt, updatedAt, inProgressAt, completedAt, archived, archivedAt, deadlineHistory |
+| `events` | title, kind (`exam`/`meeting`/`class`/`other`), workspace, courseId or orgId (optional), allDay, startAt, endAt (or null), location, notes, createdAt, updatedAt |
+| `settings/main` | theme, defaultScreen, dueSoonHours, earlyHours |
 | `meta/syncTest` | the little counter on the Settings page. Safe to ignore |
 
 - Tasks point to courses and types by **id**, not name, so renaming a course or type updates every task.
@@ -200,6 +214,9 @@ If you add a new file, also add it to `SHELL_FILES` in `service-worker.js`.
 | Built-in task types | `ACADEMIC_TYPES` and `ORG_TYPES` in `js/constants.js` (never change an existing `id`) |
 | "Due soon" window (48 h) / "early" window (24 h) | Settings, View in the app. The starting values are `DEFAULT_SETTINGS` in `js/constants.js` |
 | The Home dashboard numbers / layout | `js/logic/stats.js` (numbers), `js/views/dashboardView.js` (layout) |
+| First day of the week on the calendar (Sunday or Monday) | `WEEK_START` in `js/constants.js` |
+| Kinds of events (Exam, Meeting ...) | `EVENT_KINDS` in `js/constants.js` (never change an existing `id`) |
+| Calendar layout / what each day shows | `js/views/calendarView.js`, `js/logic/calendar.js` |
 | Which screens hide the floating Add task button | `hideAdd: true` on the route in `js/main.js` |
 | What the Settings list says | `SECTION_ORDER`, `SUMMARY` and `SECTIONS` in `js/views/settingsView.js` |
 | Default time when you pick only a date | `DEFAULT_DUE_TIME` in `js/constants.js` |
@@ -222,7 +239,7 @@ If you add a new file, also add it to `SHELL_FILES` in `service-worker.js`.
 | Blank page on GitHub Pages | You uploaded the `tasknest` folder itself instead of what is inside it |
 | After the update, sign-in screen asks for Firebase values | `config.js` was overwritten with the placeholder. Paste your values in again |
 | A course or type shows "Unknown" | It was deleted on another device and this one has not synced yet |
-| The home-screen icon is still the old one after updating | Android keeps the old icon until the app is reinstalled: remove TaskNest from your home screen, then install it again from the browser menu |
+| The home-screen icon is still the old one after updating | Android keeps the old icon until the app is reinstalled: remove TaskNest from your home screen, wait a minute, then install it again from the browser menu. The icon files are named `tasknest-*.png`; you can delete any older `icon-*.png`, `apple-touch-icon.png` and `favicon-64.png` files from your repo |
 | The form shows old text I didn't expect | It is a saved draft. Tap **Start over** (or **Cancel**) to remove it |
 | I can't find my archived task | Settings, Archived tasks. (If its course is archived, restore the course in Manage) |
 

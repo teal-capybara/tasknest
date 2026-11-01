@@ -12,6 +12,8 @@
      "new"        the blank Add task form
      "copy:ID"    a duplicate of task ID
      "edit:ID"    editing task ID
+     "eventtask:ID"   a new task made from event ID
+     "event:new" / "event:edit:ID"   the event form
    Drafts belong to the signed-in account (the key includes your account ID).
    ========================================================================== */
 
@@ -63,7 +65,12 @@ export const DRAFT_FIELDS = [
   "dueDate", "dueTime", "status", "instructions", "notes",
 ];
 
+/** The fields of the Add/Edit event form. */
+export const EVENT_DRAFT_FIELDS = [
+  "title", "kind", "workspace", "courseId", "orgId", "date", "allDay", "startTime", "endTime", "location", "notes",
+];
+
 /** True when a draft differs from the form's starting values (so an untouched form leaves no draft). */
-export function isDifferent(values, baseline) {
-  return DRAFT_FIELDS.some((f) => (values[f] ?? "") !== (baseline[f] ?? ""));
+export function isDifferent(values, baseline, fields = DRAFT_FIELDS) {
+  return fields.some((f) => (values[f] ?? "") !== (baseline[f] ?? ""));
 }

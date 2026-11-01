@@ -63,4 +63,15 @@ export const DEFAULT_SETTINGS = { dueSoonHours: 48, earlyHours: 24 };
 /* If you pick a due date but no time, this time is used. */
 export const DEFAULT_DUE_TIME = { hours: 23, minutes: 59 };
 
-export const LIMITS = { title: 120, text: 5000, name: 60 };
+/* Schedule events (exams, meetings, classes). Stored in the database as plain text ids. */
+export const EVENT_KINDS = [
+  { id: "exam",    name: "Exam" },
+  { id: "meeting", name: "Meeting" },
+  { id: "class",   name: "Class" },
+  { id: "other",   name: "Other" },
+];
+
+/* The calendar's first day of the week: 0 = Sunday, 1 = Monday. */
+export const WEEK_START = 0;
+
+export const LIMITS = { title: 120, text: 5000, name: 60, location: 120 };

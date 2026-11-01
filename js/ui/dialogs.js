@@ -46,7 +46,7 @@ function buttons({ confirmLabel, cancelLabel, danger }, dialogRef) {
  *   danger : red confirm button, for destructive actions
  */
 export function confirmDialog({ title, message, body, confirmLabel = "Confirm", cancelLabel = "Cancel", danger = false }) {
-  const paragraphs = [].concat(message || []).map((m) => h("p", {}, m));
+  const paragraphs = [].concat(message || []).filter(Boolean).map((m) => h("p", {}, m));
   return openDialog({
     title,
     content: h("div", {}, paragraphs, body || null),

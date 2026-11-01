@@ -6,14 +6,14 @@
    Nothing invalid is ever saved silently.
    ========================================================================== */
 
-import { ARRANGEMENTS, LIMITS, ORGANIZATIONS, STATUSES, WORKSPACES } from "../constants.js";
+import { ARRANGEMENTS, EVENT_KINDS, LIMITS, ORGANIZATIONS, STATUSES, WORKSPACES } from "../constants.js";
 import { fromInputs } from "./format.js";
 
 const has = (list, id) => list.some((x) => x.id === id);
 
 /**
  * values : the raw form values (all strings)
- * ctx    : { courseIds: [ids allowed], typeIds: { academics: [ids], organizations: [ids] } }
+ * ctx    : { courseIds: [ids allowed], typeIds: { academics: [ids], organizations: [ids] }, eventIds: [ids] }
  * Returns { errors: { fieldName: message }, value } (value is null if there are errors)
  */
 export function validateTaskForm(values, ctx) {
@@ -57,7 +57,64 @@ export function validateTaskForm(values, ctx) {
       title, workspace: values.workspace, courseId, orgId,
       typeId: values.typeId, arrangement: values.arrangement,
       dueAt: due.ms, instructions, notes, status: values.status,
+      // The event this task is for. Dropped quietly if that event no longer exists.
+      eventId: values.eventId && (ctx.eventIds || []).includes(values.eventId) ? values.eventId : null,
     },
+  };
+}
+
+/**
+ * Checks the Add/Edit event form.
+ * values: all strings. allDay is "1" when the box is ticked.
+ * ctx: { courseIds }
+ * Returns { errors, value }. value has startAt / endAt as numbers, ready to save.
+ */
+export function validateEventForm(values, ctx) {
+  const errors = {};
+
+  const title = (values.title || "").trim();
+  if (!title) errors.title = "Give the event a title.";
+  else if (title.length > LIMITS.title) errors.title = `Keep the title under ${LIMITS.title} characters.`;
+
+  if (!has(EVENT_KINDS, values.kind)) errors.kind = "Choose what kind of event this is.";
+  if (!has(WORKSPACES, values.workspace)) errors.workspace = "Choose Academics or Organizations.";
+
+  let courseId = null, orgId = null;
+  if (values.workspace === "academics" && values.courseId) {
+    if (!(ctx.courseIds || []).includes(values.courseId)) errors.courseId = "That course no longer exists. Choose another.";
+    else courseId = values.courseId;
+  } else if (values.workspace === "organizations" && values.orgId) {
+    if (!has(ORGANIZATIONS, values.orgId)) errors.orgId = "Choose an organization from the list.";
+    else orgId = values.orgId;
+  }
+
+  const allDay = values.allDay === "1";
+  let startAt = null, endAt = null;
+  if (!values.date) {
+    errors.date = "Pick the date of the event.";
+  } else {
+    const start = fromInputs(values.date, allDay ? "00:00" : values.startTime);
+    if (start.error) errors[start.field === "time" ? "startTime" : "date"] = start.error;
+    else if (!allDay && !values.startTime) errors.startTime = "Choose a start time, or tick All day.";
+    else startAt = start.ms;
+
+    if (!allDay && values.endTime && !errors.date && !errors.startTime) {
+      const end = fromInputs(values.date, values.endTime);
+      if (end.error) errors.endTime = end.error;
+      else if (startAt != null && end.ms <= startAt) errors.endTime = "The end time must be after the start time.";
+      else endAt = end.ms;
+    }
+  }
+
+  const location = (values.location || "").trim();
+  const notes = (values.notes || "").trim();
+  if (location.length > LIMITS.location) errors.location = `Keep this under ${LIMITS.location} characters.`;
+  if (notes.length > LIMITS.text) errors.notes = `Keep this under ${LIMITS.text} characters.`;
+
+  if (Object.keys(errors).length) return { errors, value: null };
+  return {
+    errors,
+    value: { title, kind: values.kind, workspace: values.workspace, courseId, orgId, allDay, startAt, endAt, location, notes },
   };
 }
 

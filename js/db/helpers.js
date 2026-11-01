@@ -5,6 +5,7 @@
      users/{uid}/courses/{courseId}
      users/{uid}/taskTypes/{typeId}      (your custom types only)
      users/{uid}/tasks/{taskId}
+     users/{uid}/events/{eventId}       (exams, meetings, classes)
      users/{uid}/settings/main
    ========================================================================== */
 

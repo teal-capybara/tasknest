@@ -11,7 +11,7 @@
 
    To add a page: write a function below that returns { title, build }, add it
    to SECTIONS, and add a row for it in SECTION_ORDER.
-   (Calendar and Board will be added to the start screen choices in the next Phase 3 steps.)
+   (The Board view will be added to the start screen choices in the next Phase 3 step.)
    ========================================================================== */
 
 import { h, clear } from "../ui/dom.js";
@@ -28,6 +28,7 @@ import { bindInstallCard } from "../ui/install.js";
 import { buildTaskCard } from "../ui/taskCard.js";
 import { toast } from "../ui/screens.js";
 
+const START_NAMES = { dashboard: "Dashboard", tasks: "Tasks", calendar: "Calendar" };
 const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 export function settingsView(container, params) {
@@ -48,7 +49,7 @@ const SECTION_ORDER = ["theme", "view", "account", "archived", "install", "offli
 /** One short line under each word, so you can see the current state without opening it. */
 const SUMMARY = {
   theme: () => (THEMES.find((t) => t.id === currentTheme()) || THEMES[0]).name,
-  view: () => `Starts on ${getSettings().defaultScreen === "tasks" ? "Tasks" : "Dashboard"} · due soon ${getSettings().dueSoonHours} h`,
+  view: () => `Starts on ${START_NAMES[getSettings().defaultScreen] || "Dashboard"} · due soon ${getSettings().dueSoonHours} h`,
   account: () => ((state.fb && state.fb.auth.currentUser) || {}).email || "Signed in",
   archived: () => plural(state.tasks.filter((t) => t.archived).length, "archived task"),
   install: () => "Add TaskNest to your home screen",
@@ -131,19 +132,20 @@ const SECTIONS = {
           } }, "Use defaults"),
           h("button", { type: "submit", class: "btn btn-primary" }, "Save")));
 
-      const startScreen = h("select", { class: "select", id: "set-start", value: settings.defaultScreen === "tasks" ? "tasks" : "dashboard", onChange: (e) => {
+      const startScreen = h("select", { class: "select", id: "set-start", value: START_NAMES[settings.defaultScreen] ? settings.defaultScreen : "dashboard", onChange: (e) => {
         guard(saveSettings(state.fb, state.uid, { defaultScreen: e.target.value }), "Settings not saved");
         toast("Saved.");
       } },
         h("option", { value: "dashboard" }, "Dashboard"),
-        h("option", { value: "tasks" }, "Tasks list"));
+        h("option", { value: "tasks" }, "Tasks list"),
+        h("option", { value: "calendar" }, "Calendar"));
 
       container.append(
         h("section", { class: "card" }, h("h2", {}, "Start screen"),
           h("div", { class: "field" },
             h("label", { class: "label", for: "set-start" }, "When I open the app, show"),
             startScreen,
-            h("p", { class: "hint" }, "Calendar and Board will be added to this list soon."))),
+            h("p", { class: "hint" }, "The Board view will be added to this list later."))),
         h("section", { class: "card" }, h("h2", {}, "Deadlines"), form));
     },
   },

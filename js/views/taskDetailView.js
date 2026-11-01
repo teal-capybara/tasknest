@@ -8,7 +8,7 @@
 
 import { h, clear } from "../ui/dom.js";
 import { STATUSES, WORKSPACES } from "../constants.js";
-import { state, getSettings, typeName, taskGroupName, isTaskArchived } from "../state.js";
+import { state, getSettings, typeName, taskGroupName, isTaskArchived, eventById } from "../state.js";
 import { completionTiming } from "../logic/timing.js";
 import { formatDateTime } from "../logic/format.js";
 import { arrangementName, urgencyBadge } from "../ui/taskCard.js";
@@ -33,6 +33,7 @@ export function taskDetailView(container, params) {
     const archived = isTaskArchived(task);
     const timing = completionTiming(task, settings.earlyHours);
     const id = encodeURIComponent(task.id);
+    const linkedEvent = task.eventId ? eventById(task.eventId) : null;
     const workspaceName = (WORKSPACES.find((w) => w.id === task.workspace) || {}).name;
 
     const row = (label, value) => h("div", { class: "detail-row" }, h("dt", {}, label), h("dd", {}, value));
@@ -73,7 +74,8 @@ export function taskDetailView(container, params) {
           row("Workspace", workspaceName || "—"),
           row(task.workspace === "academics" ? "Course" : "Organization", taskGroupName(task)),
           row("Task type", typeName(task.typeId)),
-          row("Work arrangement", arrangementName(task.arrangement)))),
+          row("Work arrangement", arrangementName(task.arrangement)),
+          linkedEvent ? row("For event", h("a", { href: `#/event/${encodeURIComponent(linkedEvent.id)}` }, linkedEvent.title)) : null)),
 
       h("section", { class: "card" },
         h("h2", {}, "Instructions"),
