@@ -1,8 +1,8 @@
-# TaskNest (Phase 3.7: Your capybara art and the new Calendar look)
+# TaskNest (Phase 3d: Board view)
 
 A personal school and organization task tracker that installs on your phone and works offline.
 
-**This is Phase 3.7: your capybara pictures and icons are now used exactly as drawn, and the Calendar follows your mock-up.**
+**This is Phase 3d: the Board view, which finishes Phase 3.**
 
 | Phase | What you get | Status |
 |---|---|---|
@@ -14,8 +14,8 @@ A personal school and organization task tracker that installs on your phone and 
 | 3c | Calendar (month, week, day) with schedule events (exams, meetings, classes), "Create review task" | Done |
 | 3.5 | Heart/flower calendar markers, "Add event" button on the Calendar, redesigned Home (greeting card, small counters, clear sections, Academics and Organizations progress apart), event types per workspace with your own, Manage in collapsible groups, capybara decorations | Done |
 | 3.6 | Floating pill navigation on phones, collapsible sidebar on desktop, shorter 2x2 Home tiles, tap a day for a floating window, desktop Calendar with side panels, secret capybara diary (one private note per day) | Done |
-| 3.7 | Your exact capybara poses and icons (cut out of your artwork, in `icons/art` and `icons/ui`), icon colors that follow the theme (the capybaras never change), Calendar redesigned like your mock-up (cloud banner, pill switches, Today / Upcoming / quote cards, week at a glance) | **This version** |
-| 3d | Board view | Next |
+| 3.7 | Your exact capybara poses and icons (cut out of your artwork, in `icons/art` and `icons/ui`), icon colors that follow the theme (the capybaras never change), Calendar redesigned like your mock-up (cloud banner, pill switches, Today / Upcoming / quote cards, week at a glance) | Done |
+| 3d | Board view: your tasks as Not started / In progress / Done columns, move with buttons or drag, filters | **This version** |
 | 4 | Reports, export/import backup, optional start date, polish | Later |
 | 5 | Recurring tasks | Later |
 
@@ -102,6 +102,8 @@ New **public** repository, upload the files (including the `css`, `js`, `icons` 
 ---
 
 ## Using the app
+
+**Board.** On the Tasks screen, switch from **List** to **Board** (top right). Your tasks sit in three columns: **Not started**, **In progress** and **Done**. On a phone, swipe sideways between columns. Move a task with the buttons on its card (**Start**, **Done**, **Back**, **Reopen**), or on a computer drag the card to another column. Moving a card is exactly the same as changing its status on the list, so the dates recorded for it stay correct. Use the tabs, the course or organization menu and the search box to narrow it down. Archived tasks are not shown. The Done column shows the last 14 days; press **Show all done** for older ones.
 
 **Home (dashboard).** The app opens here (you can change that under Settings, View). It shows a greeting, then four tiles: **Overdue**, **Due today**, **Due soon** and **In progress**. Tap a tile to open the Tasks list showing exactly those tasks. Under the tiles:
 - **Needs attention**: your most urgent tasks (up to 5; overdue first, then today, then soon). You can tick them off or change their status right there.

@@ -31,6 +31,7 @@ import { calendarView } from "./views/calendarView.js";
 import { eventFormView } from "./views/eventFormView.js";
 import { eventDetailView } from "./views/eventDetailView.js";
 import { tasksView } from "./views/tasksView.js";
+import { boardView } from "./views/boardView.js";
 import { taskFormView } from "./views/taskFormView.js";
 import { taskDetailView } from "./views/taskDetailView.js";
 import { manageView } from "./views/manageView.js";
@@ -52,6 +53,7 @@ const ROUTES = [
   { path: "/home",          nav: "dashboard", title: "Home",      view: homeView },
   { path: "/dashboard",     nav: "dashboard", title: "Home",      view: dashboardView },
   { path: "/tasks",         nav: "tasks",    title: "Tasks",     view: tasksView },
+  { path: "/board",         nav: "tasks",    title: "Board",     view: boardView },
   { path: "/task/new",      nav: "tasks",    title: "Add task",  view: taskFormView,  hideAdd: true },
   { path: "/task/:id/edit", nav: "tasks",    title: "Edit task", view: taskFormView,  hideAdd: true },
   { path: "/task/:id",      nav: "tasks",    title: "Task",      view: taskDetailView },

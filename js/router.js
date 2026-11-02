@@ -5,6 +5,7 @@
      #/home                opens your start screen (Dashboard or Tasks, see Settings, View)
      #/dashboard           the Dashboard
      #/tasks               the task list (#/tasks?when=overdue opens it already filtered)
+     #/board               your tasks as columns (Not started, In progress, Done)
      #/task/new            add a task      (#/task/new?from=ID duplicates a task)
      #/task/ID             one task's details
      #/task/ID/edit        edit a task

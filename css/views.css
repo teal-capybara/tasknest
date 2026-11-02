@@ -481,3 +481,36 @@ a.btn { text-decoration: none; }
 .side-event-text { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
 .side-quote { display: flex; align-items: center; justify-content: space-between; gap: .5rem; text-align: center; background: var(--surface-2); border-radius: 36px; }
 .side-quote p { margin: 0; font-weight: 600; font-style: italic; }
+
+/* ---- Tasks: List | Board switch, and the Board ---- */
+.page-head .tasks-switch { flex: none; }
+.board-toolbar { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0 .5rem; }
+.board-toolbar .input { flex: 1 1 12rem; min-width: 0; }
+.board-toolbar .select { flex: 1 1 10rem; min-width: 0; }
+
+/* Phone: columns side by side, swipe between them */
+.board { display: flex; gap: .75rem; margin: .5rem -1rem 0; padding: .25rem 1rem 1rem; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+.board-col {
+  flex: 0 0 min(84vw, 22rem); scroll-snap-align: start; min-width: 0;
+  padding: .75rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px;
+}
+.board-col.is-drop { outline: 3px dashed var(--focus); outline-offset: -3px; }
+.board-col-head { display: flex; align-items: center; gap: .5rem; margin: 0 0 .65rem; font-size: 1.05rem; }
+.board-col-title { flex: 1; }
+.board-cards { display: flex; flex-direction: column; gap: .6rem; }
+.board-empty { margin: .5rem 0; text-align: center; }
+.board-card { padding: .7rem .8rem; background: var(--surface); border: 1px solid var(--border); border-left: 6px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
+.board-card[draggable="true"] { cursor: grab; }
+.board-card.is-dragging { opacity: .45; }
+.board-card .task-title { display: block; margin-bottom: .35rem; font-weight: 700; overflow-wrap: anywhere; }
+.board-card .task-due { margin-top: .4rem; }
+.board-moves { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; }
+.board-col.col-in_progress .board-card { border-left-color: var(--link); }
+.board-col.col-done .board-card { border-left-color: var(--ok); }
+.board-more { align-self: center; margin-top: .25rem; }
+
+/* Wide screen: all three columns at once, no sideways scrolling */
+@media (min-width: 900px) {
+  .board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: .5rem 0 0; padding: .25rem 0 1rem; overflow: visible; align-items: start; }
+  .board-col { flex: none; }
+}

@@ -15,6 +15,7 @@ import { applyFilters, emptyFilters, countActiveFilters, hasAnyFilter, WHEN_OPTI
 import { SORTS } from "../logic/urgency.js";
 import { buildTaskCard, arrangementName } from "../ui/taskCard.js";
 import { loadDraft, clearDraft } from "../logic/drafts.js";
+import { tasksSwitch } from "../ui/tasksSwitch.js";
 
 // Remembered while you move between screens (reset when you close the app).
 let filters = emptyFilters();
@@ -74,7 +75,7 @@ export function tasksView(container, params, query = {}) {
   const list = h("div", { class: "task-list" });
 
   container.append(
-    h("div", { class: "page-head" }, h("h1", {}, "Tasks")),
+    h("div", { class: "page-head" }, h("h1", {}, "Tasks"), tasksSwitch("list")),
     draftBox,
     h("div", { class: "seg", role: "group", "aria-label": "Workspace" }, tabButtons),
     h("div", { class: "toolbar" }, search, filterToggle, clearButton),
