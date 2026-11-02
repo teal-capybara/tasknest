@@ -22,7 +22,7 @@ function apply(collapsed) {
 }
 
 if (mascot) {
-  mascot.append(capybara("read"));
+  mascot.append(capybara("study"));
   const p = document.createElement("p");
   p.className = "side-mascot-text";
   p.textContent = "You're doing great! Keep going!";

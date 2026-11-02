@@ -36,6 +36,7 @@
   --meta-theme: #8ED1C4;
   --mark-event: #B5651D;   /* heart on the calendar */
   --mark-task: #2E8F7F;    /* flower on the calendar */
+  --icon-hue: 0deg;       /* turns the teal button icons toward this theme (the capybaras never change) */
 }
 
 /* Theme 2: Pastel Bloom */
@@ -60,6 +61,7 @@
   --meta-theme: #F4B6D6;
   --mark-event: #C2477F;   /* heart on the calendar */
   --mark-task: #7E5BC4;    /* flower on the calendar */
+  --icon-hue: 140deg;       /* turns the teal button icons toward this theme (the capybaras never change) */
 }
 
 /* Theme 3: Ocean Breeze */
@@ -84,6 +86,7 @@
   --meta-theme: #A9C8F5;
   --mark-event: #5A6BD0;   /* heart on the calendar */
   --mark-task: #3C7FD0;    /* flower on the calendar */
+  --icon-hue: 53deg;       /* turns the teal button icons toward this theme (the capybaras never change) */
 }
 
 /* Theme 4: Midnight (dark) */
@@ -108,6 +111,7 @@
   --meta-theme: #1F2430;
   --mark-event: #E8C36F;   /* heart on the calendar */
   --mark-task: #6FB9AB;    /* flower on the calendar */
+  --icon-hue: 0deg;       /* turns the teal button icons toward this theme (the capybaras never change) */
   color-scheme: dark;
 }
 
@@ -139,6 +143,7 @@
   --meta-theme: #E4C8D5;
   --mark-event: #8F5F85;   /* heart on the calendar */
   --mark-task: #C0558A;    /* flower on the calendar */
+  --icon-hue: 143deg;       /* turns the teal button icons toward this theme (the capybaras never change) */
 }
 
 /* Theme 6: Velvet Dusk (dark) */
@@ -163,6 +168,7 @@
   --meta-theme: #302B3D;
   --mark-event: #E6C2A0;   /* heart on the calendar */
   --mark-task: #B49ACB;    /* flower on the calendar */
+  --icon-hue: 97deg;       /* turns the teal button icons toward this theme (the capybaras never change) */
   color-scheme: dark;
 }
 
@@ -188,6 +194,7 @@
   --meta-theme: #352A33;
   --mark-event: #E6C79C;   /* heart on the calendar */
   --mark-task: #E39BB9;    /* flower on the calendar */
+  --icon-hue: 164deg;       /* turns the teal button icons toward this theme (the capybaras never change) */
   color-scheme: dark;
 }
 
@@ -213,5 +220,6 @@
   --meta-theme: #20333A;
   --mark-event: #E3C98F;   /* heart on the calendar */
   --mark-task: #82BDB6;    /* flower on the calendar */
+  --icon-hue: 0deg;       /* turns the teal button icons toward this theme (the capybaras never change) */
   color-scheme: dark;
 }

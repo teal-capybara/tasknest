@@ -24,7 +24,7 @@
    ========================================================================== */
 
 import { h, clear } from "../ui/dom.js";
-import { capybara } from "../ui/capybara.js";
+import { capybara, icon } from "../ui/capybara.js";
 import { itemRow } from "../ui/calendarItems.js";
 import { openDayWindow } from "../ui/dayWindow.js";
 import { WEEK_START } from "../constants.js";
@@ -34,7 +34,11 @@ import {
   monthLabel, dayLabel, weekLabel, formatClock, itemsByDay, upcomingEvents,
 } from "../logic/calendar.js";
 
-const VIEWS = [{ id: "month", name: "Month" }, { id: "week", name: "Week" }, { id: "day", name: "Day" }];
+const VIEWS = [
+  { id: "month", name: "Month", icon: "calendar" },
+  { id: "week",  name: "Week",  icon: "tasks" },
+  { id: "day",   name: "Day",   icon: "sparkle" },
+];
 
 const QUOTES = [
   "Small steps lead to big progress.",
@@ -60,24 +64,27 @@ export function calendarView(container, params, query = {}) {
   const viewButtons = VIEWS.map((v) => h("button", {
     type: "button", class: "seg-btn", dataset: { view: v.id },
     onClick: () => { memory.view = v.id; render(); },
-  }, v.name));
+  }, icon(v.icon, 22), h("span", {}, v.name)));
   const label = h("h2", { class: "cal-label", "aria-live": "polite" });
   const prev = h("button", { type: "button", class: "btn cal-arrow", onClick: () => move(-1) }, "‹");
   const next = h("button", { type: "button", class: "btn cal-arrow", onClick: () => move(1) }, "›");
   const todayButton = h("button", { type: "button", class: "btn", onClick: () => { memory.cursor = noonOf(Date.now()); render(); } }, "Today");
-  const addEvent = h("a", { class: "btn btn-primary", href: "#/event/new" }, "Add event");
+  const addEvent = h("a", { class: "btn btn-primary cal-add", href: "#/event/new" }, "+ Add event");
   const body = h("div", { class: "cal-body" });
   const side = h("aside", { class: "cal-side", "aria-label": "Today and coming up" });
 
   container.append(
     h("div", { class: "cal-banner" },
       h("div", { class: "cal-banner-text" },
-        h("h1", {}, "Calendar"),
-        h("p", { class: "cal-tagline" }, "Plan ahead, stay on track!"),
+        h("h1", {}, icon("calendar", 38), "Calendar"),
+        h("p", { class: "cal-tagline" }, "Plan ahead, stay on track!", icon("heart", 18)),
         addEvent),
-      h("div", { class: "cal-banner-art" }, capybara("cloud"))),
-    h("div", { class: "seg", role: "group", "aria-label": "Calendar view" }, viewButtons),
-    h("div", { class: "cal-nav" }, prev, label, next, todayButton),
+      h("div", { class: "cal-banner-art", "aria-hidden": "true" },
+        h("span", { class: "cal-cloud" }),
+        capybara("coffee"),
+        icon("sparkle", 22), icon("star", 20)),
+      h("div", { class: "cal-nav" }, prev, h("div", { class: "cal-month-pill" }, label), next, todayButton),
+      h("div", { class: "seg cal-switch", role: "group", "aria-label": "Calendar view" }, viewButtons)),
     h("div", { class: "cal-layout" }, body, side));
 
   function move(direction) {
@@ -150,7 +157,7 @@ export function calendarView(container, params, query = {}) {
            h("span", { class: "cal-chips" }, chips, list.length > 2 ? h("span", { class: "cal-chip-more" }, `+${list.length - 2} more`) : null)));
       }
     }
-    return h("div", { class: "cal-grid" }, head, cells);
+    return h("div", { class: "cal-card" }, h("div", { class: "cal-grid" }, head, cells));
   }
 
   /** Tapping a day: highlight it and open the floating window. */
@@ -181,12 +188,13 @@ export function calendarView(container, params, query = {}) {
     const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
     return h("section", { class: "cal-glance" },
       h("div", { class: "cal-glance-text" },
-        h("h3", {}, "Your week at a glance"),
+        h("h3", {}, icon("tasks", 28), "Your week at a glance"),
         h("p", { class: "muted" }, tasks.length ? `You've finished ${done} of ${tasks.length} tasks due this week.` : "No tasks are due this week.")),
       tasks.length ? h("div", { class: "cal-glance-bar" },
         h("div", { class: "bar", role: "progressbar", "aria-label": "Tasks done this week", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": String(pct) },
           h("span", { class: "bar-fill", style: `width: ${pct}%` })),
-        h("strong", {}, `${pct}%`)) : null);
+        h("strong", {}, `${pct}%`)) : null,
+      h("div", { class: "cal-glance-art", "aria-hidden": "true" }, capybara("goal")));
   }
 
   /* ---------- the side column (wide screens) ---------- */
@@ -197,22 +205,25 @@ export function calendarView(container, params, query = {}) {
     const quote = QUOTES[Math.floor(now / 86400000) % QUOTES.length];
     side.append(
       h("section", { class: "side-card" },
-        h("h3", {}, h("span", { class: "side-star", "aria-hidden": "true" }, "✦"), "Today"),
+        h("h3", {}, icon("sparkle", 24), "Today"),
         h("p", { class: "muted" }, new Date(now).toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })),
         todayItems.length
           ? h("ul", { class: "cal-items" }, todayItems.slice(0, 3).map((i) => itemRow(i)))
-          : h("div", { class: "side-empty" }, h("p", {}, "Nothing scheduled today!"), capybara("sit")),
-        h("a", { class: "btn btn-primary side-wide", href: `#/event/new?date=${dayKey(now)}` }, "+ Add event")),
+          : h("div", { class: "side-empty" }, h("p", {}, "No tasks scheduled today!"), capybara("relaxing")),
+        h("div", { class: "side-buttons" },
+          h("a", { class: "btn", href: "#/task/new" }, "+ Task"),
+          h("a", { class: "btn btn-primary", href: `#/event/new?date=${dayKey(now)}` }, "+ Event"))),
       upcoming.length ? h("section", { class: "side-card" },
-        h("h3", {}, "Upcoming events", h("a", { class: "side-link", href: "#/dashboard" }, "See all")),
-        h("ul", { class: "side-events" }, upcoming.map((e) => {
+        h("h3", {}, icon("calendar", 24), "Upcoming events", h("a", { class: "side-link", href: "#/dashboard" }, "See all →")),
+        h("ul", { class: "side-events" }, upcoming.map((e, n) => {
           const d = new Date(e.startAt);
           const group = eventGroupName(e);
           return h("li", {}, h("a", { class: "side-event", href: `#/event/${encodeURIComponent(e.id)}` },
-            h("span", { class: "side-date" }, h("small", {}, d.toLocaleDateString([], { month: "short" }).toUpperCase()), h("strong", {}, String(d.getDate()))),
+            h("span", { class: `side-date${n % 2 ? " alt" : ""}` }, h("small", {}, d.toLocaleDateString([], { month: "short" }).toUpperCase()), h("strong", {}, String(d.getDate()).padStart(2, "0"))),
             h("span", { class: "side-event-text" }, h("strong", {}, e.title), h("span", { class: "muted small" }, `${e.allDay ? "All day" : formatClock(e.startAt)}${group ? ` · ${group}` : ""}`))));
         }))) : null,
-      h("section", { class: "side-card side-quote" }, h("p", {}, `“${quote}”`)));
+      h("section", { class: "side-card side-quote" },
+        icon("sprout", 34), h("p", {}, `“${quote}” ♡`), icon("sprout", 34)));
   }
 
   /* ---------- week / day lists ---------- */

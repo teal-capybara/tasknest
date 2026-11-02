@@ -21,15 +21,15 @@ import { state, getSettings, isTaskArchived, taskGroupName, eventGroupName, even
 import { dashboardStats } from "../logic/stats.js";
 import { buildTaskCard } from "../ui/taskCard.js";
 import { upcomingEvents, relativeDay, formatClock } from "../logic/calendar.js";
-import { capybara } from "../ui/capybara.js";
+import { capybara, icon } from "../ui/capybara.js";
 
 const MAX_ATTENTION = 5;
 
 const TILES = [
-  { key: "overdue",     label: "Overdue",     icon: "⚠", tone: "danger", href: "#/tasks?when=overdue" },
-  { key: "due_today",   label: "Due today",   icon: "●", tone: "warn",   href: "#/tasks?when=today" },
-  { key: "due_soon",    label: "Due soon",    icon: "◐", tone: "warn",   href: "#/tasks?when=soon" },
-  { key: "in_progress", label: "In progress", icon: "▶", tone: "info",   href: "#/tasks?status=in_progress" },
+  { key: "overdue",     label: "Overdue",     icon: "overdue",    tone: "danger", href: "#/tasks?when=overdue" },
+  { key: "due_today",   label: "Due today",   icon: "duetoday",   tone: "warn",   href: "#/tasks?when=today" },
+  { key: "due_soon",    label: "Due soon",    icon: "duesoon",    tone: "warn",   href: "#/tasks?when=soon" },
+  { key: "in_progress", label: "In progress", icon: "inprogress", tone: "info",   href: "#/tasks?status=in_progress" },
 ];
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
@@ -94,6 +94,8 @@ function hero(stats, upcoming, now) {
   if (c.due_today) bits.push(`${c.due_today} due today`);
   const line = bits.length ? `You have ${bits.join(" and ")}.` : "Nothing due today. Nice and calm.";
   const next = upcoming[0];
+  // The capybara matches the day: busy when something is overdue, thinking about what to do first, or relaxing
+  const pose = c.overdue ? "working" : c.due_today ? "thinking" : "relaxing";
   return h("section", { class: "hero-card" },
     h("div", { class: "hero-text" },
       h("h1", {}, greeting(now)),
@@ -102,22 +104,23 @@ function hero(stats, upcoming, now) {
       next ? h("a", { class: "hero-next", href: `#/event/${encodeURIComponent(next.id)}` },
         h("span", { class: "cal-mark cal-mark-event", "aria-hidden": "true" }),
         h("span", {}, h("strong", {}, "Up next: "), next.title, " · ", relativeDay(next.startAt, now), next.allDay ? "" : ` ${formatClock(next.startAt)}`)) : null),
-    h("div", { class: "hero-art" }, capybara("sit")));
+    h("div", { class: "hero-art" }, capybara(pose)));
 }
 
 function tiles(stats) {
   return h("div", { class: "stat-grid" }, TILES.map((tile) => {
     const n = stats.counts[tile.key];
     return h("a", { class: `stat-tile stat-${tile.tone}${n ? "" : " is-zero"}`, href: tile.href },
+      icon(tile.icon, 30),
       h("span", { class: "stat-number" }, String(n)),
-      h("span", { class: "stat-label" }, h("span", { class: "badge-icon", "aria-hidden": "true" }, tile.icon), tile.label));
+      h("span", { class: "stat-label" }, tile.label));
   }));
 }
 
 function eventsSection(upcoming, now) {
   if (!upcoming.length) return null;
   return h("section", { class: "dash-section dash-box" },
-    sectionHead(h("span", { class: "cal-mark cal-mark-event" }), "Coming up", plural(upcoming.length, "event")),
+    sectionHead(icon("calendar", 32), "Coming up", plural(upcoming.length, "event")),
     h("ul", { class: "event-list" }, upcoming.map((e) => {
       const kind = eventKindName(e.kind);
       const group = eventGroupName(e);
@@ -139,12 +142,13 @@ function attentionSection(stats, now) {
   const shown = stats.attention.slice(0, MAX_ATTENTION);
   const more = stats.attention.length - shown.length;
   return h("section", { class: "dash-section dash-box" },
-    sectionHead("!", "Needs attention", stats.attention.length ? plural(stats.attention.length, "task") : ""),
+    sectionHead(icon("overdue", 32), "Needs attention", stats.attention.length ? plural(stats.attention.length, "task") : ""),
     shown.length
       ? h("div", { class: "task-list" }, shown.map((task) => buildTaskCard(task, now)))
       : h("div", { class: "caught-up" },
-          h("strong", {}, "✓ You're all caught up."),
-          h("p", { class: "muted" }, "Nothing is overdue or due soon.")),
+          capybara("cheering"),
+          h("div", {}, h("strong", {}, "You're all caught up."),
+            h("p", { class: "muted" }, "Nothing is overdue or due soon."))),
     h("p", { class: "dash-more" },
       more > 0 ? h("a", { href: "#/tasks" }, `See ${plural(more, "more task")}`) : null,
       more > 0 ? " · " : null,
@@ -174,14 +178,14 @@ function progressSection(stats) {
       })));
   }).filter(Boolean);
   if (!blocks.length) return null;
-  return h("section", { class: "dash-section dash-box" }, sectionHead("%", "Progress"), blocks);
+  return h("section", { class: "dash-section dash-box" }, sectionHead(icon("inprogress", 32), "Progress"), blocks);
 }
 
 function weekSection(stats, settings) {
   const w = stats.week;
   const part = (n, label) => h("li", { class: "week-part" }, h("strong", {}, String(n)), h("span", { class: "muted small" }, label));
   return h("section", { class: "dash-section dash-box" },
-    sectionHead("✓", "Last 7 days", w.done ? plural(w.done, "task") : ""),
+    sectionHead(icon("completed", 32), "Last 7 days", w.done ? plural(w.done, "task") : ""),
     w.done
       ? [
           h("ul", { class: "week-list" }, part(w.early, "early"), part(w.ontime, "on time"), part(w.late, "late"), part(w.nodeadline, "no deadline")),

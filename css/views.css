@@ -215,8 +215,8 @@ a.btn { text-decoration: none; }
 .hero-text h1 { margin: 0; color: var(--on-primary); font-size: 1.55rem; line-height: 1.15; }
 .hero-line { margin: .35rem 0 0; font-weight: 600; font-size: 1.05rem; }
 .hero-card .dash-date { color: var(--on-primary); opacity: .85; }
-.hero-art { flex: none; width: 42%; max-width: 230px; }
-.hero-art .capy svg { display: block; width: 100%; height: auto; }
+.hero-art { flex: none; width: 36%; max-width: 190px; align-self: flex-end; margin-bottom: -1px; }
+
 .hero-next {
   display: flex; align-items: center; gap: .5rem; margin-top: .75rem; padding: .5rem .7rem; min-height: 44px;
   background: var(--surface); color: var(--text); border-radius: 14px; text-decoration: none; font-size: .9rem;
@@ -237,6 +237,7 @@ a.btn { text-decoration: none; }
 .stat-warn   { border-left-color: var(--warn); }
 .stat-info   { border-left-color: var(--link); }
 .stat-number { font-size: 1.7rem; font-weight: 800; line-height: 1; min-width: 1.2ch; }
+.stat-tile .ui-icon { width: 30px; height: 30px; }
 .stat-label { display: inline-flex; align-items: center; gap: .35rem; font-size: .9rem; font-weight: 600; color: var(--text-muted); line-height: 1.15; }
 .stat-tile.is-zero .stat-number { color: var(--text-muted); }
 @media (min-width: 760px) {
@@ -257,15 +258,13 @@ a.btn { text-decoration: none; }
 .dash-box { padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow); }
 .dash-head-row { display: flex; align-items: center; gap: .6rem; margin: 0 0 .75rem; }
 .dash-head-row h2 { flex: 1; margin: 0; font-size: 1.3rem; }
-.dash-icon {
-  display: inline-flex; align-items: center; justify-content: center; flex: none;
-  width: 36px; height: 36px; font-weight: 800; border-radius: 50%;
-  background: var(--primary); color: var(--on-primary);
-}
-.dash-icon .cal-mark { width: 18px; height: 18px; background: var(--on-primary); }
+.dash-icon { display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.dash-icon .ui-icon { width: 34px; height: 34px; }
 .dash-count { flex: none; padding: .15rem .6rem; font-size: .8rem; font-weight: 700; color: var(--text-muted); background: var(--surface-2); border-radius: 999px; }
 .dash-more { margin: .75rem 0 0; }
 
+.caught-up { display: flex; align-items: center; gap: .9rem; }
+.caught-up .capy { flex: none; width: 84px; }
 .caught-up p { margin: .25rem 0 0; }
 
 .progress-block + .progress-block { margin-top: 1rem; padding-top: .75rem; border-top: 1px solid var(--border); }
@@ -282,13 +281,67 @@ a.btn { text-decoration: none; }
 .week-part { display: flex; flex-direction: column; align-items: center; padding: .5rem .25rem; background: var(--surface-2); border-radius: 12px; text-align: center; }
 .week-part strong { font-size: 1.4rem; }
 
-/* ---- Calendar ---- */
-.cal-nav { display: flex; align-items: center; gap: .5rem; margin: .75rem 0; }
-.cal-label { flex: 1; margin: 0; text-align: center; font-size: 1.1rem; }
-.cal-arrow { min-width: 44px; padding: 0 .6rem; font-size: 1.4rem; line-height: 1; }
+/* ---- Calendar: sky banner with a scalloped cloud edge, like your mock-up ---- */
+.cal-banner {
+  position: relative; display: grid; gap: .5rem .75rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "text art" "nav nav" "switch switch";
+  padding: 1rem 1rem .5rem 1.1rem; overflow: hidden;
+  color: var(--on-primary); border-radius: 28px; box-shadow: var(--shadow);
+  background:
+    linear-gradient(180deg, var(--primary), color-mix(in srgb, var(--primary) 55%, var(--bg)));
+}
+/* the bumps repeat along the bottom edge */
+.cal-banner::before {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 64px; pointer-events: none;
+  background:
+    radial-gradient(50px 40px at 50% 100%, var(--bg) 97%, transparent 100%) 0 100% / 100px 40px repeat-x,
+    linear-gradient(var(--bg), var(--bg)) 0 100% / 100% 20px no-repeat;
+}
+.cal-banner > * { position: relative; z-index: 1; }
+.cal-banner-text { grid-area: text; align-self: center; min-width: 0; padding-bottom: .5rem; }
+.cal-banner h1 { display: flex; align-items: center; gap: .5rem; margin: 0; color: var(--on-primary); }
+.cal-tagline { display: flex; align-items: center; gap: .35rem; margin: .2rem 0 .6rem; font-weight: 600; }
+.cal-banner-art { grid-area: art; position: relative; width: 150px; align-self: end; }
+.cal-banner-art .capy { position: relative; z-index: 1; display: block; width: 88%; margin: 0 auto -10px; }
+.cal-cloud { position: absolute; left: 0; right: 0; bottom: -4px; height: 40px; border-radius: 999px; background: var(--cloud); box-shadow: 0 0 0 1px rgba(255,255,255,.4); }
+.cal-cloud::before, .cal-cloud::after { content: ""; position: absolute; bottom: 12px; border-radius: 50%; background: var(--cloud); }
+.cal-cloud::before { left: 14%; width: 44px; height: 38px; }
+.cal-cloud::after { right: 12%; width: 54px; height: 46px; }
+.cal-banner-art > .ui-icon { position: absolute; z-index: 2; }
+.cal-banner-art > .ui-icon:nth-of-type(1) { left: -6px; top: 4px; }
+.cal-banner-art > .ui-icon:nth-of-type(2) { right: -4px; top: 14px; }
+.cal-nav { grid-area: nav; display: flex; align-items: center; gap: .5rem; margin: 0; }
+.cal-nav .btn { background: var(--surface); border-color: var(--border); }
+.cal-month-pill { flex: 1; display: flex; justify-content: center; align-items: center; min-height: 44px; padding: 0 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; }
+.cal-label { margin: 0; font-size: 1rem; color: var(--text); white-space: nowrap; }
+.cal-arrow { min-width: 44px; padding: 0 .6rem; font-size: 1.4rem; line-height: 1; border-radius: 999px; }
+.cal-switch { grid-area: switch; justify-self: start; margin: .4rem 0 .35rem; background: var(--surface); box-shadow: var(--shadow); }
+.cal-switch .seg-btn { display: inline-flex; align-items: center; gap: .4rem; }
+.cal-switch .ui-icon { width: 22px; height: 22px; }
+.cal-add { min-height: 40px; }
 
+@media (max-width: 899px) {
+  .cal-add { display: none; }            /* the floating button already says Add event */
+  .cal-banner-art { width: 128px; }
+  .cal-tagline { font-size: .9rem; }
+  .cal-banner h1 { font-size: 1.5rem; }
+  .cal-banner h1 .ui-icon { width: 30px; height: 30px; }
+  .cal-month-pill { padding: 0 .4rem; }
+  .cal-nav .btn { padding: 0 .55rem; }
+}
+@media (min-width: 900px) {
+  .cal-banner { grid-template-columns: minmax(0, 1fr) 300px; grid-template-areas: "text art" "switch art"; padding: 1.25rem 1.5rem .5rem; min-height: 210px; }
+  .cal-banner-art { width: 280px; }
+  .cal-nav { grid-area: auto; position: absolute; top: 1.1rem; right: 1.25rem; z-index: 3; }
+  .cal-month-pill { flex: none; min-width: 11rem; }
+  .cal-banner-art { align-self: center; margin-top: 2.5rem; }
+  .cal-banner-art .capy { width: 70%; }
+}
+.cal-card { padding: .6rem; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow); }
+/* month grid, day cells, and the lists of items */
 .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
-.cal-dow { text-align: center; font-size: .75rem; font-weight: 700; color: var(--text-muted); padding: .2rem 0; }
+.cal-dow { text-align: center; font-size: .8rem; font-weight: 700; color: var(--link); padding: .45rem 0; background: var(--surface-2); border-radius: 10px; }
 .cal-day {
   display: flex; flex-direction: column; align-items: center; gap: .15rem;
   min-height: 56px; padding: .25rem .1rem;
@@ -366,30 +419,16 @@ a.btn { text-decoration: none; }
 :root { --cloud: color-mix(in srgb, var(--primary) 35%, #ffffff); }
 
 /* ---- Soft sky banners (Home greeting card and Calendar header) ---- */
-.hero-card, .cal-banner {
-  background:
-    radial-gradient(70px 44px at 12% 108%, var(--cloud) 96%, transparent 100%),
-    radial-gradient(100px 56px at 30% 112%, var(--cloud) 96%, transparent 100%),
-    radial-gradient(80px 46px at 62% 110%, var(--cloud) 96%, transparent 100%),
-    radial-gradient(120px 60px at 88% 112%, var(--cloud) 96%, transparent 100%),
-    linear-gradient(180deg, var(--primary), color-mix(in srgb, var(--primary) 55%, var(--bg)));
+.hero-card {
+  background: linear-gradient(180deg, var(--primary), color-mix(in srgb, var(--primary) 60%, var(--bg)));
 }
 
-/* ---- Calendar ---- */
-.cal-banner {
-  display: flex; align-items: flex-end; justify-content: space-between; gap: .5rem;
-  padding: 1rem 1rem .5rem 1.25rem; overflow: hidden;
-  color: var(--on-primary); border-radius: 24px; box-shadow: var(--shadow);
-}
-.cal-banner-text { flex: 1 1 0; min-width: 0; align-self: center; padding-bottom: 1rem; }
-.cal-banner h1 { margin: 0; color: var(--on-primary); }
-.cal-tagline { margin: .15rem 0 .6rem; font-weight: 600; }
-.cal-banner-art { flex: none; width: 46%; max-width: 240px; }
-.cal-banner-art .capy svg { display: block; width: 100%; height: auto; }
 .cal-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
 .cal-side { display: none; }
 .cal-glance { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; margin-top: 1rem; padding: .8rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow); }
-.cal-glance h3 { margin: 0; font-size: 1.05rem; }
+.cal-glance h3 { display: flex; align-items: center; gap: .5rem; margin: 0; font-size: 1.05rem; }
+.cal-glance-art { flex: none; width: 72px; margin-left: auto; }
+.cal-glance-art .capy { width: 100%; }
 .cal-glance p { margin: .1rem 0 0; }
 .cal-glance-bar { display: flex; align-items: center; gap: .6rem; flex: 1 1 12rem; }
 .cal-glance-bar .bar { flex: 1; }
@@ -404,7 +443,6 @@ a.btn { text-decoration: none; }
 .day-actions { margin: .9rem 0 0; }
 .diary-btn { flex: none; position: relative; width: 52px; padding: 2px; line-height: 0; cursor: pointer; background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; }
 .diary-btn[aria-pressed="true"] { background: var(--primary); }
-.diary-btn .capy svg { display: block; width: 100%; height: auto; }
 .diary-btn.has-entry::after { content: ""; position: absolute; top: -3px; right: -3px; width: 12px; height: 12px; border-radius: 50%; background: var(--mark-event); border: 2px solid var(--surface); }
 .diary-text { width: 100%; min-height: 11rem; resize: vertical; }
 .diary-foot { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-top: .6rem; }
@@ -432,13 +470,14 @@ a.btn { text-decoration: none; }
 .side-link { margin-left: auto; font-size: .85rem; font-weight: 600; }
 .side-empty { text-align: center; }
 .side-empty p { margin: .25rem 0 0; font-weight: 600; }
-.side-empty .capy { width: 140px; margin: .25rem auto .5rem; }
-.side-empty .capy svg { display: block; width: 100%; height: auto; }
+.side-empty .capy { display: block; width: 170px; margin: .25rem auto .5rem; }
 .side-wide { display: flex; width: 100%; margin-top: .6rem; }
+.side-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .6rem; }
+.side-date.alt { background: color-mix(in srgb, var(--accent) 35%, var(--surface)); }
 .side-events { list-style: none; margin: .5rem 0 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; }
 .side-event { display: flex; align-items: center; gap: .7rem; min-height: 48px; color: inherit; text-decoration: none; }
 .side-date { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: none; width: 48px; height: 48px; line-height: 1.1; background: var(--surface-2); border-radius: 12px; }
 .side-date small { font-size: .65rem; font-weight: 700; color: var(--text-muted); }
 .side-event-text { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
-.side-quote { text-align: center; background: var(--surface-2); }
+.side-quote { display: flex; align-items: center; justify-content: space-between; gap: .5rem; text-align: center; background: var(--surface-2); border-radius: 36px; }
 .side-quote p { margin: 0; font-weight: 600; font-style: italic; }

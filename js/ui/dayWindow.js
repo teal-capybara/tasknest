@@ -11,7 +11,7 @@
    ========================================================================== */
 
 import { h, clear } from "./dom.js";
-import { capybara } from "./capybara.js";
+import { capybara, icon } from "./capybara.js";
 import { itemRow } from "./calendarItems.js";
 import { state } from "../state.js";
 import { dayKey, dayLabel } from "../logic/calendar.js";
@@ -59,7 +59,7 @@ export function openDayWindow({ date, getItems, onClose }) {
   text.addEventListener("blur", save);
 
   /* ---------- the little capybara button ---------- */
-  const diaryButton = h("button", { type: "button", class: "diary-btn", "aria-label": "Open the diary for this day", "aria-pressed": "false", onClick: () => showDiary(diaryPanel.hidden) }, capybara("peek"));
+  const diaryButton = h("button", { type: "button", class: "diary-btn", "aria-label": "Open the diary for this day", "aria-pressed": "false", onClick: () => showDiary(diaryPanel.hidden) }, icon("profile", 44));
   function showDiary(open) {
     if (!open) save();
     diaryPanel.hidden = !open;
@@ -105,7 +105,7 @@ export function openDayWindow({ date, getItems, onClose }) {
     clear(list);
     list.append(items.length
       ? h("ul", { class: "cal-items" }, items.map((item) => itemRow(item)))
-      : h("div", { class: "cal-empty-art" }, capybara("sit"), h("p", { class: "muted" }, "Nothing scheduled. A free day!")));
+      : h("div", { class: "cal-empty-art" }, capybara("relaxing"), h("p", { class: "muted" }, "Nothing scheduled. A free day!")));
   }
 
   refresh();

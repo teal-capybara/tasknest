@@ -155,3 +155,10 @@
   animation: spin .9s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- Picture icons (icons/ui). The teal ones take the theme's hue; the capybaras never do. ---- */
+.ui-icon { display: inline-block; flex: none; object-fit: contain; filter: hue-rotate(var(--icon-hue, 0deg)); }
+.ui-icon.is-fixed { filter: none; }
+.nav-img { width: 28px; height: 28px; }
+.capy { display: inline-block; line-height: 0; }
+.capy img { display: block; width: 100%; height: auto; }

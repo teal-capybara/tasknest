@@ -153,7 +153,6 @@
 
   .side-mascot { margin-top: auto; text-align: center; }
   .side-mascot .capy { display: block; width: 100%; max-width: 150px; margin: 0 auto; }
-  .side-mascot .capy svg { display: block; width: 100%; height: auto; }
   .side-mascot-text { margin: .4rem 0 0; font-size: .85rem; color: var(--text-muted); }
 
   /* Collapsed: icons only */

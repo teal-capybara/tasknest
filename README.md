@@ -1,8 +1,8 @@
-# TaskNest (Phase 3.6: Day window, diary and navigation)
+# TaskNest (Phase 3.7: Your capybara art and the new Calendar look)
 
 A personal school and organization task tracker that installs on your phone and works offline.
 
-**This is Phase 3.6: a second polish pass (navigation, Home tiles, Calendar day window and the secret capybara diary).**
+**This is Phase 3.7: your capybara pictures and icons are now used exactly as drawn, and the Calendar follows your mock-up.**
 
 | Phase | What you get | Status |
 |---|---|---|
@@ -13,7 +13,8 @@ A personal school and organization task tracker that installs on your phone and 
 | 3b | New app icon, Home dashboard, choose your start screen | Done |
 | 3c | Calendar (month, week, day) with schedule events (exams, meetings, classes), "Create review task" | Done |
 | 3.5 | Heart/flower calendar markers, "Add event" button on the Calendar, redesigned Home (greeting card, small counters, clear sections, Academics and Organizations progress apart), event types per workspace with your own, Manage in collapsible groups, capybara decorations | Done |
-| 3.6 | Floating pill navigation on phones, collapsible sidebar on desktop, shorter 2x2 Home tiles, tap a day for a floating window, desktop Calendar with side panels, secret capybara diary (one private note per day) | **This version** |
+| 3.6 | Floating pill navigation on phones, collapsible sidebar on desktop, shorter 2x2 Home tiles, tap a day for a floating window, desktop Calendar with side panels, secret capybara diary (one private note per day) | Done |
+| 3.7 | Your exact capybara poses and icons (cut out of your artwork, in `icons/art` and `icons/ui`), icon colors that follow the theme (the capybaras never change), Calendar redesigned like your mock-up (cloud banner, pill switches, Today / Upcoming / quote cards, week at a glance) | **This version** |
 | 3d | Board view | Next |
 | 4 | Reports, export/import backup, optional start date, polish | Later |
 | 5 | Recurring tasks | Later |
@@ -209,6 +210,10 @@ Whenever you change any app file:
 3. Open the app online. Tap **Reload** on the banner.
 
 If you add a new file, also add it to `SHELL_FILES` in `service-worker.js`.
+
+## About the pictures
+
+The capybaras are in `icons/art/` and the small icons in `icons/ui/` (all PNG, cut out of the artwork you gave me). The capybaras are never recolored. The teal button icons take the theme's hue through `--icon-hue` in `css/themes.css`. To use a sharper version of a picture, replace the file with one of the same name and bump `VERSION` in `service-worker.js`.
 
 ## Where to change common things
 

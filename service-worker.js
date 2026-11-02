@@ -15,7 +15,7 @@
    If you add a new file to the app, add it to SHELL_FILES too.
    ========================================================================== */
 
-const VERSION = "v3-6-day-window";
+const VERSION = "v3-7-art";
 const SHELL_CACHE = `tasknest-shell-${VERSION}`;
 const SDK_CACHE = "tasknest-firebase-sdk"; // Firebase files are versioned by URL, so this one is kept
 
@@ -79,6 +79,40 @@ const SHELL_FILES = [
   "js/views/tasksView.js",
   "icons/tasknest-apple-180.png",
   "icons/tasknest-favicon-64.png",
+  "icons/art/capy-cheering.png",
+  "icons/art/capy-coffee.png",
+  "icons/art/capy-goal.png",
+  "icons/art/capy-relaxing.png",
+  "icons/art/capy-study.png",
+  "icons/art/capy-thinking.png",
+  "icons/art/capy-working.png",
+  "icons/ui/add.png",
+  "icons/ui/archived.png",
+  "icons/ui/bell.png",
+  "icons/ui/calendar.png",
+  "icons/ui/cloud.png",
+  "icons/ui/completed.png",
+  "icons/ui/delete.png",
+  "icons/ui/duesoon.png",
+  "icons/ui/duetoday.png",
+  "icons/ui/duplicate.png",
+  "icons/ui/edit.png",
+  "icons/ui/favorite.png",
+  "icons/ui/filter.png",
+  "icons/ui/heart.png",
+  "icons/ui/home.png",
+  "icons/ui/inprogress.png",
+  "icons/ui/manage.png",
+  "icons/ui/overdue.png",
+  "icons/ui/profile.png",
+  "icons/ui/search.png",
+  "icons/ui/settings.png",
+  "icons/ui/sparkle.png",
+  "icons/ui/sprout.png",
+  "icons/ui/star.png",
+  "icons/ui/tag.png",
+  "icons/ui/tasks.png",
+  "icons/ui/view.png",
   "icons/tasknest-192.png",
   "icons/tasknest-512.png",
   "icons/tasknest-maskable-512.png",
