@@ -62,7 +62,7 @@ export function clearAllDrafts() {
 /** The form fields a draft may hold. Anything else found in storage is ignored. */
 export const DRAFT_FIELDS = [
   "title", "workspace", "courseId", "orgId", "typeId", "arrangement",
-  "dueDate", "dueTime", "status", "instructions", "notes",
+  "startDate", "dueDate", "dueTime", "status", "instructions", "notes",
 ];
 
 /** The fields of the Add/Edit event form. */

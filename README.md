@@ -1,8 +1,8 @@
-# TaskNest (Phase 4b: Reports)
+# TaskNest (Phase 4c: Start date and accessibility polish)
 
 A personal school and organization task tracker that installs on your phone and works offline.
 
-**This is Phase 4b: the Reports page (on top of 4a: backup, moods, desktop Add button).**
+**This is Phase 4c, which finishes Phase 4: an optional start date on tasks, and accessibility polish.**
 
 | Phase | What you get | Status |
 |---|---|---|
@@ -17,8 +17,8 @@ A personal school and organization task tracker that installs on your phone and 
 | 3.7 | Your exact capybara poses and icons (cut out of your artwork, in `icons/art` and `icons/ui`), icon colors that follow the theme (the capybaras never change), Calendar redesigned like your mock-up (cloud banner, pill switches, Today / Upcoming / quote cards, week at a glance) | Done |
 | 3d | Board view: your tasks as Not started / In progress / Done columns, move with buttons or drag, filters | Done |
 | 4a | Backup (download / restore a file), mood picker beside the diary, floating Add pill on desktop | Done |
-| 4b | Reports: finished over time, early / on time / late, by course and type, events, CSV download | **This version** |
-| 4c | Optional start date, accessibility polish | Later |
+| 4b | Reports: finished over time, early / on time / late, by course and type, events, CSV download | Done |
+| 4c | Optional start date on tasks; accessibility polish (skip link, focus moves to the new page, bigger tap targets) | **This version** |
 | 4 | Reports, export/import backup, optional start date, polish | Later |
 | 5 | Recurring tasks | Later |
 
@@ -106,6 +106,10 @@ New **public** repository, upload the files (including the `css`, `js`, `icons` 
 
 ## Using the app
 
+**Start date (optional).** The task form has a *Start date* above the deadline: the day you plan to begin. Leave it empty if it doesn't matter. It can't be after the deadline. While the start date is still ahead, the task shows a *Starts Mon, Nov 9* chip on the list and Board. The detail page and the CSV show it too, and it is part of backups. It changes nothing else: the task still appears in your lists, and urgency still follows the deadline.
+
+**Accessibility.** A *Skip to content* link appears when you press Tab. When you open a page, keyboard and screen-reader focus moves to its heading. Buttons and tabs are at least 44 px tall. Colors were checked for readable contrast in all eight themes. Status and urgency always use an icon or words, never only color.
+
 **Reports.** On Home, under *Last 7 days*, tap **See full reports** (or go to `#/reports`). Pick a period (7, 30, 90 days or all time) and a workspace. You get: tasks finished and added, the share finished on time or early, average days from adding a task to finishing it, a bar chart of tasks finished over time (daily for 7 days, weekly otherwise), early / on time / late, finished per course or organization, finished per task type, and events that happened. *Download tasks (CSV)* saves every task as a spreadsheet. Reports include archived tasks. Early / on time / late uses each task's current deadline, so moving a deadline after finishing changes the result.
 
 **Mood.** In a day's window, next to the capybara, there is a face button. Tap it and pick how you felt that day from 12 moods (ecstatic, happy, confident, grateful, calm, okay, tired, anxious, stressed, sad, depressed, angry). It saves straight away, and tapping the same mood again clears it. Like the diary, it is private: it is saved in that day's entry and only shows in that day's window.
@@ -191,7 +195,7 @@ Everything lives under your account: `users/{your-id}/...`
 |---|---|
 | `courses` | name, archived, createdAt, updatedAt |
 | `taskTypes` | your custom types only: name, workspace (`academics` or `organizations`), createdAt, updatedAt |
-| `tasks` | title, workspace, courseId or orgId, typeId, arrangement, status, dueAt, instructions, notes, eventId (optional), createdAt, updatedAt, inProgressAt, completedAt, archived, archivedAt, deadlineHistory |
+| `tasks` | title, workspace, courseId or orgId, typeId, arrangement, status, startAt (optional), dueAt, instructions, notes, eventId (optional), createdAt, updatedAt, inProgressAt, completedAt, archived, archivedAt, deadlineHistory |
 | `eventTypes` | your custom event types only: name, workspace, createdAt, updatedAt |
 | `events` | title, kind (a built-in id such as `exam`, or the id of one of your `eventTypes`), workspace, courseId or orgId (optional), allDay, startAt, endAt (or null), location, notes, createdAt, updatedAt |
 | `diary` | one private note and mood per day, document id is the day (for example `2026-11-03`): text, mood, updatedAt. Only ever read one day at a time, from the capybara in the Calendar day window |

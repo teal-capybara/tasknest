@@ -102,10 +102,10 @@ export function csvCell(value) {
 
 export function tasksToCsv(tasks, ctx) {
   const date = (ms) => (ms == null ? "" : new Date(ms).toISOString().slice(0, 16).replace("T", " "));
-  const head = ["Title", "Workspace", "Course / Organization", "Type", "Status", "Deadline", "Finished", "Created", "Archived", "Instructions", "Notes"];
+  const head = ["Title", "Workspace", "Course / Organization", "Type", "Status", "Start", "Deadline", "Finished", "Created", "Archived", "Instructions", "Notes"];
   const rows = tasks.map((t) => [
     t.title, t.workspace, ctx.groupName(t), ctx.typeName(t.typeId), t.status,
-    date(t.dueAt), date(t.completedAt), date(t.createdAt), t.archived ? "yes" : "", t.instructions || "", t.notes || "",
+    date(t.startAt), date(t.dueAt), date(t.completedAt), date(t.createdAt), t.archived ? "yes" : "", t.instructions || "", t.notes || "",
   ]);
   return "\uFEFF" + [head, ...rows].map((r) => r.map(csvCell).join(",")).join("\r\n");
 }

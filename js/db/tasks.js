@@ -7,6 +7,7 @@
      typeId, arrangement ("individual" | "group"),
      status ("not_started" | "in_progress" | "done"),
      dueAt            deadline as a number (ms since 1970), or null for none
+     startAt          optional start date (the start of that day), or null
      instructions, notes
      createdAt, updatedAt            set automatically
      inProgressAt                    the FIRST time it was marked In progress
@@ -37,6 +38,7 @@ function toFields(input) {
     arrangement: input.arrangement,
     status: input.status,
     dueAt: input.dueAt == null ? null : input.dueAt,
+    startAt: input.startAt == null ? null : input.startAt,
     instructions: (input.instructions || "").trim(),
     notes: (input.notes || "").trim(),
     eventId: input.eventId || null,

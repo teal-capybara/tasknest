@@ -70,6 +70,7 @@ export function taskDetailView(container, params) {
       h("section", { class: "card" },
         h("h2", {}, "Details"),
         h("dl", { class: "detail-list" },
+          task.startAt != null ? row("Start date", new Date(task.startAt).toLocaleDateString([], { weekday: "short", year: "numeric", month: "short", day: "numeric" })) : null,
           row("Deadline", task.dueAt == null ? "No deadline" : formatDateTime(task.dueAt)),
           row("Workspace", workspaceName || "—"),
           row(task.workspace === "academics" ? "Course" : "Organization", taskGroupName(task)),

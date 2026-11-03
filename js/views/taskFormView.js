@@ -58,7 +58,7 @@ export function taskFormView(container, params, query) {
         title: copyOf ? `${base.title} (copy)` : base.title,
         workspace: base.workspace, courseId: base.courseId || "", orgId: base.orgId || "",
         typeId: base.typeId, arrangement: base.arrangement,
-        dueDate: toInputDate(base.dueAt), dueTime: toInputTime(base.dueAt),
+        startDate: copyOf ? "" : toInputDate(base.startAt), dueDate: toInputDate(base.dueAt), dueTime: toInputTime(base.dueAt),
         status: copyOf ? "not_started" : base.status,
         instructions: base.instructions || "", notes: base.notes || "",
       }
@@ -67,7 +67,7 @@ export function taskFormView(container, params, query) {
         title: "",
         workspace: query.ws === "organizations" ? "organizations" : "academics",
         courseId: query.course || "", orgId: query.org || "",
-        typeId: "", arrangement: "individual", dueDate: "", dueTime: "",
+        typeId: "", arrangement: "individual", startDate: "", dueDate: "", dueTime: "",
         status: "not_started", instructions: "", notes: "",
       };
   // What the form looks like before you touch it. A draft only exists if you changed something.
@@ -88,6 +88,7 @@ export function taskFormView(container, params, query) {
     orgId: h("select", { class: "select", id: "f-orgId", name: "orgId", "aria-describedby": "f-orgId-error", value: initial.orgId },
       h("option", { value: "" }, "Choose an organization…"), optionEls(ORGS, initial.orgId)),
     typeId: h("select", { class: "select", id: "f-typeId", name: "typeId", "aria-describedby": "f-typeId-error f-typeId-hint" }),
+    startDate: h("input", { type: "date", class: "input", id: "f-startDate", name: "startDate", value: initial.startDate, "aria-describedby": "f-startDate-error f-startDate-hint" }),
     dueDate: h("input", { type: "date", class: "input", id: "f-dueDate", name: "dueDate", value: initial.dueDate, "aria-describedby": "f-dueDate-error f-due-hint" }),
     dueTime: h("input", { type: "time", class: "input", id: "f-dueTime", name: "dueTime", value: initial.dueTime, "aria-describedby": "f-dueTime-error f-due-hint" }),
     status: h("select", { class: "select", id: "f-status", name: "status", "aria-describedby": "f-status-error", value: initial.status }, optionEls(STATUSES, initial.status)),
@@ -138,6 +139,7 @@ export function taskFormView(container, params, query) {
     courseField, orgField,
     typeField,
     arrangementGroup,
+    field("startDate", "Start date (optional)", el.startDate, { hint: "The day you plan to begin. Leave empty if it doesn't matter." }),
     h("div", { class: "due-row" },
       field("dueDate", "Due date", el.dueDate),
       field("dueTime", "Due time", el.dueTime)),
@@ -297,7 +299,7 @@ function fromEvent(event) {
     title: `${event.kind === "exam" ? "Review for" : "Prepare for"} ${event.title}`,
     workspace: event.workspace, courseId: academics ? (event.courseId || "") : "", orgId: academics ? "" : (event.orgId || ""),
     typeId: event.kind === "exam" && academics ? "exam" : event.kind === "meeting" && !academics ? "org-meeting" : "",
-    arrangement: "individual", dueDate: dayKeyOf(due), dueTime: "", status: "not_started",
+    arrangement: "individual", startDate: "", dueDate: dayKeyOf(due), dueTime: "", status: "not_started",
     instructions: `For ${event.title} (${eventWhen(event)}).`, notes: "",
   };
 }

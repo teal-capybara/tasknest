@@ -44,6 +44,11 @@ export function validateTaskForm(values, ctx) {
   const due = fromInputs(values.dueDate, values.dueTime);
   if (due.error) errors[due.field === "time" ? "dueTime" : "dueDate"] = due.error;
 
+  // Optional start date: the day you plan to begin (stored as the start of that day).
+  const start = values.startDate ? fromInputs(values.startDate, "00:00") : { ms: null };
+  if (start.error) errors.startDate = start.error;
+  else if (start.ms != null && due.ms != null && start.ms > due.ms) errors.startDate = "The start date can't be after the deadline.";
+
   const instructions = (values.instructions || "").trim();
   const notes = (values.notes || "").trim();
   if (instructions.length > LIMITS.text) errors.instructions = `Keep this under ${LIMITS.text} characters.`;
@@ -56,7 +61,7 @@ export function validateTaskForm(values, ctx) {
     value: {
       title, workspace: values.workspace, courseId, orgId,
       typeId: values.typeId, arrangement: values.arrangement,
-      dueAt: due.ms, instructions, notes, status: values.status,
+      dueAt: due.ms, startAt: start.ms ?? null, instructions, notes, status: values.status,
       // The event this task is for. Dropped quietly if that event no longer exists.
       eventId: values.eventId && (ctx.eventIds || []).includes(values.eventId) ? values.eventId : null,
     },

@@ -32,6 +32,12 @@ export function urgencyBadge(task, now) {
     h("span", { class: "badge-icon", "aria-hidden": "true" }, u.icon), text);
 }
 
+/** "Starts Mon, Nov 9" for a task whose start date is still ahead (and not finished); otherwise null. */
+export function startChip(task, now) {
+  if (task.startAt == null || task.status === "done" || task.startAt <= now) return null;
+  return h("span", { class: "chip chip-start" }, `Starts ${new Date(task.startAt).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}`);
+}
+
 export function buildTaskCard(task, now) {
   const u = urgencyOf(task, now, getSettings());
   const archived = isTaskArchived(task);
@@ -65,6 +71,7 @@ export function buildTaskCard(task, now) {
         h("span", { class: `chip chip-${task.workspace}` }, taskGroupName(task)),
         h("span", { class: "chip" }, typeName(task.typeId)),
         h("span", { class: "chip" }, arrangementName(task.arrangement)),
+        startChip(task, now),
         archived ? h("span", { class: "chip chip-archived" }, "Archived") : null),
       h("div", { class: "task-due" },
         urgencyBadge(task, now),

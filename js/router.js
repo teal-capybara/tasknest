@@ -102,6 +102,17 @@ function navigate() {
   location.replace("#/home"); // unknown address: go home
 }
 
+/**
+ * After you open a new page, put keyboard / screen-reader focus on its heading, so the
+ * new page is announced and Tab continues from the top of it (not from the old page).
+ * Does nothing visible for touch and mouse users.
+ */
+function moveFocusToPage() {
+  const heading = container.querySelector("h1") || container;
+  heading.setAttribute("tabindex", "-1");
+  heading.focus({ preventScroll: true });
+}
+
 /** The big "Add" buttons say "Add task" everywhere except the Calendar, where they say "Add event". */
 function setAddButton(forEvents) {
   document.querySelectorAll("[data-add-task]").forEach((a) => {
@@ -118,6 +129,7 @@ function mount() {
   container.textContent = "";
   current = route.view(container, params, query) || {};
   window.scrollTo(0, 0);
+  moveFocusToPage();
 }
 
 function onDataChange() {

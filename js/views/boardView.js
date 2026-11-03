@@ -19,7 +19,7 @@ import { ORGS, WORKSPACES } from "../constants.js";
 import { state, orgName, courseName, typeName, taskGroupName, isTaskArchived, getSettings } from "../state.js";
 import { boardColumns, moveOptions } from "../logic/board.js";
 import { formatDue } from "../logic/format.js";
-import { urgencyBadge, arrangementName } from "../ui/taskCard.js";
+import { urgencyBadge, arrangementName, startChip } from "../ui/taskCard.js";
 import { changeStatus } from "../ui/taskActions.js";
 import { tasksSwitch } from "../ui/tasksSwitch.js";
 import { icon } from "../ui/capybara.js";
@@ -123,7 +123,7 @@ export function boardView(container) {
       h("a", { class: "task-title", href }, task.title),
       h("div", { class: "chips" },
         h("span", { class: `chip chip-${task.workspace}` }, taskGroupName(task)),
-        h("span", { class: "chip" }, typeName(task.typeId))),
+        h("span", { class: "chip" }, typeName(task.typeId)), startChip(task, now)),
       h("div", { class: "task-due" }, urgencyBadge(task, now),
         task.status === "done" || task.dueAt == null ? null : h("span", { class: "due-text" }, formatDue(task.dueAt, now))),
       h("div", { class: "board-moves" },

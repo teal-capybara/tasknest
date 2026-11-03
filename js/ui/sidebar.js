@@ -10,6 +10,10 @@ const KEY = "tasknest.sidebar";
 function read() { try { return localStorage.getItem(KEY) === "collapsed"; } catch { return false; } }
 function write(collapsed) { try { localStorage.setItem(KEY, collapsed ? "collapsed" : "open"); } catch { /* fine */ } }
 
+// "Skip to content": the address bar uses #, so this link must not change the address.
+const skip = document.getElementById("skip-link");
+if (skip) skip.addEventListener("click", (e) => { e.preventDefault(); const view = document.getElementById("view"); if (view) view.focus(); });
+
 const button = document.getElementById("side-toggle");
 const mascot = document.getElementById("side-mascot");
 
