@@ -163,7 +163,9 @@
   .side-collapsed .side-add { padding: 0; min-width: 0; width: 100%; justify-content: center; }
   .side-collapsed .side-mascot .capy { max-width: 56px; }
 
-  .bottom-nav, .fab { display: none; }
+  .bottom-nav { display: none; }
+  /* The floating Add pill stays on desktop too, at the lower right (hidden by .hide-fab as before). */
+  .fab { right: 1.75rem; bottom: 1.75rem; }
   .app-header .brand { display: none; }
   .app-header { justify-content: flex-end; }
   .app-main { padding-bottom: 3rem; }
