@@ -16,6 +16,7 @@ import { itemRow } from "./calendarItems.js";
 import { state } from "../state.js";
 import { dayKey, dayLabel } from "../logic/calendar.js";
 import { watchDiaryDay, saveDiaryDay, DIARY_MAX } from "../db/diary.js";
+import { MOODS, moodById } from "../logic/moods.js";
 
 /**
  * date: the day to show.  getItems(): the current list of items for that day (called again on refresh()).
@@ -43,14 +44,44 @@ export function openDayWindow({ date, getItems, onClose }) {
     h("p", { class: "muted small" }, "Only you can read this, and only from here. It belongs to this day alone."),
     text,
     h("div", { class: "diary-foot" }, status,
-      h("button", { type: "button", class: "btn", onClick: () => showDiary(false) }, "Back to the day")));
+      h("button", { type: "button", class: "btn", onClick: () => show("day") }, "Back to the day")));
 
+  let mood = "";
   function save() {
     clearTimeout(timer); timer = null;
     if (!dirty || !loaded) return;
-    saveDiaryDay(state.fb, state.uid, key, text.value);
+    saveDiaryDay(state.fb, state.uid, key, { text: text.value, mood });
     dirty = false;
     status.textContent = "Saved ✓";
+  }
+
+  /* ---------- the mood (saved in the same private entry) ---------- */
+  const moodNote = h("p", { class: "muted small mood-note", role: "status" }, "");
+  const moodButtons = MOODS.map((m) => h("button", {
+    type: "button", class: "mood-opt", "aria-pressed": "false", disabled: true, dataset: { mood: m.id },
+    onClick: () => pickMood(mood === m.id ? "" : m.id),
+  }, h("span", { class: "mood-emoji", "aria-hidden": "true" }, m.emoji), h("span", { class: "mood-label" }, m.label)));
+  const moodPanel = h("div", { class: "mood-panel", hidden: true },
+    h("p", { class: "muted small" }, "How did you feel today? Private, like your diary. Tap it again to clear."),
+    h("div", { class: "mood-grid", role: "group", "aria-label": `Mood for ${dayLabel(date)}` }, moodButtons),
+    moodNote,
+    h("div", { class: "diary-foot" }, h("span"),
+      h("button", { type: "button", class: "btn", onClick: () => show("day") }, "Back to the day")));
+
+  function paintMood() {
+    const m = moodById(mood);
+    for (const b of moodButtons) b.setAttribute("aria-pressed", String(b.dataset.mood === mood));
+    moodNote.textContent = m ? `Feeling ${m.label.toLowerCase()} ${m.emoji}` : "No mood picked.";
+    moodButton.replaceChildren(h("span", { class: "mood-emoji", "aria-hidden": "true" }, m ? m.emoji : "🙂"));
+    moodButton.classList.toggle("has-entry", !!m);
+    moodButton.setAttribute("aria-label", m ? `Mood for this day: ${m.label}. Change it.` : "Pick your mood for this day");
+  }
+  function pickMood(id) {
+    if (!loaded) return;
+    mood = id;
+    saveDiaryDay(state.fb, state.uid, key, { text: text.value, mood });   // writes the current text too, so nothing is lost
+    dirty = false;
+    paintMood();
   }
   text.addEventListener("input", () => {
     dirty = true; status.textContent = "Writing…";
@@ -58,35 +89,43 @@ export function openDayWindow({ date, getItems, onClose }) {
   });
   text.addEventListener("blur", save);
 
-  /* ---------- the little capybara button ---------- */
-  const diaryButton = h("button", { type: "button", class: "diary-btn", "aria-label": "Open the diary for this day", "aria-pressed": "false", onClick: () => showDiary(diaryPanel.hidden) }, icon("profile", 44));
-  function showDiary(open) {
-    if (!open) save();
-    diaryPanel.hidden = !open;
-    dayPanel.hidden = open;
-    diaryButton.setAttribute("aria-pressed", String(open));
-    title.textContent = open ? `Diary · ${dayLabel(date)}` : dayLabel(date);
-    if (open) text.focus();
+  /* ---------- the two little buttons (capybara = diary, face = mood) ---------- */
+  const diaryButton = h("button", { type: "button", class: "diary-btn", "aria-label": "Open the diary for this day", "aria-pressed": "false", onClick: () => show(diaryPanel.hidden ? "diary" : "day") }, icon("profile", 44));
+  const moodButton = h("button", { type: "button", class: "diary-btn mood-btn", "aria-pressed": "false", onClick: () => show(moodPanel.hidden ? "mood" : "day") });
+
+  function show(which) {
+    save();
+    dayPanel.hidden = which !== "day";
+    diaryPanel.hidden = which !== "diary";
+    moodPanel.hidden = which !== "mood";
+    diaryButton.setAttribute("aria-pressed", String(which === "diary"));
+    moodButton.setAttribute("aria-pressed", String(which === "mood"));
+    title.textContent = which === "diary" ? `Diary · ${dayLabel(date)}` : which === "mood" ? `Mood · ${dayLabel(date)}` : dayLabel(date);
+    if (which === "diary") text.focus();
   }
 
-  const stop = watchDiaryDay(state.fb, state.uid, key, (value) => {
-    if (value !== null) {
-      diaryButton.classList.toggle("has-entry", value !== "");
-      if (!dirty) text.value = value;
+  const stop = watchDiaryDay(state.fb, state.uid, key, (entry) => {
+    if (entry !== null) {
+      diaryButton.classList.toggle("has-entry", entry.text !== "");
+      if (!dirty) text.value = entry.text;
+      mood = entry.mood;
     }
     loaded = true;
     text.disabled = false;
     text.placeholder = "What happened today?";
+    for (const b of moodButtons) b.disabled = false;
+    paintMood();
   });
+  paintMood();
 
   /* ---------- the window ---------- */
   const title = h("h2", { class: "day-title", id: "day-title" }, dayLabel(date));
   const dialog = h("dialog", { class: "dialog day-dialog", "aria-labelledby": "day-title" },
     h("div", { class: "day-head" },
       h("div", { class: "day-head-text" }, title, isToday ? h("span", { class: "chip" }, "Today") : null),
-      diaryButton,
+      diaryButton, moodButton,
       h("button", { type: "button", class: "btn day-close", "aria-label": "Close", onClick: () => dialog.close() }, "✕")),
-    dayPanel, diaryPanel);
+    dayPanel, diaryPanel, moodPanel);
 
   dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); });   // tap outside to close
   let closed = false;

@@ -1,8 +1,8 @@
-# TaskNest (Phase 3d: Board view)
+# TaskNest (Phase 4a: Backup, moods, desktop Add button)
 
 A personal school and organization task tracker that installs on your phone and works offline.
 
-**This is Phase 3d: the Board view, which finishes Phase 3.**
+**This is Phase 4a: backup and restore, a mood picker in the day window, and the floating Add button on desktop.**
 
 | Phase | What you get | Status |
 |---|---|---|
@@ -15,7 +15,10 @@ A personal school and organization task tracker that installs on your phone and 
 | 3.5 | Heart/flower calendar markers, "Add event" button on the Calendar, redesigned Home (greeting card, small counters, clear sections, Academics and Organizations progress apart), event types per workspace with your own, Manage in collapsible groups, capybara decorations | Done |
 | 3.6 | Floating pill navigation on phones, collapsible sidebar on desktop, shorter 2x2 Home tiles, tap a day for a floating window, desktop Calendar with side panels, secret capybara diary (one private note per day) | Done |
 | 3.7 | Your exact capybara poses and icons (cut out of your artwork, in `icons/art` and `icons/ui`), icon colors that follow the theme (the capybaras never change), Calendar redesigned like your mock-up (cloud banner, pill switches, Today / Upcoming / quote cards, week at a glance) | Done |
-| 3d | Board view: your tasks as Not started / In progress / Done columns, move with buttons or drag, filters | **This version** |
+| 3d | Board view: your tasks as Not started / In progress / Done columns, move with buttons or drag, filters | Done |
+| 4a | Backup (download / restore a file), mood picker beside the diary, floating Add pill on desktop | **This version** |
+| 4b | Reports | Next |
+| 4c | Optional start date, accessibility polish | Later |
 | 4 | Reports, export/import backup, optional start date, polish | Later |
 | 5 | Recurring tasks | Later |
 
@@ -103,6 +106,12 @@ New **public** repository, upload the files (including the `css`, `js`, `icons` 
 
 ## Using the app
 
+**Mood.** In a day's window, next to the capybara, there is a face button. Tap it and pick how you felt that day from 12 moods (ecstatic, happy, confident, grateful, calm, okay, tired, anxious, stressed, sad, depressed, angry). It saves straight away, and tapping the same mood again clears it. Like the diary, it is private: it is saved in that day's entry and only shows in that day's window.
+
+**Backup.** Settings, then Backup. *Download backup* saves one file (`tasknest-backup-DATE.json`) with your courses, tasks, events, your own task and event types, and your settings. Your diary and moods are not included. To restore, choose a backup file: you see what is inside, then pick **Add to what I have** (nothing is deleted; same items are updated) or **Replace everything** (anything not in the file is deleted, after a confirmation). Keep a backup now and then, for example before a big change.
+
+**Add button on desktop.** The round Add pill is at the lower right on computers too, and says "Add event" on the Calendar.
+
 **Board.** On the Tasks screen, switch from **List** to **Board** (top right). Your tasks sit in three columns: **Not started**, **In progress** and **Done**. On a phone, swipe sideways between columns. Move a task with the buttons on its card (**Start**, **Done**, **Back**, **Reopen**), or on a computer drag the card to another column. Moving a card is exactly the same as changing its status on the list, so the dates recorded for it stay correct. Use the tabs, the course or organization menu and the search box to narrow it down. Archived tasks are not shown. The Done column shows the last 14 days; press **Show all done** for older ones.
 
 **Home (dashboard).** The app opens here (you can change that under Settings, View). It shows a greeting, then four tiles: **Overdue**, **Due today**, **Due soon** and **In progress**. Tap a tile to open the Tasks list showing exactly those tasks. Under the tiles:
@@ -163,6 +172,7 @@ Archived tasks are never counted. "Due today" means a deadline later today; a de
 | Word | What is inside |
 |---|---|
 | Theme | The eight color themes (four light, four dark) |
+| Backup | Download a backup file, or restore one (merge or replace) |
 | View | The screen the app starts on (Dashboard, Tasks list or Calendar; Board joins later), and the "Due soon" and "Early" windows (hours) |
 | Account | Your name, email, Account ID, Sign out |
 | Archived tasks | Tasks you archived |
@@ -182,8 +192,8 @@ Everything lives under your account: `users/{your-id}/...`
 | `tasks` | title, workspace, courseId or orgId, typeId, arrangement, status, dueAt, instructions, notes, eventId (optional), createdAt, updatedAt, inProgressAt, completedAt, archived, archivedAt, deadlineHistory |
 | `eventTypes` | your custom event types only: name, workspace, createdAt, updatedAt |
 | `events` | title, kind (a built-in id such as `exam`, or the id of one of your `eventTypes`), workspace, courseId or orgId (optional), allDay, startAt, endAt (or null), location, notes, createdAt, updatedAt |
-| `diary` | one private note per day, document id is the day (for example `2026-11-03`): text, updatedAt. Only ever read one day at a time, from the capybara in the Calendar day window |
-| `settings/main` | theme, defaultScreen, dueSoonHours, earlyHours |
+| `diary` | one private note and mood per day, document id is the day (for example `2026-11-03`): text, mood, updatedAt. Only ever read one day at a time, from the capybara in the Calendar day window |
+| `settings/main` | theme, defaultScreen, dueSoonHours, earlyHours, lastExportAt |
 | `meta/syncTest` | the little counter on the Settings page. Safe to ignore |
 
 - Tasks point to courses and types by **id**, not name, so renaming a course or type updates every task.

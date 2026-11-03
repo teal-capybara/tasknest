@@ -6,6 +6,7 @@
      #/settings/view       the screen the app starts on, and how "due soon" and "early" are worked out
      #/settings/account    who you are signed in as, sign out
      #/settings/archived   tasks you archived (restore or delete them here)
+     #/settings/backup     save everything to a file, or bring a saved file back
      #/settings/install    install the app on your phone
      #/settings/offline    the little counter that proves offline saving works
 
@@ -27,6 +28,9 @@ import { renderThemePicker, markSelected } from "../ui/themePicker.js";
 import { bindInstallCard } from "../ui/install.js";
 import { buildTaskCard } from "../ui/taskCard.js";
 import { toast } from "../ui/screens.js";
+import { confirmDialog } from "../ui/dialogs.js";
+import { buildBackup, backupFileName, parseBackup, planImport, COLLECTIONS } from "../logic/backup.js";
+import { applyImport } from "../db/backup.js";
 
 const START_NAMES = { dashboard: "Dashboard", tasks: "Tasks", calendar: "Calendar" };
 const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
@@ -44,7 +48,7 @@ export function settingsView(container, params) {
 
 /* ---------------------------------------------------------------- the list */
 
-const SECTION_ORDER = ["theme", "view", "account", "archived", "install", "offline"];
+const SECTION_ORDER = ["theme", "view", "account", "archived", "backup", "install", "offline"];
 
 /** One short line under each word, so you can see the current state without opening it. */
 const SUMMARY = {
@@ -52,6 +56,7 @@ const SUMMARY = {
   view: () => `Starts on ${START_NAMES[getSettings().defaultScreen] || "Dashboard"} · due soon ${getSettings().dueSoonHours} h`,
   account: () => ((state.fb && state.fb.auth.currentUser) || {}).email || "Signed in",
   archived: () => plural(state.tasks.filter((t) => t.archived).length, "archived task"),
+  backup: () => (getSettings().lastExportAt ? `Last saved ${new Date(getSettings().lastExportAt).toLocaleDateString([], { month: "short", day: "numeric" })}` : "Save a copy of your data"),
   install: () => "Add TaskNest to your home screen",
   offline: () => "Check that offline saving works",
 };
@@ -207,6 +212,90 @@ const SECTIONS = {
 
       render();
       return { update: render, destroy() { document.removeEventListener("click", closeMenus); } };
+    },
+  },
+
+  backup: {
+    title: "Backup",
+    build(container) {
+      const counts = () => [
+        plural(state.courses.length, "course"), plural(state.tasks.length, "task"), plural(state.events.length, "event"),
+        plural(state.customTypes.length + state.customEventTypes.length, "custom type"),
+      ].join(", ");
+
+      /* ---- export ---- */
+      const exportButton = h("button", { type: "button", class: "btn btn-primary", onClick: () => {
+        const json = JSON.stringify(buildBackup(state), null, 2);
+        const url = URL.createObjectURL(new Blob([json], { type: "application/json" }));
+        const link = h("a", { href: url, download: backupFileName() });
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        guard(saveSettings(state.fb, state.uid, { lastExportAt: Date.now() }), "Settings not saved");
+        toast("Backup saved to your downloads.");
+      } }, "Download backup");
+
+      /* ---- import ---- */
+      const message = h("p", { class: "small", role: "status", "aria-live": "polite" });
+      const choices = h("div", { class: "form-actions", hidden: true });
+      const fileInput = h("input", { type: "file", id: "backup-file", class: "input", accept: ".json,application/json" });
+      let parsed = null;
+
+      const finish = (result) => {
+        parsed = null; choices.hidden = true; fileInput.value = "";
+        message.textContent = `Done: ${plural(result.written, "item")} restored${result.deleted ? `, ${plural(result.deleted, "item")} removed` : ""}. It syncs in the background.`;
+      };
+
+      const doMerge = () => {
+        if (!parsed) return;
+        finish(applyImport(state.fb, state.uid, planImport(parsed.data, collectionsNow(), "merge")));
+        toast("Backup added.");
+      };
+      const doReplace = async () => {
+        if (!parsed) return;
+        const plan = planImport(parsed.data, collectionsNow(), "replace");
+        const ok = await confirmDialog({
+          title: "Replace everything?",
+          message: [
+            `This makes your data match the backup exactly. ${plural(plan.deletes.length, "item")} you have now that aren't in the backup will be permanently deleted.`,
+            "Your diary and moods are not touched. Tip: download a backup of what you have now first.",
+          ],
+          confirmLabel: "Replace everything", danger: true,
+        });
+        if (!ok || !parsed) return;
+        finish(applyImport(state.fb, state.uid, plan));
+        toast("Backup restored.");
+      };
+      choices.append(
+        h("button", { type: "button", class: "btn btn-primary", id: "backup-merge", onClick: doMerge }, "Add to what I have"),
+        h("button", { type: "button", class: "btn btn-danger", id: "backup-replace", onClick: doReplace }, "Replace everything…"));
+
+      fileInput.addEventListener("change", async () => {
+        parsed = null; choices.hidden = true;
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) { message.textContent = ""; return; }
+        if (file.size > 8 * 1024 * 1024) { message.textContent = "That file is too large to be a TaskNest backup."; return; }
+        let text;
+        try { text = await file.text(); } catch (e) { message.textContent = "Couldn't read that file."; return; }
+        const result = parseBackup(text);
+        if (!result.ok) { message.textContent = result.error; return; }
+        parsed = result;
+        const when = result.exportedAt ? ` made ${new Date(result.exportedAt).toLocaleDateString([], { year: "numeric", month: "short", day: "numeric" })}` : "";
+        message.textContent = `Backup${when}: ${COLLECTIONS.map((c) => `${result.counts[c.key]} ${c.label}`).join(", ")}.${result.skipped ? ` ${plural(result.skipped, "damaged item")} will be skipped.` : ""} How should it be restored?`;
+        choices.hidden = false;
+      });
+
+      const collectionsNow = () => ({ courses: state.courses, taskTypes: state.customTypes, eventTypes: state.customEventTypes, tasks: state.tasks, events: state.events });
+
+      container.append(
+        h("section", { class: "card" }, h("h2", {}, "Save a copy"),
+          h("p", { class: "muted" }, "Downloads one file with your courses, tasks, events, your own types and your settings. Your diary and moods stay private and are not included."),
+          h("p", { class: "small", id: "backup-counts" }, `Right now: ${counts()}.`),
+          exportButton),
+        h("section", { class: "card" }, h("h2", {}, "Bring a backup back"),
+          h("p", { class: "muted" }, "Choose a TaskNest backup file. You'll see what's in it before anything changes."),
+          h("label", { class: "label", for: "backup-file" }, "Backup file"), fileInput, message, choices));
     },
   },
 
