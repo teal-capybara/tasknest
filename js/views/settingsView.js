@@ -31,6 +31,7 @@ import { toast } from "../ui/screens.js";
 import { confirmDialog } from "../ui/dialogs.js";
 import { buildBackup, backupFileName, parseBackup, planImport, COLLECTIONS } from "../logic/backup.js";
 import { applyImport } from "../db/backup.js";
+import { BUILD } from "../version.js";
 
 const START_NAMES = { dashboard: "Dashboard", tasks: "Tasks", calendar: "Calendar" };
 const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
@@ -71,9 +72,17 @@ function menuPage(container) {
   });
 
   const fill = () => rows.forEach((r) => { r.hint.textContent = SUMMARY[r.id](); });
+  const versionLine = h("p", { class: "muted small", id: "app-version" }, `TaskNest files: ${BUILD}`);
+  // The offline copy has its own version name (from service-worker.js). If it differs from the files' version, an upload was probably incomplete.
+  if (window.caches) caches.keys().then((names) => {
+    const shell = names.filter((n) => n.startsWith("tasknest-shell-")).map((n) => n.slice("tasknest-shell-".length));
+    if (!shell.length) return;
+    versionLine.textContent = shell.includes(BUILD) ? `TaskNest ${BUILD}` : `TaskNest files: ${BUILD} · offline copy: ${shell.join(", ")}. If these differ, reload the app, or check that every file from the latest zip was uploaded.`;
+  }).catch(() => {});
   container.append(
     h("div", { class: "page-head" }, h("h1", {}, "Settings")),
-    h("nav", { class: "settings-list card", "aria-label": "Settings" }, rows.map((r) => r.link)));
+    h("nav", { class: "settings-list card", "aria-label": "Settings" }, rows.map((r) => r.link)),
+    versionLine);
   fill();
   return { update: fill };
 }

@@ -106,7 +106,9 @@ New **public** repository, upload the files (including the `css`, `js`, `icons` 
 
 ## Using the app
 
-**Start date (optional).** The task form has a *Start date* above the deadline: the day you plan to begin. Leave it empty if it doesn't matter. It can't be after the deadline. While the start date is still ahead, the task shows a *Starts Mon, Nov 9* chip on the list and Board. The detail page and the CSV show it too, and it is part of backups. It changes nothing else: the task still appears in your lists, and urgency still follows the deadline.
+**Start date (optional).** The task form has a *Start date* above the deadline: the day you plan to begin. Leave it empty if it doesn't matter (the **Clear start date** button removes it). It can't be after the deadline. While the start date is still ahead, the task shows a *Starts Mon, Nov 9* chip on the list and Board. The detail page and the CSV show it too, and it is part of backups. It changes nothing else: the task still appears in your lists, and urgency still follows the deadline.
+
+**Which version is running?** Settings shows the version at the bottom. If it shows two different names (files vs offline copy), some files from the zip weren't uploaded, or the app needs a reload.
 
 **Accessibility.** A *Skip to content* link appears when you press Tab. When you open a page, keyboard and screen-reader focus moves to its heading. Buttons and tabs are at least 44 px tall. Colors were checked for readable contrast in all eight themes. Status and urgency always use an icon or words, never only color.
 

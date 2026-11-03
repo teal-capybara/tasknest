@@ -129,6 +129,11 @@ export function taskFormView(container, params, query) {
   const dueWarn = h("p", { class: "warn-text", hidden: true });
   const clearDue = h("button", { type: "button", class: "btn btn-link", onClick: () => { el.dueDate.value = ""; el.dueTime.value = ""; syncDueHint(); } }, "Clear deadline");
 
+  const clearStart = h("button", { type: "button", class: "btn btn-link", onClick: () => { el.startDate.value = ""; syncStartClear(); el.startDate.dispatchEvent(new Event("input", { bubbles: true })); } }, "Clear start date");
+  const syncStartClear = () => { clearStart.hidden = !el.startDate.value; };
+  el.startDate.addEventListener("input", syncStartClear);
+  syncStartClear();
+
   const summary = h("div", { class: "form-summary error-text", role: "alert", hidden: true, tabindex: "-1" });
 
   const form = h("form", { class: "task-form", novalidate: true, onSubmit: onSubmit },
@@ -140,6 +145,7 @@ export function taskFormView(container, params, query) {
     typeField,
     arrangementGroup,
     field("startDate", "Start date (optional)", el.startDate, { hint: "The day you plan to begin. Leave empty if it doesn't matter." }),
+    clearStart,
     h("div", { class: "due-row" },
       field("dueDate", "Due date", el.dueDate),
       field("dueTime", "Due time", el.dueTime)),

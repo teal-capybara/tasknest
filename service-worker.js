@@ -15,7 +15,7 @@
    If you add a new file to the app, add it to SHELL_FILES too.
    ========================================================================== */
 
-const VERSION = "v4c-polish";
+const VERSION = "v4c-polish2";
 const SHELL_CACHE = `tasknest-shell-${VERSION}`;
 const SDK_CACHE = "tasknest-firebase-sdk"; // Firebase files are versioned by URL, so this one is kept
 
@@ -60,6 +60,7 @@ const SHELL_FILES = [
   "js/router.js",
   "js/session.js",
   "js/state.js",
+  "js/version.js",
   "js/sync-status.js",
   "js/theme.js",
   "js/ui/dialogs.js",
