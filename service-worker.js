@@ -15,7 +15,7 @@
    If you add a new file to the app, add it to SHELL_FILES too.
    ========================================================================== */
 
-const VERSION = "v4a-backup";
+const VERSION = "v4b-reports";
 const SHELL_CACHE = `tasknest-shell-${VERSION}`;
 const SDK_CACHE = "tasknest-firebase-sdk"; // Firebase files are versioned by URL, so this one is kept
 
@@ -52,6 +52,7 @@ const SHELL_FILES = [
   "js/logic/filters.js",
   "js/logic/format.js",
   "js/logic/stats.js",
+  "js/logic/reports.js",
   "js/logic/timing.js",
   "js/logic/urgency.js",
   "js/logic/validate.js",
@@ -83,6 +84,7 @@ const SHELL_FILES = [
   "js/views/taskFormView.js",
   "js/views/tasksView.js",
   "js/views/boardView.js",
+  "js/views/reportsView.js",
   "icons/tasknest-apple-180.png",
   "icons/tasknest-favicon-64.png",
   "icons/art/capy-cheering.png",

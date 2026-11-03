@@ -191,5 +191,6 @@ function weekSection(stats, settings) {
           h("ul", { class: "week-list" }, part(w.early, "early"), part(w.ontime, "on time"), part(w.late, "late"), part(w.nodeadline, "no deadline")),
           h("p", { class: "muted small" }, `“Early” means finished at least ${settings.earlyHours} hours before the deadline (change it under Settings, View).`),
         ]
-      : h("p", { class: "muted" }, "Nothing finished in the last 7 days yet."));
+      : h("p", { class: "muted" }, "Nothing finished in the last 7 days yet."),
+    h("p", { class: "dash-more" }, h("a", { href: "#/reports" }, "See full reports")));
 }

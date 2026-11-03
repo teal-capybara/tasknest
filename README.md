@@ -1,8 +1,8 @@
-# TaskNest (Phase 4a: Backup, moods, desktop Add button)
+# TaskNest (Phase 4b: Reports)
 
 A personal school and organization task tracker that installs on your phone and works offline.
 
-**This is Phase 4a: backup and restore, a mood picker in the day window, and the floating Add button on desktop.**
+**This is Phase 4b: the Reports page (on top of 4a: backup, moods, desktop Add button).**
 
 | Phase | What you get | Status |
 |---|---|---|
@@ -16,8 +16,8 @@ A personal school and organization task tracker that installs on your phone and 
 | 3.6 | Floating pill navigation on phones, collapsible sidebar on desktop, shorter 2x2 Home tiles, tap a day for a floating window, desktop Calendar with side panels, secret capybara diary (one private note per day) | Done |
 | 3.7 | Your exact capybara poses and icons (cut out of your artwork, in `icons/art` and `icons/ui`), icon colors that follow the theme (the capybaras never change), Calendar redesigned like your mock-up (cloud banner, pill switches, Today / Upcoming / quote cards, week at a glance) | Done |
 | 3d | Board view: your tasks as Not started / In progress / Done columns, move with buttons or drag, filters | Done |
-| 4a | Backup (download / restore a file), mood picker beside the diary, floating Add pill on desktop | **This version** |
-| 4b | Reports | Next |
+| 4a | Backup (download / restore a file), mood picker beside the diary, floating Add pill on desktop | Done |
+| 4b | Reports: finished over time, early / on time / late, by course and type, events, CSV download | **This version** |
 | 4c | Optional start date, accessibility polish | Later |
 | 4 | Reports, export/import backup, optional start date, polish | Later |
 | 5 | Recurring tasks | Later |
@@ -105,6 +105,8 @@ New **public** repository, upload the files (including the `css`, `js`, `icons` 
 ---
 
 ## Using the app
+
+**Reports.** On Home, under *Last 7 days*, tap **See full reports** (or go to `#/reports`). Pick a period (7, 30, 90 days or all time) and a workspace. You get: tasks finished and added, the share finished on time or early, average days from adding a task to finishing it, a bar chart of tasks finished over time (daily for 7 days, weekly otherwise), early / on time / late, finished per course or organization, finished per task type, and events that happened. *Download tasks (CSV)* saves every task as a spreadsheet. Reports include archived tasks. Early / on time / late uses each task's current deadline, so moving a deadline after finishing changes the result.
 
 **Mood.** In a day's window, next to the capybara, there is a face button. Tap it and pick how you felt that day from 12 moods (ecstatic, happy, confident, grateful, calm, okay, tired, anxious, stressed, sad, depressed, angry). It saves straight away, and tapping the same mood again clears it. Like the diary, it is private: it is saved in that day's entry and only shows in that day's window.
 
