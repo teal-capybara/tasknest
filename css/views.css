@@ -51,6 +51,7 @@ a.btn { text-decoration: none; }
 
 /* ---- Segmented buttons (workspace tabs; also radio groups in the form) ---- */
 .seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; max-width: 100%; }
+.seg-btn { min-width: 44px; }
 .seg-btn, .seg-radio span {
   display: inline-flex; align-items: center; justify-content: center;
   min-height: 40px; padding: 0 1rem;
@@ -120,7 +121,7 @@ a.btn { text-decoration: none; }
 .urg-done .task-title { color: var(--text-muted); }
 .is-archived { opacity: .72; }
 
-.task-check { width: 1.6rem; height: 1.6rem; margin: .1rem 0 0; accent-color: var(--link); cursor: pointer; }
+.task-check { width: 1.75rem; height: 1.75rem; margin: .05rem 0 0; flex: none; accent-color: var(--link); cursor: pointer; }
 .task-body { min-width: 0; }
 .task-title { display: block; font-weight: 700; font-size: 1.05rem; color: var(--text); text-decoration: none; overflow-wrap: anywhere; }
 .task-title:hover { text-decoration: underline; }
@@ -538,3 +539,4 @@ a.btn { text-decoration: none; }
 .report-row-2 { grid-template-columns: 1fr auto; }
 .report-num { text-align: right; }
 @media (min-width: 760px) { .report-stats { grid-template-columns: repeat(4, 1fr); } .report-body { grid-template-columns: 1fr 1fr; } .report-body > section:first-child, .report-body > section:last-of-type, .report-body > p { grid-column: 1 / -1; } }
+.chip-start { background: var(--surface-2); color: var(--text); border: 1px dashed var(--border); }

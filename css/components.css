@@ -40,7 +40,7 @@
 .btn-primary:hover { background: var(--primary-hover); filter: none; }
 
 .btn-large { width: 100%; min-height: 52px; font-size: 1.05rem; margin: .5rem 0; }
-.btn-small { min-height: 36px; padding: .25rem .75rem; font-size: .875rem; border-radius: 10px; }
+.btn-small { min-height: 44px; padding: .25rem .75rem; font-size: .875rem; border-radius: 10px; }
 
 /* ---- Sync indicator (the chip in the header) ---- */
 .sync-chip {

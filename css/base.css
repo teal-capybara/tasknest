@@ -51,3 +51,9 @@ a { color: var(--link); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Skip link: hidden until it gets keyboard focus */
+.skip-link { position: fixed; left: .75rem; top: -4rem; z-index: 100; padding: .6rem 1rem; border-radius: 10px; background: var(--primary); color: var(--on-primary); font-weight: 700; text-decoration: none; }
+.skip-link:focus { top: .75rem; }
+/* Programmatic focus on a page heading / the page itself should not draw a ring */
+h1:focus, .app-main:focus { outline: none; }
