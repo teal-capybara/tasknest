@@ -553,13 +553,19 @@ a.btn { text-decoration: none; }
 .term-row { display: flex; gap: .5rem; align-items: center; }
 .term-row .select { width: auto; min-width: 9rem; }
 .sched-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; }
-.sched-day { display: grid; grid-template-columns: 3.6rem 1fr; gap: .5rem; align-items: start; padding: .8rem; border-radius: 20px; background: var(--surface); border: 1px solid var(--border); }
+.sched-day { padding: .8rem .9rem .9rem; border-radius: 22px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
 .sched-day.alt { background: var(--surface-2); }
-.sched-dayname { margin: 0; align-self: center; font-size: 1rem; letter-spacing: .04em; color: var(--text); }
-.sched-items { list-style: none; margin: 0; padding: 0; display: grid; gap: .7rem; }
-.sched-item { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .15rem .75rem; }
-.sched-what { display: flex; flex-direction: column; min-width: 0; }
-.sched-when { display: flex; flex-direction: column; text-align: right; }
+.sched-dayname { display: flex; align-items: center; gap: .5rem; margin: 0 0 .5rem; font-size: 1.05rem; color: var(--text); }
+.sched-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+/* One class = two columns. Left: name, professor. Right: time, room. A long name wraps on the left; the time stays put. */
+.sched-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .1rem .75rem; align-items: start; padding: .55rem 0 .55rem .7rem; border-left: 4px solid var(--tint); border-radius: 2px; }
+.sched-item + .sched-item { margin-top: .35rem; }
+.sched-what, .sched-when { display: flex; flex-direction: column; gap: .1rem; }
+.sched-what { min-width: 0; }
+.sched-when { text-align: right; white-space: nowrap; }
+.sched-name { font-size: 1rem; line-height: 1.25; overflow-wrap: break-word; }
+.sched-prof, .sched-room { font-size: .85rem; line-height: 1.25; color: var(--text-muted); }
+.sched-time { font-size: .88rem; line-height: 1.25; }
 .sched-table { display: none; }
 .course-grid { display: grid; gap: .8rem; }
 .course-head { display: flex; justify-content: space-between; align-items: flex-start; gap: .6rem; }
@@ -584,11 +590,18 @@ a.btn { text-decoration: none; }
   .sched-list { display: none; }
   .sched-switch { display: none; }
   .course-grid { grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr)); }
-  .sched-table { display: grid; grid-template-columns: 5rem repeat(var(--cols), minmax(9rem, 1fr)); gap: .4rem; overflow-x: auto; padding: .75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; }
-  .tt-dayhead { height: 2rem; font-weight: 700; text-align: center; }
-  .tt-track { position: relative; border-left: 1px dashed var(--border); background: repeating-linear-gradient(to bottom, transparent 0, transparent calc(4rem - 1px), var(--border) calc(4rem - 1px), var(--border) 4rem); }
-  .tt-times .tt-track { border-left: 0; background: none; }
+  .sched-table { display: grid; grid-template-columns: 5rem repeat(var(--cols), minmax(9rem, 1fr)); gap: .5rem; overflow-x: auto; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; box-shadow: var(--shadow); }
+  .tt-dayhead { height: 2.4rem; display: flex; align-items: center; justify-content: center; }
+  .tt-daypill { padding: .25rem .9rem; font-weight: 700; border-radius: 999px; background: var(--surface-2); }
+  .tt-col.is-today .tt-daypill { background: var(--primary); color: var(--on-primary); }
+  .tt-track { position: relative; border-radius: 18px; background: color-mix(in srgb, var(--surface-2) 55%, transparent); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--hour) - 1px), var(--border) calc(var(--hour) - 1px), var(--border) var(--hour)); }
+  .tt-col.is-today .tt-track { background-color: color-mix(in srgb, var(--primary) 12%, var(--surface)); }
+  .tt-times .tt-track { background: none; border-radius: 0; }
   .tt-hour { position: absolute; right: .4rem; transform: translateY(-.5em); font-size: .75rem; color: var(--text-muted); white-space: nowrap; }
-  .tt-block { position: absolute; left: 2px; right: 2px; display: flex; flex-direction: column; gap: .1rem; padding: .35rem .5rem; overflow: hidden; font-size: .8rem; line-height: 1.25; color: var(--text); background: color-mix(in srgb, var(--tint) 38%, var(--surface)); border: 1px solid var(--tint); border-radius: 12px; }
-  .tt-name { font-size: .85rem; }
+  .tt-block { position: absolute; left: 4px; right: 4px; display: flex; flex-direction: column; gap: .1rem; padding: .4rem .6rem .4rem .7rem; overflow: hidden; font-size: .8rem; line-height: 1.25; color: var(--text); background: color-mix(in srgb, var(--tint) 34%, var(--surface)); border-left: 5px solid var(--tint); border-radius: 14px; box-shadow: 0 2px 6px rgba(0, 0, 0, .08); }
+  .tt-name { font-size: .88rem; }
+  .tt-time { font-weight: 600; }
+  .tt-prof, .tt-room { color: var(--text-muted); }
+  .tt-now { position: absolute; left: 0; right: 0; height: 0; border-top: 2px solid var(--danger, #d33); z-index: 2; }
+  .tt-now::before { content: ""; position: absolute; left: -4px; top: -6px; width: 10px; height: 10px; border-radius: 50%; background: var(--danger, #d33); }
 }
