@@ -6,7 +6,7 @@
 
 import { h, clear } from "../ui/dom.js";
 import { state, termNow } from "../state.js";
-import { weekOf, timetableBounds, toMinutes, formatRange, formatTime, dayName } from "../logic/schedule.js";
+import { weekOf, timetableBounds, toMinutes, formatRange, formatTime, dayName, dayShort } from "../logic/schedule.js";
 import { termPicker } from "../ui/termPicker.js";
 import { scheduleSwitch } from "../ui/scheduleSwitch.js";
 import { banner } from "../ui/scheduleBits.js";
@@ -15,9 +15,10 @@ import { capybara } from "../ui/capybara.js";
 const HOUR_REM = 5;      // height of one hour in the timetable (keep in step with --hour below)
 // Each course gets its own color from the theme, so classes are easy to tell apart.
 const TINTS = [
-  "var(--primary)", "var(--mark-event)", "var(--mark-task)", "var(--link)",
-  "color-mix(in srgb, var(--primary) 55%, var(--mark-event))", "color-mix(in srgb, var(--link) 55%, var(--mark-task))",
-  "color-mix(in srgb, var(--mark-event) 55%, var(--link))", "color-mix(in srgb, var(--primary) 55%, var(--mark-task))",
+  "color-mix(in srgb, var(--primary) 70%, var(--text))", "color-mix(in srgb, var(--accent) 65%, var(--text))",
+  "color-mix(in srgb, var(--link) 70%, var(--surface))", "color-mix(in srgb, var(--primary) 50%, var(--accent))",
+  "color-mix(in srgb, var(--accent) 55%, var(--link))", "color-mix(in srgb, var(--primary) 55%, var(--link))",
+  "color-mix(in srgb, var(--link) 55%, var(--accent))", "color-mix(in srgb, var(--accent) 50%, var(--primary))",
 ];
 
 export function scheduleView(container) {
@@ -50,9 +51,12 @@ export function scheduleView(container) {
 
 /* ---- phone: one block per day ---- */
 function phoneList(week, tint) {
+  const today = new Date().getDay();
   return h("ol", { class: "sched-list" }, week.map(({ day, items }, i) =>
-    h("li", { class: `sched-day${i % 2 ? " alt" : ""}${day === new Date().getDay() ? " is-today" : ""}` },
-      h("h2", { class: "sched-dayname", "aria-label": dayName(day) }, dayName(day), day === new Date().getDay() ? h("span", { class: "chip" }, "Today") : null),
+    h("li", { class: `sched-day${i % 2 ? " alt" : ""}${day === today ? " is-today" : ""}` },
+      // Left: the day (MON, TUE...). Right: that day's classes, each with a thin theme-colored bar.
+      h("h2", { class: "sched-dayname", "aria-label": dayName(day) }, h("span", { "aria-hidden": "true" }, dayShort(day)),
+        day === today ? h("span", { class: "sched-today" }, "Today") : null),
       h("ul", { class: "sched-items" }, items.map(({ course, slot }) =>
         // Left: course name, then professor.  Right: time, then room.  A long name wraps on the left and the time stays put.
         h("li", { class: "sched-item", style: `--tint: ${tint.get(course.id)}` },

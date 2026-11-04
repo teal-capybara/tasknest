@@ -36,17 +36,17 @@ export function coursesView(container) {
         h("a", { class: "btn btn-primary", href: "#/course/new" }, "Add a course")));
       return;
     }
-    body.append(h("div", { class: "course-grid" }, courses.map(card)));
+    body.append(h("div", { class: "course-grid" }, courses.map((c, i) => card(c, i))));
   }
 
   render();
   return { update() { picker.update(); render(); } };
 }
 
-function card(course) {
+function card(course, i = 0) {
   const slots = cleanSlots(course.slots);
   const row = (label, value) => (value ? h("div", { class: "course-row" }, h("dt", {}, label), h("dd", {}, value)) : null);
-  return h("article", { class: "card course-card" },
+  return h("article", { class: `card course-card${i % 2 ? " alt" : ""}` },
     h("div", { class: "course-head" },
       h("div", {},
         course.code ? h("p", { class: "course-code" }, course.code) : null,
