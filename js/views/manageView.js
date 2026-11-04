@@ -1,11 +1,8 @@
 /* ==========================================================================
-   MANAGE: your courses, and the task types and event types of each workspace.
+   MANAGE: the task types and event types of each workspace. (Courses live on the Courses page.)
 
    The page is a few collapsible groups (tap a heading to open it), so you see
    the headings first instead of everything at once:
-     Courses          add, rename, archive or delete (delete also deletes the
-                      course's tasks, so it warns and asks you to confirm;
-                      archive is the safer choice and is offered first)
      Academics        task types + event types
      Organizations    task types + event types
    The built-in types are fixed. Your own can be renamed or deleted. Deleting one
@@ -17,7 +14,6 @@ import { h, clear } from "../ui/dom.js";
 import { DEFAULT_TYPES, EVENT_KINDS, WORKSPACES } from "../constants.js";
 import { state, typesFor, eventKindsFor } from "../state.js";
 import { validateName } from "../logic/validate.js";
-import { addCourse, renameCourse, setCourseArchived, deleteCourse } from "../db/courses.js";
 import { addTaskType, renameTaskType, deleteTaskType } from "../db/taskTypes.js";
 import { addEventType, renameEventType, deleteEventType } from "../db/eventTypes.js";
 import { confirmDialog, promptDialog } from "../ui/dialogs.js";
@@ -26,8 +22,6 @@ import { toast } from "../ui/screens.js";
 const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 export function manageView(container) {
-  let showArchived = false;
-
   /* ---------- a small "add something" form (built once, so typing is never interrupted) ---------- */
   function addForm({ label, placeholder, button, existingNames, onAdd }) {
     const input = h("input", { type: "text", class: "input", placeholder, "aria-label": label, autocomplete: "off" });
@@ -43,69 +37,6 @@ export function manageView(container) {
       input.focus();
     } }, input, h("button", { type: "submit", class: "btn btn-primary" }, button));
     return h("div", {}, form, error);
-  }
-
-  /* ---------- courses ---------- */
-  const courseList = h("ul", { class: "row-list" });
-  const archivedBox = h("input", { type: "checkbox", onChange: (e) => { showArchived = e.target.checked; renderCourses(); } });
-
-  function renderCourses() {
-    clear(courseList);
-    const courses = state.courses.filter((c) => showArchived || !c.archived);
-    if (!courses.length) {
-      courseList.append(h("li", { class: "row empty-row muted" },
-        state.courses.length ? "All your courses are archived." : "No courses yet. Add your first one above."));
-      return;
-    }
-    for (const course of courses) {
-      const tasks = state.tasks.filter((t) => t.courseId === course.id);
-      const open = tasks.filter((t) => t.status !== "done" && !t.archived).length;
-
-      courseList.append(h("li", { class: `row${course.archived ? " is-archived" : ""}` },
-        h("div", { class: "row-main" },
-          h("strong", {}, course.name, course.archived ? h("span", { class: "chip chip-archived" }, "Archived") : null),
-          h("span", { class: "muted small" }, `${plural(tasks.length, "task")} · ${open} unfinished`)),
-        h("div", { class: "row-actions" },
-          h("button", { type: "button", class: "btn btn-small", onClick: () => onRenameCourse(course) }, "Rename"),
-          h("button", { type: "button", class: "btn btn-small", onClick: () => onArchiveCourse(course) }, course.archived ? "Restore" : "Archive"),
-          h("button", { type: "button", class: "btn btn-small btn-danger-outline", onClick: () => onDeleteCourse(course, tasks) }, "Delete…"))));
-    }
-  }
-
-  async function onRenameCourse(course) {
-    const others = state.courses.map((c) => c.name);
-    const name = await promptDialog({
-      title: "Rename course", label: "Course name", value: course.name,
-      validate: (text) => validateName(text, others, { ignore: course.name }).error || "",
-    });
-    if (name === null) return;
-    renameCourse(state.fb, state.uid, course.id, name);
-    toast("Course renamed. All its tasks follow automatically.");
-  }
-
-  function onArchiveCourse(course) {
-    setCourseArchived(state.fb, state.uid, course.id, !course.archived);
-    toast(course.archived ? "Course restored." : "Course archived. Its tasks are hidden from your lists but kept for your records.");
-  }
-
-  async function onDeleteCourse(course, tasks) {
-    const n = tasks.length;
-    const events = state.events.filter((e) => e.courseId === course.id);
-    const ok = await confirmDialog({
-      title: `Delete "${course.name}"?`,
-      message: [
-        n
-          ? `This will also permanently delete ${plural(n, "task")} that belong to this course, with their notes and history. This cannot be undone.`
-          : "This course has no tasks. This cannot be undone.",
-        events.length ? `Its ${plural(events.length, "event")} will stay on your calendar, without a course.` : null,
-        "Not sure? Archive the course instead. It disappears from your lists but nothing is lost, and you can restore it any time.",
-      ],
-      confirmLabel: n ? `Delete course and ${plural(n, "task")}` : "Delete course",
-      danger: true,
-    });
-    if (!ok) return;
-    deleteCourse(state.fb, state.uid, course.id, tasks.map((t) => t.id), events.map((e) => e.id));
-    toast(n ? `Course and ${plural(n, "task")} deleted.` : "Course deleted.");
   }
 
   /* ---------- task types and event types (one block per workspace and per thing) ---------- */
@@ -210,16 +141,6 @@ export function manageView(container) {
   }
 
   /* ---------- page ---------- */
-  const coursesFold = fold("Courses", "",
-    h("p", { class: "muted" }, "Each academic task belongs to a course. Renaming a course updates all its tasks."),
-    addForm({
-      label: "New course name", placeholder: "e.g. CS 101 Data Structures", button: "Add course",
-      existingNames: () => state.courses.map((c) => c.name),
-      onAdd: (name) => { addCourse(state.fb, state.uid, name); toast("Course added."); },
-    }),
-    h("label", { class: "check" }, archivedBox, h("span", {}, "Show archived courses")),
-    courseList);
-
   const wsFolds = WORKSPACES.map((ws) => ({
     ws,
     ...fold(ws.name, "",
@@ -230,14 +151,14 @@ export function manageView(container) {
   }));
 
   container.append(
+    h("a", { class: "back-link", href: "#/settings" }, "← Settings"),
     h("div", { class: "page-head" }, h("h1", {}, "Manage")),
     h("p", { class: "muted" }, "Tap a group to open it."),
-    coursesFold.node, ...wsFolds.map((f) => f.node));
+    h("p", { class: "muted small" }, "Courses (with their days, times and professors) now live under ", h("a", { href: "#/courses" }, "Courses"), "."),
+    ...wsFolds.map((f) => f.node));
 
   function refresh() {
-    renderCourses(); renderTypes();
-    const live = state.courses.filter((c) => !c.archived).length;
-    coursesFold.sub.textContent = live ? `${plural(live, "course")}` : "No courses yet";
+    renderTypes();
     for (const f of wsFolds) {
       const t = KINDS.task.custom(f.ws.id).length, e = KINDS.event.custom(f.ws.id).length;
       f.sub.textContent = `Task types and event types${t + e ? ` · ${t + e} of your own` : ""}`;

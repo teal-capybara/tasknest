@@ -139,7 +139,7 @@ function onDataChange() {
 
 function highlightNav(name) {
   document.querySelectorAll("[data-route]").forEach((link) => {
-    if (link.dataset.route === name) link.setAttribute("aria-current", "page");
+    if (link.dataset.route.split(" ").includes(name)) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   });
 }

@@ -16,7 +16,7 @@
 
 import { h, clear, fillSelect } from "../ui/dom.js";
 import { ORGS, WORKSPACES } from "../constants.js";
-import { state, orgName, courseName, typeName, taskGroupName, isTaskArchived, getSettings } from "../state.js";
+import { state, orgName, courseName, typeName, taskGroupName, isTaskHidden, termCourses, getSettings } from "../state.js";
 import { boardColumns, moveOptions } from "../logic/board.js";
 import { formatDue } from "../logic/format.js";
 import { urgencyBadge, arrangementName, startChip } from "../ui/taskCard.js";
@@ -73,7 +73,7 @@ export function boardView(container) {
 
   function syncControls() {
     for (const b of tabs) b.setAttribute("aria-pressed", String(b.dataset.tab === filters.workspace));
-    fillSelect(course, state.courses.filter((c) => !c.archived).map((c) => ({ id: c.id, name: c.name })), filters.courseId, { placeholder: "All courses" });
+    fillSelect(course, termCourses().map((c) => ({ id: c.id, name: c.name })), filters.courseId, { placeholder: "All courses" });
     fillSelect(org, ORGS, filters.orgId, { placeholder: "All organizations" });
     if (filters.courseId && course.value !== filters.courseId) filters.courseId = "";
     // pick Academics or Organizations to narrow down by course or organization (keeps the phone screen short)
@@ -90,7 +90,7 @@ export function boardView(container) {
   function renderColumns() {
     const now = Date.now();
     const columns = boardColumns(state.tasks, filters, {
-      now, settings: getSettings(), isArchived: isTaskArchived, showAllDone,
+      now, settings: getSettings(), isArchived: isTaskHidden, showAllDone,
       names: { course: courseName, org: orgName, type: typeName, arrangement: arrangementName },
     });
     const total = columns.reduce((n, c) => n + c.tasks.length, 0);

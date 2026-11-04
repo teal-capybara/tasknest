@@ -17,7 +17,8 @@
    ========================================================================== */
 
 import { h, clear } from "../ui/dom.js";
-import { state, getSettings, isTaskArchived, taskGroupName, eventGroupName, eventKindName } from "../state.js";
+import { state, getSettings, isTaskHidden, taskGroupName, eventGroupName, eventKindName, termNow } from "../state.js";
+import { homeSchedule, dayName, formatRange } from "../logic/schedule.js";
 import { dashboardStats } from "../logic/stats.js";
 import { buildTaskCard } from "../ui/taskCard.js";
 import { upcomingEvents, relativeDay, formatClock } from "../logic/calendar.js";
@@ -41,7 +42,7 @@ export function dashboardView(container) {
   function render() {
     const now = Date.now();
     const settings = getSettings();
-    const stats = dashboardStats(state.tasks, { now, settings, isArchived: isTaskArchived, groupName: taskGroupName });
+    const stats = dashboardStats(state.tasks, { now, settings, isArchived: isTaskHidden, groupName: taskGroupName });
 
     clear(body);
 
@@ -59,14 +60,36 @@ export function dashboardView(container) {
 
     // (append(null) would print the word "null", so leave out sections that have nothing to show)
     // (two columns on a wide screen: the main things on the left, the overview on the right)
-    const main = [attentionSection(stats, now), progressSection(stats)].filter(Boolean);
+    const main = [classesSection(now), attentionSection(stats, now), progressSection(stats)].filter(Boolean);
     const side = [eventsSection(upcoming, now), weekSection(stats, settings)].filter(Boolean);
     body.append(hero(stats, upcoming, now), tiles(stats),
       h("div", { class: "dash-cols" }, h("div", { class: "dash-col" }, main), h("div", { class: "dash-col" }, side)));
   }
 
   render();
-  return { update: render };
+  // Check once a minute, so the class card moves on to tomorrow right after your last class ends (and nothing else is redrawn).
+  const planKey = () => { const p = homeSchedule(state.courses, termNow(), Date.now()); return p ? `${p.when}${p.day}` : ""; };
+  let lastKey = planKey();
+  const tick = setInterval(() => { const key = planKey(); if (key !== lastKey) { lastKey = key; render(); } }, 60 * 1000);
+  return { update: render, destroy() { clearInterval(tick); } };
+}
+
+/**
+ * Today's classes until your last class of the day has finished, then tomorrow's.
+ * Only the course description and the time are shown here; the rest is on the Schedule page.
+ */
+function classesSection(now) {
+  const plan = homeSchedule(state.courses, termNow(), now);
+  if (!plan) return null;
+  const title = plan.when === "today" ? "Today's classes" : "Tomorrow's classes";
+  return h("section", { class: "dash-section dash-box class-card" },
+    sectionHead(icon("calendar", 32), title, dayName(plan.day)),
+    plan.when === "tomorrow" && plan.noClassesToday ? h("p", { class: "muted small" }, "No classes today.") : null,
+    plan.items.length
+      ? h("ul", { class: "class-list" }, plan.items.map(({ course, slot }) =>
+          h("li", { class: "class-row" }, h("strong", { class: "class-time" }, formatRange(slot)), h("span", {}, course.name))))
+      : h("div", { class: "class-none" }, capybara("relaxing"), h("p", { class: "muted" }, plan.when === "tomorrow" ? "No classes tomorrow." : "No classes.")),
+    h("p", { class: "dash-more" }, h("a", { href: "#/schedule" }, "Full schedule")));
 }
 
 /* ---------------------------------------------------------------- pieces */

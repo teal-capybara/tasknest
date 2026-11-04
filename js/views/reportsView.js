@@ -8,7 +8,8 @@
 
 import { h, clear } from "../ui/dom.js";
 import { WORKSPACES } from "../constants.js";
-import { state, getSettings, taskGroupName, typeName, eventKindName } from "../state.js";
+import { state, getSettings, taskGroupName, typeName, eventKindName, isOutOfTerm, termNow } from "../state.js";
+import { termName } from "../logic/schedule.js";
 import { reportStats, tasksToCsv, RANGES } from "../logic/reports.js";
 import { backupFileName } from "../logic/backup.js";
 import { toast } from "../ui/screens.js";
@@ -35,10 +36,11 @@ export function reportsView(container) {
 
     const now = Date.now();
     const settings = getSettings();
-    const r = reportStats(state.tasks, state.events, { now, settings, groupName: taskGroupName, typeName, kindName: eventKindName }, { rangeDays, workspace });
+    const tasks = state.tasks.filter((t) => !isOutOfTerm(t));   // this semester's academic tasks + organization tasks
+    const r = reportStats(tasks, state.events, { now, settings, groupName: taskGroupName, typeName, kindName: eventKindName }, { rangeDays, workspace });
     clear(body);
 
-    if (!state.tasks.length) {
+    if (!tasks.length) {
       body.append(h("div", { class: "empty card" }, h("h2", {}, "No data yet"), h("p", { class: "muted" }, "Reports fill in as you add and finish tasks.")));
       return;
     }
@@ -91,14 +93,14 @@ export function reportsView(container) {
       h("section", { class: "card" }, h("h2", {}, "Take it with you"),
         h("p", { class: "muted" }, "A spreadsheet file (opens in Excel or Google Sheets) with all your tasks, archived ones included."),
         h("button", { type: "button", class: "btn", onClick: () => {
-          const csv = tasksToCsv(state.tasks, { groupName: taskGroupName, typeName });
+          const csv = tasksToCsv(tasks, { groupName: taskGroupName, typeName });
           const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
           const link = h("a", { href: url, download: backupFileName().replace("backup", "tasks").replace(".json", ".csv") });
           document.body.append(link); link.click(); link.remove();
           setTimeout(() => URL.revokeObjectURL(url), 10000);
           toast("Spreadsheet saved to your downloads.");
         } }, "Download tasks (CSV)")),
-      h("p", { class: "muted small" }, "Reports include archived tasks. “Finished” counts tasks marked Done inside the period."),
+      h("p", { class: "muted small" }, `Reports include archived tasks. Academic tasks are those of ${termName(termNow())}; organization tasks are always included. “Finished” counts tasks marked Done inside the period.`),
     ].filter(Boolean));
   }
 

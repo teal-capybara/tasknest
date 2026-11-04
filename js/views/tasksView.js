@@ -10,7 +10,7 @@
 
 import { h, clear, fillSelect } from "../ui/dom.js";
 import { ARRANGEMENTS, ORGS, STATUSES, WORKSPACES } from "../constants.js";
-import { state, allTypes, typesFor, orgName, courseName, typeName, isTaskArchived, getSettings } from "../state.js";
+import { state, allTypes, typesFor, orgName, courseName, typeName, isTaskHidden, termCourses, getSettings } from "../state.js";
 import { applyFilters, emptyFilters, countActiveFilters, hasAnyFilter, WHEN_OPTIONS } from "../logic/filters.js";
 import { SORTS } from "../logic/urgency.js";
 import { buildTaskCard, arrangementName } from "../ui/taskCard.js";
@@ -85,7 +85,7 @@ export function tasksView(container, params, query = {}) {
   function syncControls() {
     for (const b of tabButtons) b.setAttribute("aria-pressed", String(b.dataset.tab === filters.workspace));
 
-    fillSelect(course.el, state.courses.map((c) => ({ id: c.id, name: c.archived ? `${c.name} (archived)` : c.name })), filters.courseId, { placeholder: "All courses" });
+    fillSelect(course.el, termCourses().map((c) => ({ id: c.id, name: c.name })), filters.courseId, { placeholder: "All courses" });
     fillSelect(org.el, ORGS, filters.orgId, { placeholder: "All organizations" });
     // Task types of the workspace you are looking at (all of them on the "All" tab).
     fillSelect(type.el, filters.workspace === "all" ? allTypes() : typesFor(filters.workspace), filters.typeId, { placeholder: "All types" });
@@ -121,7 +121,7 @@ export function tasksView(container, params, query = {}) {
     const shown = applyFilters(state.tasks, filters, {
       now,
       settings: getSettings(),
-      isArchived: isTaskArchived,
+      isArchived: isTaskHidden,
       names: {
         course: courseName, org: orgName, type: typeName,
         arrangement: arrangementName,

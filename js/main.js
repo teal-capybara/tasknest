@@ -37,6 +37,9 @@ import { taskDetailView } from "./views/taskDetailView.js";
 import { manageView } from "./views/manageView.js";
 import { settingsView } from "./views/settingsView.js";
 import { reportsView } from "./views/reportsView.js";
+import { scheduleView } from "./views/scheduleView.js";
+import { coursesView } from "./views/coursesView.js";
+import { courseFormView } from "./views/courseFormView.js";
 
 /* path: the address after #   nav: which menu item to highlight   view: the screen.
    hideAdd: true hides the floating "Add task" button on that screen.
@@ -63,7 +66,11 @@ const ROUTES = [
   { path: "/event/:id/edit", nav: "calendar", title: "Edit event", view: eventFormView,  hideAdd: true },
   { path: "/event/:id",     nav: "calendar", title: "Event",      view: eventDetailView },
   { path: "/reports",       nav: "dashboard", title: "Reports",   view: reportsView, hideAdd: true },
-  { path: "/manage",        nav: "manage",   title: "Manage",    view: manageView },
+  { path: "/schedule",      nav: "schedule", title: "Schedule",  view: scheduleView, hideAdd: true },
+  { path: "/courses",       nav: "courses",  title: "Courses",   view: coursesView,  hideAdd: true },
+  { path: "/course/new",    nav: "courses",  title: "Add course", view: courseFormView, hideAdd: true },
+  { path: "/course/:id/edit", nav: "courses", title: "Edit course", view: courseFormView, hideAdd: true },
+  { path: "/manage",        nav: "settings",   title: "Manage",    view: manageView },
   { path: "/settings",          nav: "settings", title: "Settings", view: settingsView },
   { path: "/settings/:section", nav: "settings", title: "Settings", view: settingsView },
 ];

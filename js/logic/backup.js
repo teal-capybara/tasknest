@@ -24,7 +24,7 @@ export const COLLECTIONS = [
   { key: "events",     required: "title", label: "events" },
 ];
 
-const SETTING_KEYS = { theme: "string", defaultScreen: "string", dueSoonHours: "number", earlyHours: "number" };
+const SETTING_KEYS = { theme: "string", defaultScreen: "string", dueSoonHours: "number", earlyHours: "number", termId: "string" };
 const ID_OK = /^[A-Za-z0-9_-]{1,100}$/;
 const isPlain = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 

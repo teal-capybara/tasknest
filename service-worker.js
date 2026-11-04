@@ -15,7 +15,7 @@
    If you add a new file to the app, add it to SHELL_FILES too.
    ========================================================================== */
 
-const VERSION = "v4c-polish2";
+const VERSION = "v6-schedule";
 const SHELL_CACHE = `tasknest-shell-${VERSION}`;
 const SDK_CACHE = "tasknest-firebase-sdk"; // Firebase files are versioned by URL, so this one is kept
 
@@ -53,6 +53,7 @@ const SHELL_FILES = [
   "js/logic/format.js",
   "js/logic/stats.js",
   "js/logic/reports.js",
+  "js/logic/schedule.js",
   "js/logic/timing.js",
   "js/logic/urgency.js",
   "js/logic/validate.js",
@@ -64,6 +65,9 @@ const SHELL_FILES = [
   "js/sync-status.js",
   "js/theme.js",
   "js/ui/dialogs.js",
+  "js/ui/termPicker.js",
+  "js/ui/scheduleSwitch.js",
+  "js/ui/scheduleBits.js",
   "js/ui/dom.js",
   "js/ui/install.js",
   "js/ui/capybara.js",
@@ -86,6 +90,9 @@ const SHELL_FILES = [
   "js/views/tasksView.js",
   "js/views/boardView.js",
   "js/views/reportsView.js",
+  "js/views/scheduleView.js",
+  "js/views/coursesView.js",
+  "js/views/courseFormView.js",
   "icons/tasknest-apple-180.png",
   "icons/tasknest-favicon-64.png",
   "icons/art/capy-cheering.png",
@@ -99,6 +106,8 @@ const SHELL_FILES = [
   "icons/ui/archived.png",
   "icons/ui/bell.png",
   "icons/ui/calendar.png",
+  "icons/ui/courses.png",
+  "icons/ui/schedule.png",
   "icons/ui/cloud.png",
   "icons/ui/completed.png",
   "icons/ui/delete.png",

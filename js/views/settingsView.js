@@ -17,7 +17,7 @@
 
 import { h, clear } from "../ui/dom.js";
 import { DEFAULT_SETTINGS } from "../constants.js";
-import { state, getSettings, isTaskArchived } from "../state.js";
+import { state, getSettings, isTaskArchived, isOutOfTerm } from "../state.js";
 import { session } from "../session.js";
 import { applyTheme, currentTheme, THEMES } from "../theme.js";
 import { saveSettings } from "../db/settings.js";
@@ -49,14 +49,15 @@ export function settingsView(container, params) {
 
 /* ---------------------------------------------------------------- the list */
 
-const SECTION_ORDER = ["theme", "view", "account", "archived", "backup", "install", "offline"];
+const SECTION_ORDER = ["theme", "view", "account", "manage", "archived", "backup", "install", "offline"];
 
 /** One short line under each word, so you can see the current state without opening it. */
 const SUMMARY = {
   theme: () => (THEMES.find((t) => t.id === currentTheme()) || THEMES[0]).name,
   view: () => `Starts on ${START_NAMES[getSettings().defaultScreen] || "Dashboard"} · due soon ${getSettings().dueSoonHours} h`,
   account: () => ((state.fb && state.fb.auth.currentUser) || {}).email || "Signed in",
-  archived: () => plural(state.tasks.filter((t) => t.archived).length, "archived task"),
+  archived: () => plural(state.tasks.filter((t) => t.archived && !isOutOfTerm(t)).length, "archived task"),
+  manage: () => "Task types and event types",
   backup: () => (getSettings().lastExportAt ? `Last saved ${new Date(getSettings().lastExportAt).toLocaleDateString([], { month: "short", day: "numeric" })}` : "Save a copy of your data"),
   install: () => "Add TaskNest to your home screen",
   offline: () => "Check that offline saving works",
@@ -65,8 +66,8 @@ const SUMMARY = {
 function menuPage(container) {
   const rows = SECTION_ORDER.map((id) => {
     const hint = h("span", { class: "settings-hint" });
-    const link = h("a", { class: "settings-row", href: `#/settings/${id}` },
-      h("span", { class: "settings-name" }, SECTIONS[id].title), hint,
+    const link = h("a", { class: "settings-row", href: id === "manage" ? "#/manage" : `#/settings/${id}` },
+      h("span", { class: "settings-name" }, id === "manage" ? "Manage" : SECTIONS[id].title), hint,
       h("span", { class: "settings-chevron", "aria-hidden": "true" }, "›"));
     return { id, hint, link };
   });
@@ -191,10 +192,10 @@ const SECTIONS = {
 
       function render() {
         const now = Date.now();
-        const archived = state.tasks.filter((t) => t.archived)
+        const archived = state.tasks.filter((t) => t.archived && !isOutOfTerm(t))
           .sort((a, b) => (b.archivedAt || 0) - (a.archivedAt || 0));
         // Tasks that are hidden only because their COURSE is archived (restore the course in Manage).
-        const viaCourse = state.tasks.filter((t) => !t.archived && isTaskArchived(t)).length;
+        const viaCourse = state.tasks.filter((t) => !t.archived && !isOutOfTerm(t) && isTaskArchived(t)).length;
 
         note.textContent = archived.length
           ? "Archived tasks are hidden from your lists but kept for your records. Open the ⋯ menu to restore one."

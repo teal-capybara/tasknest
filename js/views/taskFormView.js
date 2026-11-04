@@ -19,7 +19,7 @@
 
 import { h, clear, optionEls } from "../ui/dom.js";
 import { ARRANGEMENTS, LIMITS, ORGS, STATUSES, WORKSPACES } from "../constants.js";
-import { state, typesFor, eventById, eventGroupName } from "../state.js";
+import { state, typesFor, eventById, eventGroupName, coursesForPicker } from "../state.js";
 import { validateTaskForm } from "../logic/validate.js";
 import { fromInputs, toInputDate, toInputTime, startOfDay } from "../logic/format.js";
 import { eventWhen, addDays, dayKey as dayKeyOf } from "../logic/calendar.js";
@@ -40,7 +40,7 @@ export function taskFormView(container, params, query) {
 
   /* ---------- choices for the dropdowns ---------- */
   // Archived courses can't be picked for NEW work, but keep the one this task already uses.
-  const courses = state.courses.filter((c) => !c.archived || (editing && c.id === editing.courseId));
+  const courses = coursesForPicker(editing && editing.courseId);
   const courseIds = courses.map((c) => c.id);
   const typeIdsByWorkspace = Object.fromEntries(WORKSPACES.map((w) => [w.id, typesFor(w.id).map((t) => t.id)]));
 

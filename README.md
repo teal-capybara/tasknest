@@ -1,8 +1,8 @@
-# TaskNest (Phase 4c: Start date and accessibility polish)
+# TaskNest (Phase 6: Class schedule and courses)
 
 A personal school and organization task tracker that installs on your phone and works offline.
 
-**This is Phase 4c, which finishes Phase 4: an optional start date on tasks, and accessibility polish.**
+**This is Phase 6: school years and semesters, full course details, the Class Schedule and Courses pages, and a class card on Home. (Phase 5, recurring tasks, is skipped for now.)**
 
 | Phase | What you get | Status |
 |---|---|---|
@@ -18,7 +18,8 @@ A personal school and organization task tracker that installs on your phone and 
 | 3d | Board view: your tasks as Not started / In progress / Done columns, move with buttons or drag, filters | Done |
 | 4a | Backup (download / restore a file), mood picker beside the diary, floating Add pill on desktop | Done |
 | 4b | Reports: finished over time, early / on time / late, by course and type, events, CSV download | Done |
-| 4c | Optional start date on tasks; accessibility polish (skip link, focus moves to the new page, bigger tap targets) | **This version** |
+| 4c | Optional start date on tasks; accessibility polish (skip link, focus moves to the new page, bigger tap targets) | Done |
+| 6 | Class schedule: school year + semester, course details, Schedule and Courses pages, Home class card | **This version** (temporary icons) |
 | 4 | Reports, export/import backup, optional start date, polish | Later |
 | 5 | Recurring tasks | Later |
 
@@ -105,6 +106,12 @@ New **public** repository, upload the files (including the `css`, `js`, `icons` 
 ---
 
 ## Using the app
+
+**Semesters (Phase 6).** The Schedule and Courses pages have a school year and semester picker (*＋ Add school year* adds the next year). Choosing a semester gives a clean slate: you see only that semester's courses, schedule and academic tasks (on Tasks, Board, Home, Reports and Archived tasks, and in the course pickers). Organization tasks are not tied to a semester, and the Calendar always shows everything. Courses you made before this feature count as 2026–2027, 1st semester. Nothing is deleted when you switch.
+
+**Courses.** Add a course from the Courses page: course description (the name used everywhere), course code, lecture or laboratory, units, professor, room, semester, and its class times (add one line per day). Only the Courses and Schedule pages show the details; everywhere else a course is just its description. Edit a course to archive or delete it. A gentle heads-up appears if class times overlap; it never blocks saving. *Manage* (task types and event types) is now under Settings.
+
+**Schedule.** On a phone: a list of your class days with each course, professor, room and time. On a computer: a weekly timetable. On Home, the class card shows today's classes until your last class has ended, then tomorrow's (or "No classes tomorrow").
 
 **Start date (optional).** The task form has a *Start date* above the deadline: the day you plan to begin. Leave it empty if it doesn't matter (the **Clear start date** button removes it). It can't be after the deadline. While the start date is still ahead, the task shows a *Starts Mon, Nov 9* chip on the list and Board. The detail page and the CSV show it too, and it is part of backups. It changes nothing else: the task still appears in your lists, and urgency still follows the deadline.
 
@@ -195,13 +202,13 @@ Everything lives under your account: `users/{your-id}/...`
 
 | Collection | What is in a document |
 |---|---|
-| `courses` | name, archived, createdAt, updatedAt |
+| `courses` | name (the course description), code, kind (lecture or laboratory), units, professor, room, termId (for example `2026-2027|1`), slots (day, start, end), archived, createdAt, updatedAt |
 | `taskTypes` | your custom types only: name, workspace (`academics` or `organizations`), createdAt, updatedAt |
 | `tasks` | title, workspace, courseId or orgId, typeId, arrangement, status, startAt (optional), dueAt, instructions, notes, eventId (optional), createdAt, updatedAt, inProgressAt, completedAt, archived, archivedAt, deadlineHistory |
 | `eventTypes` | your custom event types only: name, workspace, createdAt, updatedAt |
 | `events` | title, kind (a built-in id such as `exam`, or the id of one of your `eventTypes`), workspace, courseId or orgId (optional), allDay, startAt, endAt (or null), location, notes, createdAt, updatedAt |
 | `diary` | one private note and mood per day, document id is the day (for example `2026-11-03`): text, mood, updatedAt. Only ever read one day at a time, from the capybara in the Calendar day window |
-| `settings/main` | theme, defaultScreen, dueSoonHours, earlyHours, lastExportAt |
+| `settings/main` | theme, defaultScreen, dueSoonHours, earlyHours, lastExportAt, termId, schoolYears |
 | `meta/syncTest` | the little counter on the Settings page. Safe to ignore |
 
 - Tasks point to courses and types by **id**, not name, so renaming a course or type updates every task.

@@ -8,6 +8,7 @@
    ========================================================================== */
 
 import { DEFAULT_TYPES, DEFAULT_SETTINGS, EVENT_KINDS, ORGS } from "./constants.js";
+import { currentTerm, inTerm } from "./logic/schedule.js";
 
 export const state = {
   fb: null,            // Firebase handles (set by main.js)
@@ -60,6 +61,15 @@ export function getSettings() {
 }
 
 /** Every task type (built-in + custom), for looking up names. */
+/** The school year + semester you are looking at ("2025-2026|1"). */
+export const termNow = () => currentTerm(getSettings());
+
+/** Courses to offer when PICKING a course (forms): this semester's, plus the one already in use (keepId). */
+export function coursesForPicker(keepId) {
+  const term = termNow();
+  return state.courses.filter((c) => (!c.archived && inTerm(c, term)) || c.id === keepId);
+}
+
 export function allTypes() {
   return [...DEFAULT_TYPES, ...sortedCustom()];
 }
@@ -101,6 +111,23 @@ export function isTaskArchived(task) {
   }
   return false;
 }
+
+/**
+ * True for an ACADEMIC task whose course belongs to another school year / semester than the one chosen.
+ * (Organization tasks are never tied to a semester.) Lists, the Board, Home, Reports and Archived tasks
+ * leave these out, so each semester starts with a clean slate. The Calendar still shows everything.
+ */
+export function isOutOfTerm(task) {
+  if (task.workspace !== "academics") return false;
+  const c = courseById(task.courseId);
+  return Boolean(c) && !inTerm(c, termNow());
+}
+
+/** Hidden from the everyday screens: archived, or from another semester. */
+export const isTaskHidden = (task) => isTaskArchived(task) || isOutOfTerm(task);
+
+/** The courses of the chosen semester (not archived), for filters and menus. */
+export const termCourses = () => state.courses.filter((c) => !c.archived && inTerm(c, termNow()));
 
 /** "CS 101" for academic tasks, "GDGoC-TUPM" for organization tasks. */
 export function taskGroupName(task) {

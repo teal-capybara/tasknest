@@ -12,7 +12,7 @@
 
 import { h, optionEls, clear } from "../ui/dom.js";
 import { LIMITS, ORGS, WORKSPACES } from "../constants.js";
-import { state, eventById, allEventKinds, eventKindsFor } from "../state.js";
+import { state, eventById, allEventKinds, eventKindsFor, coursesForPicker } from "../state.js";
 import { validateEventForm } from "../logic/validate.js";
 import { toInputDate, toInputTime } from "../logic/format.js";
 import { parseDayKey, dayKey } from "../logic/calendar.js";
@@ -26,7 +26,7 @@ export function eventFormView(container, params, query) {
   if (params.id && !editing) return notFound(container);
   const mode = editing ? "edit" : "create";
 
-  const courses = state.courses.filter((c) => !c.archived || (editing && c.id === editing.courseId));
+  const courses = coursesForPicker(editing && editing.courseId);
   const courseIds = courses.map((c) => c.id);
 
   /* ---------- starting values ---------- */

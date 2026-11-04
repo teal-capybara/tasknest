@@ -1,7 +1,15 @@
 /* ==========================================================================
    COURSES (database)
 
-   A course document:  { name, archived, createdAt, updatedAt }
+   A course document:
+     name         the course description: the name shown everywhere in the app (task forms, lists...)
+     code         course code, e.g. "PATHFIT3-M"          (only the Schedule and Courses pages show the next ones)
+     kind         "lecture" | "laboratory"
+     units        number or null
+     professor, room
+     termId       "2025-2026|1" (school year | semester), or missing for older courses
+     slots        [{ day, start, end }]  when the class meets (see js/logic/schedule.js)
+     archived, createdAt, updatedAt
    Tasks point to a course by its id (courseId), never by its name, so renaming
    a course updates every task automatically.
 
@@ -24,6 +32,18 @@ export function addCourse(fb, uid, name) {
   guard(fb.F.setDoc(docRef(fb, uid, "courses", id), {
     name: name.trim(), archived: false, createdAt: now, updatedAt: now,
   }));
+  return id;
+}
+
+/** Saves the full course form. id = null creates a new course. Returns the id. */
+export function saveCourse(fb, uid, id, fields) {
+  const now = Date.now();
+  if (!id) {
+    id = newId(fb, uid, "courses");
+    guard(fb.F.setDoc(docRef(fb, uid, "courses", id), { ...fields, archived: false, createdAt: now, updatedAt: now }));
+  } else {
+    guard(fb.F.setDoc(docRef(fb, uid, "courses", id), { ...fields, updatedAt: now }, { merge: true }));
+  }
   return id;
 }
 
