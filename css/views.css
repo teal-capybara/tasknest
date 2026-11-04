@@ -553,21 +553,25 @@ a.btn { text-decoration: none; }
 .term-row { display: flex; gap: .5rem; align-items: center; }
 .term-row .select { width: auto; min-width: 9rem; }
 .sched-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; }
-.sched-day { padding: .8rem .9rem .9rem; border-radius: 22px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
-.sched-day.alt { background: var(--surface-2); }
-.sched-dayname { display: flex; align-items: center; gap: .5rem; margin: 0 0 .5rem; font-size: 1.05rem; color: var(--text); }
+.sched-day { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: .35rem; align-items: center; padding: .7rem .6rem .7rem .7rem; border-radius: 22px; background: color-mix(in srgb, var(--primary) 13%, var(--surface)); border: 1px solid var(--border); box-shadow: var(--shadow); }
+.sched-day.alt { background: color-mix(in srgb, var(--accent) 16%, var(--surface)); }
+.sched-day.is-today { border-color: var(--primary); }
+.sched-dayname { text-transform: uppercase; display: flex; flex-direction: column; align-items: flex-start; gap: .25rem; margin: 0; font-size: .95rem; letter-spacing: .03em; color: var(--text); }
+.sched-today { font-size: .62rem; font-weight: 700; letter-spacing: 0; padding: .05rem .35rem; border-radius: 999px; background: var(--surface); border: 1px solid var(--primary); color: var(--text); }
 .sched-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
 /* One class = two columns. Left: name, professor. Right: time, room. A long name wraps on the left; the time stays put. */
-.sched-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .1rem .75rem; align-items: start; padding: .55rem 0 .55rem .7rem; border-left: 4px solid var(--tint); border-radius: 2px; }
+.sched-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .1rem .6rem; align-items: start; padding: .45rem 0 .45rem .6rem; border-left: 4px solid var(--tint); border-radius: 2px; }
 .sched-item + .sched-item { margin-top: .35rem; }
 .sched-what, .sched-when { display: flex; flex-direction: column; gap: .1rem; }
 .sched-what { min-width: 0; }
 .sched-when { text-align: right; white-space: nowrap; }
-.sched-name { font-size: 1rem; line-height: 1.25; overflow-wrap: break-word; }
+.sched-name { font-size: .95rem; line-height: 1.25; overflow-wrap: break-word; }
 .sched-prof, .sched-room { font-size: .85rem; line-height: 1.25; color: var(--text-muted); }
-.sched-time { font-size: .88rem; line-height: 1.25; }
+.sched-time { font-size: .8rem; line-height: 1.25; }
 .sched-table { display: none; }
 .course-grid { display: grid; gap: .8rem; }
+.course-card { background: color-mix(in srgb, var(--primary) 16%, var(--surface)); }
+.course-card.alt { background: color-mix(in srgb, var(--accent) 20%, var(--surface)); }
 .course-head { display: flex; justify-content: space-between; align-items: flex-start; gap: .6rem; }
 .course-head h2 { margin: 0; font-size: 1.1rem; }
 .course-code { margin: 0 0 .1rem; font-weight: 700; font-size: .8rem; letter-spacing: .04em; color: var(--text-muted); }
