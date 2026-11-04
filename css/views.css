@@ -543,63 +543,39 @@ a.btn { text-decoration: none; }
 
 /* ---- Class schedule, Courses, Home class card ---- */
 .sched-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
-.sched-banner { position: relative; display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin: .6rem 0; padding: 1rem 1.2rem; color: var(--on-primary); background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 55%, var(--accent))); border-radius: 30px; box-shadow: var(--shadow); overflow: hidden; }
-.sched-bubble { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, .28); pointer-events: none; }
-.sched-bubble-1 { width: 7rem; height: 7rem; right: 5rem; top: -2.5rem; }
-.sched-bubble-2 { width: 3.5rem; height: 3.5rem; left: 42%; bottom: -1.2rem; }
-.sched-banner-text { position: relative; }
-.sched-banner h1 { margin: .1rem 0 0; font-size: 1.6rem; }
+.sched-banner { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin: .6rem 0; padding: .9rem 1.1rem; color: var(--on-primary); background: var(--primary); border-radius: 28px; box-shadow: var(--shadow); overflow: hidden; }
+.sched-banner h1 { margin: .1rem 0 0; font-size: 1.5rem; }
 .sched-term { margin: .1rem 0 0; font-weight: 600; }
 .sched-cloud .ui-icon { opacity: .9; }
-.sched-banner-art { position: relative; flex: none; width: 92px; }
+.sched-banner-art { flex: none; width: 84px; }
 .sched-banner-art .capy { width: 100%; }
 .term-picker { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: .5rem 0 .9rem; }
 .term-row { display: flex; gap: .5rem; align-items: center; }
 .term-row .select { width: auto; min-width: 9rem; }
-
-/* three little colored stat tiles */
-.sched-stats { list-style: none; margin: 0 0 .9rem; padding: 0; display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); gap: .6rem; }
-.sched-stat { display: flex; flex-direction: column; align-items: center; padding: .6rem .3rem; text-align: center; color: var(--text); background: var(--fill); border-bottom: 4px solid var(--accent); border-radius: 18px; }
-.sched-stat strong { font-size: 1.5rem; line-height: 1.15; }
-.sched-stat span { font-size: .78rem; font-weight: 600; }
-
-/* phone schedule: a card per day, a colored row per class */
-.sched-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .8rem; }
-.sched-day { padding: .8rem .8rem .9rem; border-radius: 24px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
-.sched-day.is-today { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary), var(--shadow); }
-.sched-dayname { display: flex; align-items: center; gap: .5rem; margin: 0 0 .55rem .2rem; font-size: 1.05rem; color: var(--text); }
-.sched-daycount { margin-left: auto; font-size: .78rem; font-weight: 600; color: var(--text-muted); }
-.sched-items { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.sched-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; }
+.sched-day { padding: .8rem .9rem .9rem; border-radius: 22px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
+.sched-day.alt { background: var(--surface-2); }
+.sched-dayname { display: flex; align-items: center; gap: .5rem; margin: 0 0 .5rem; font-size: 1.05rem; color: var(--text); }
+.sched-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
 /* One class = two columns. Left: name, professor. Right: time, room. A long name wraps on the left; the time stays put. */
-.sched-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .1rem .75rem; align-items: start; padding: .65rem .8rem; color: var(--text); background: var(--fill); border-left: 6px solid var(--accent); border-radius: 16px; }
+.sched-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .1rem .75rem; align-items: start; padding: .55rem 0 .55rem .7rem; border-left: 4px solid var(--tint); border-radius: 2px; }
+.sched-item + .sched-item { margin-top: .35rem; }
 .sched-what, .sched-when { display: flex; flex-direction: column; gap: .1rem; }
 .sched-what { min-width: 0; }
 .sched-when { text-align: right; white-space: nowrap; }
 .sched-name { font-size: 1rem; line-height: 1.25; overflow-wrap: break-word; }
-.sched-prof, .sched-room { font-size: .85rem; line-height: 1.25; opacity: .85; }
+.sched-prof, .sched-room { font-size: .85rem; line-height: 1.25; color: var(--text-muted); }
 .sched-time { font-size: .88rem; line-height: 1.25; }
-.sched-desktop { display: none; }
-
-/* courses */
-.course-grid { display: grid; gap: .9rem; }
-.course-card { display: flex; flex-direction: column; overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow); transition: transform .15s ease, box-shadow .15s ease; }
-.course-card.is-archived { opacity: .7; }
-.course-top { position: relative; padding: .9rem 1rem 1rem; color: var(--text); background: var(--fill); border-bottom: 4px solid var(--accent); }
-.course-toprow { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; }
-.course-badges { display: flex; flex-wrap: wrap; gap: .35rem; min-width: 0; padding-top: .2rem; }
-.course-code { padding: .1rem .6rem; font-size: .78rem; font-weight: 800; letter-spacing: .04em; color: var(--text); background: var(--surface); border: 2px solid var(--accent); border-radius: 999px; }
-.course-pill { padding: .12rem .6rem; font-size: .78rem; font-weight: 700; color: var(--text); background: var(--surface); border-radius: 999px; }
-.course-title { margin: .4rem 0 0; font-size: 1.15rem; line-height: 1.25; }
-.course-edit { flex: none; color: var(--text); background: var(--surface); }
-.course-facts { list-style: none; margin: 0; padding: .8rem 1rem 0; display: grid; gap: .55rem; }
-.course-fact { display: flex; align-items: center; gap: .65rem; }
-.course-fact-icon { flex: none; display: grid; place-items: center; width: 2.2rem; height: 2.2rem; background: var(--fill); border-radius: 12px; }
-.course-fact-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
-.course-fact-label { font-size: .75rem; font-weight: 600; color: var(--text-muted); }
-.course-when { padding: .8rem 1rem 1rem; display: grid; gap: .35rem; margin-top: auto; }
-.course-slots { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
-.course-slot { padding: .25rem .65rem; font-size: .82rem; font-weight: 700; color: var(--text); background: var(--fill); border: 1px solid var(--accent); border-radius: 999px; }
-
+.sched-table { display: none; }
+.course-grid { display: grid; gap: .8rem; }
+.course-head { display: flex; justify-content: space-between; align-items: flex-start; gap: .6rem; }
+.course-head h2 { margin: 0; font-size: 1.1rem; }
+.course-code { margin: 0 0 .1rem; font-weight: 700; font-size: .8rem; letter-spacing: .04em; color: var(--text-muted); }
+.course-info { margin: .6rem 0 0; display: grid; gap: .35rem; }
+.course-row { display: grid; grid-template-columns: 6rem 1fr; gap: .5rem; }
+.course-row dt { color: var(--text-muted); font-size: .85rem; }
+.course-row dd { margin: 0; }
+.course-slots { list-style: none; margin: 0; padding: 0; }
 .slot-list { display: grid; gap: .5rem; margin-bottom: .5rem; }
 .slot-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: .4rem; align-items: center; }
 @media (max-width: 520px) { .slot-row { grid-template-columns: 1fr 1fr; } .slot-row select { grid-column: 1 / -1; } }
@@ -613,29 +589,19 @@ a.btn { text-decoration: none; }
 @media (min-width: 900px) {
   .sched-list { display: none; }
   .sched-switch { display: none; }
-  .sched-stats { max-width: 36rem; }
-  .course-grid { grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); gap: 1.1rem; }
-  .course-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0, 0, 0, .12); }
-  .sched-desktop { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
-  .sched-table { display: grid; grid-template-columns: 4.6rem repeat(var(--cols), minmax(7.5rem, 1fr)); gap: .5rem; overflow-x: auto; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 30px; box-shadow: var(--shadow); }
+  .course-grid { grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr)); }
+  .sched-table { display: grid; grid-template-columns: 5rem repeat(var(--cols), minmax(9rem, 1fr)); gap: .5rem; overflow-x: auto; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; box-shadow: var(--shadow); }
   .tt-dayhead { height: 2.4rem; display: flex; align-items: center; justify-content: center; }
-  .tt-daypill { padding: .25rem 1rem; font-weight: 700; border-radius: 999px; background: var(--surface-2); }
-  .tt-col.is-today .tt-daypill { background: var(--primary); color: var(--on-primary); box-shadow: var(--shadow); }
-  .tt-track { position: relative; border-radius: 20px; background-color: color-mix(in srgb, var(--surface-2) 60%, transparent); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--hour) - 1px), var(--border) calc(var(--hour) - 1px), var(--border) var(--hour)); }
-  .tt-col.is-today .tt-track { background-color: color-mix(in srgb, var(--primary) 14%, var(--surface)); }
+  .tt-daypill { padding: .25rem .9rem; font-weight: 700; border-radius: 999px; background: var(--surface-2); }
+  .tt-col.is-today .tt-daypill { background: var(--primary); color: var(--on-primary); }
+  .tt-track { position: relative; border-radius: 18px; background: color-mix(in srgb, var(--surface-2) 55%, transparent); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--hour) - 1px), var(--border) calc(var(--hour) - 1px), var(--border) var(--hour)); }
+  .tt-col.is-today .tt-track { background-color: color-mix(in srgb, var(--primary) 12%, var(--surface)); }
   .tt-times .tt-track { background: none; border-radius: 0; }
   .tt-hour { position: absolute; right: .4rem; transform: translateY(-.5em); font-size: .75rem; color: var(--text-muted); white-space: nowrap; }
-  .tt-block { position: absolute; left: 5px; right: 5px; display: flex; flex-direction: column; gap: .12rem; padding: .5rem .65rem .5rem .8rem; overflow: hidden; font-size: .8rem; line-height: 1.25; color: var(--text); background: var(--fill); border-left: 6px solid var(--accent); border-radius: 16px; box-shadow: 0 3px 8px rgba(0, 0, 0, .10); transition: transform .12s ease; }
-  .tt-block:hover { transform: scale(1.02); z-index: 3; }
-  .tt-name { font-size: .9rem; }
-  .tt-time { font-weight: 700; }
-  .tt-prof, .tt-room { opacity: .85; }
-  .tt-free { position: absolute; inset: 1.2rem 0 auto; display: flex; flex-direction: column; align-items: center; gap: .3rem; color: var(--text-muted); font-size: .8rem; font-weight: 600; }
-  .tt-free .capy { width: 64px; opacity: .9; }
-  .tt-now { position: absolute; left: 0; right: 0; height: 0; border-top: 2px solid var(--danger, #d33); z-index: 4; }
+  .tt-block { position: absolute; left: 4px; right: 4px; display: flex; flex-direction: column; gap: .1rem; padding: .4rem .6rem .4rem .7rem; overflow: hidden; font-size: .8rem; line-height: 1.25; color: var(--text); background: color-mix(in srgb, var(--tint) 34%, var(--surface)); border-left: 5px solid var(--tint); border-radius: 14px; box-shadow: 0 2px 6px rgba(0, 0, 0, .08); }
+  .tt-name { font-size: .88rem; }
+  .tt-time { font-weight: 600; }
+  .tt-prof, .tt-room { color: var(--text-muted); }
+  .tt-now { position: absolute; left: 0; right: 0; height: 0; border-top: 2px solid var(--danger, #d33); z-index: 2; }
   .tt-now::before { content: ""; position: absolute; left: -4px; top: -6px; width: 10px; height: 10px; border-radius: 50%; background: var(--danger, #d33); }
 }
-.sched-today { padding: .9rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow); }
-.sched-today h2 { margin: 0 0 .6rem; font-size: 1.05rem; }
-.today-classes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .6rem; }
-.today-class { display: flex; flex-direction: column; min-width: 12rem; padding: .55rem .8rem; color: var(--text); background: var(--fill); border-left: 5px solid var(--accent); border-radius: 14px; font-size: .88rem; }
