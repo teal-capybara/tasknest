@@ -223,3 +223,27 @@
   --icon-hue: 0deg;       /* turns the teal button icons toward this theme (the capybaras never change) */
   color-scheme: dark;
 }
+
+/* ---- Course colors: built ONLY from the theme's own colors (primary, accent, link), so every theme stays in its own palette. ---- */
+:root {
+  --fill-mix: 42%;
+  --c1d: var(--primary);
+  --c1: color-mix(in srgb, var(--c1d) var(--fill-mix), var(--surface));
+  --c2d: var(--accent);
+  --c2: color-mix(in srgb, var(--c2d) var(--fill-mix), var(--surface));
+  --c3d: color-mix(in srgb, var(--primary) 50%, var(--accent));
+  --c3: color-mix(in srgb, var(--c3d) var(--fill-mix), var(--surface));
+  --c4d: var(--link);
+  --c4: color-mix(in srgb, var(--c4d) var(--fill-mix), var(--surface));
+  --c5d: color-mix(in srgb, var(--primary) 60%, var(--link));
+  --c5: color-mix(in srgb, var(--c5d) var(--fill-mix), var(--surface));
+  --c6d: color-mix(in srgb, var(--accent) 65%, var(--primary));
+  --c6: color-mix(in srgb, var(--c6d) var(--fill-mix), var(--surface));
+  --c7d: color-mix(in srgb, var(--link) 50%, var(--accent));
+  --c7: color-mix(in srgb, var(--c7d) var(--fill-mix), var(--surface));
+  --c8d: color-mix(in srgb, var(--primary) 70%, var(--surface));
+  --c8: color-mix(in srgb, var(--c8d) var(--fill-mix), var(--surface));
+}
+:root[data-theme="midnight"], :root[data-theme="velvet-dusk"], :root[data-theme="rose-eclipse"], :root[data-theme="abyssal-tide"] {
+  --fill-mix: 30%;
+}
