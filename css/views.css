@@ -543,12 +543,36 @@ a.btn { text-decoration: none; }
 
 /* ---- Class schedule, Courses, Home class card ---- */
 .sched-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
-.sched-banner { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin: .6rem 0; padding: .9rem 1.1rem; color: var(--on-primary); background: var(--primary); border-radius: 28px; box-shadow: var(--shadow); overflow: hidden; }
-.sched-banner h1 { margin: .1rem 0 0; font-size: 1.5rem; }
-.sched-term { margin: .1rem 0 0; font-weight: 600; }
+.sched-banner { position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: .75rem; min-height: 8.2rem; margin: .6rem 0 .8rem; padding: 1rem 1.1rem 0; color: var(--on-primary); border-radius: 28px; box-shadow: var(--shadow); overflow: hidden; isolation: isolate;
+  background: radial-gradient(circle at 88% 0%, color-mix(in srgb, var(--accent) 38%, transparent) 0, transparent 46%), linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 82%, var(--accent))); }
+.sched-banner::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: .5; background-image: radial-gradient(circle, color-mix(in srgb, var(--on-primary) 16%, transparent) 1.5px, transparent 2px); background-size: 16px 16px; -webkit-mask-image: linear-gradient(100deg, #000 0%, transparent 62%); mask-image: linear-gradient(100deg, #000 0%, transparent 62%); }
+.sched-banner::after { content: ""; position: absolute; z-index: -1; right: -2.2rem; bottom: -3.2rem; width: 11rem; height: 11rem; border-radius: 50%; background: color-mix(in srgb, var(--surface) 30%, transparent); }
+.sched-banner-text { align-self: center; padding-bottom: 1rem; min-width: 0; }
+.sched-banner h1 { margin: .1rem 0 0; font-size: 1.45rem; line-height: 1.15; white-space: nowrap; }
+.sched-term { margin: .25rem 0 0; font-weight: 600; }
 .sched-cloud .ui-icon { opacity: .9; }
-.sched-banner-art { flex: none; width: 84px; }
-.sched-banner-art .capy { width: 100%; }
+.sched-banner-art { flex: none; width: 6.4rem; margin-right: -.1rem; margin-bottom: -.3rem; }
+.sched-banner-art img { display: block; width: 100%; height: auto; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .18)); }
+.stk-b { right: auto; top: auto; }
+.stk-b1 { top: .7rem; right: 7rem; width: 1.3rem; --r: -12deg; }
+.stk-b2 { top: 1.1rem; right: 1rem; width: 1.15rem; --r: 10deg; }
+.stk-b3 { bottom: .6rem; right: 7.2rem; width: 1.5rem; --r: 18deg; }
+.stk-b4 { top: 3.6rem; right: .8rem; width: 1.1rem; --r: 14deg; opacity: .95; }
+/* stickers (pictures from icons/stk/) */
+.stk { position: absolute; display: block; pointer-events: none; transform: rotate(var(--r, 0deg)); }
+.stk img { display: block; width: 100%; height: auto; }
+.stk-corner { top: -.8rem; width: 1.8rem; z-index: 1; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .2)); }
+.stk-bit { right: .8rem; bottom: .7rem; width: 2rem; z-index: 1; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .15)); }
+.stk-peek { top: -2.1rem; width: 3.8rem; height: 2.2rem; overflow: hidden; z-index: 1; transform: none; }
+.stk-peek img { filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .12)); }
+.stk-finale { display: flex; flex-direction: column; align-items: center; gap: .1rem; margin: 1rem 0 .4rem; color: var(--text-muted); text-align: center; }
+.stk-finale p { margin: 0; font-size: .85rem; font-weight: 600; }
+.stk-big { position: static; width: 6.5rem; }
+.sched-day.has-peek { margin-top: 1.5rem; }
+.sched-day, .course-card { position: relative; }
+.course-card.has-peek { margin-top: 1.5rem; }
+.course-card.has-bit .course-row:last-of-type dd { padding-right: 2.6rem; }
+.tt-wrap { display: none; position: relative; margin-top: 1.8rem; }
 .term-picker { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: .5rem 0 .9rem; }
 .term-row { display: flex; gap: .5rem; align-items: center; }
 .term-row .select { width: auto; min-width: 9rem; }
@@ -568,7 +592,6 @@ a.btn { text-decoration: none; }
 .sched-name { font-size: .95rem; line-height: 1.25; overflow-wrap: break-word; }
 .sched-prof, .sched-room { font-size: .85rem; line-height: 1.25; color: var(--text-muted); }
 .sched-time { font-size: .8rem; line-height: 1.25; }
-.sched-table { display: none; }
 .course-grid { display: grid; gap: .8rem; }
 .course-card { background: color-mix(in srgb, var(--primary) 16%, var(--surface)); }
 .course-card.alt { background: color-mix(in srgb, var(--accent) 20%, var(--surface)); }
@@ -591,7 +614,14 @@ a.btn { text-decoration: none; }
 
 /* A computer shows the weekly timetable instead of the list, and the sidebar has both pages */
 @media (min-width: 900px) {
-  .sched-list { display: none; }
+  .sched-list, .sched-finale-phone { display: none; }
+  .tt-wrap { display: block; }
+  .sched-banner { min-height: 9.5rem; }
+  .sched-banner-art { width: 8.5rem; }
+  .sched-banner h1 { font-size: 1.8rem; }
+  .stk-b1 { right: 9.5rem; } .stk-b4 { right: 1.4rem; }
+  .course-card.has-peek { margin-top: 0; }
+  .course-grid { row-gap: 2rem; }
   .sched-switch { display: none; }
   .course-grid { grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr)); }
   .sched-table { display: grid; grid-template-columns: 5rem repeat(var(--cols), minmax(9rem, 1fr)); gap: .5rem; overflow-x: auto; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; box-shadow: var(--shadow); }
