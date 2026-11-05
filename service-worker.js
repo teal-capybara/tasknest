@@ -15,7 +15,7 @@
    If you add a new file to the app, add it to SHELL_FILES too.
    ========================================================================== */
 
-const VERSION = "v6-schedule6";
+const VERSION = "v6-schedule7";
 const SHELL_CACHE = `tasknest-shell-${VERSION}`;
 const SDK_CACHE = "tasknest-firebase-sdk"; // Firebase files are versioned by URL, so this one is kept
 
@@ -68,6 +68,7 @@ const SHELL_FILES = [
   "js/ui/termPicker.js",
   "js/ui/scheduleSwitch.js",
   "js/ui/scheduleBits.js",
+  "js/ui/stickers.js",
   "js/ui/dom.js",
   "js/ui/install.js",
   "js/ui/capybara.js",
@@ -102,6 +103,28 @@ const SHELL_FILES = [
   "icons/art/capy-study.png",
   "icons/art/capy-thinking.png",
   "icons/art/capy-working.png",
+  "icons/stk/bag.webp",
+  "icons/stk/bed.webp",
+  "icons/stk/boba.webp",
+  "icons/stk/book.webp",
+  "icons/stk/books.webp",
+  "icons/stk/calendar.webp",
+  "icons/stk/clipboard.webp",
+  "icons/stk/clock.webp",
+  "icons/stk/flower.webp",
+  "icons/stk/grad.webp",
+  "icons/stk/heart.webp",
+  "icons/stk/hourglass.webp",
+  "icons/stk/laptop.webp",
+  "icons/stk/music.webp",
+  "icons/stk/paw.webp",
+  "icons/stk/pencil.webp",
+  "icons/stk/planner.webp",
+  "icons/stk/sleep.webp",
+  "icons/stk/sparkle.webp",
+  "icons/stk/sprout.webp",
+  "icons/stk/sprout2.webp",
+  "icons/stk/star.webp",
   "icons/ui/add.png",
   "icons/ui/archived.png",
   "icons/ui/bell.png",

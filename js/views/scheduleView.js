@@ -11,6 +11,7 @@ import { termPicker } from "../ui/termPicker.js";
 import { scheduleSwitch } from "../ui/scheduleSwitch.js";
 import { banner } from "../ui/scheduleBits.js";
 import { capybara } from "../ui/capybara.js";
+import { sticker, peek, finale } from "../ui/stickers.js";
 
 const HOUR_REM = 5;      // height of one hour in the timetable (keep in step with --hour below)
 // Each course gets its own color from the theme, so classes are easy to tell apart.
@@ -30,7 +31,7 @@ export function scheduleView(container) {
 
   function render() {
     const term = termNow();
-    clear(top).append(banner("Class Schedule", term));
+    clear(top).append(banner("Class Schedule", term, "planner"));
     const week = weekOf(state.courses, term);
     clear(body);
     if (!week.length) {
@@ -42,7 +43,8 @@ export function scheduleView(container) {
     }
     const tint = new Map();
     state.courses.forEach((c, i) => tint.set(c.id, TINTS[i % TINTS.length]));
-    body.append(phoneList(week, tint), timetable(week, tint));
+    body.append(phoneList(week, tint), h("div", { class: "tt-wrap" }, peek("book", "right: 2.5rem"), sticker("sparkle", "stk-corner", "left: 1.4rem; top: -.8rem; --r: -12deg"), timetable(week, tint)),
+      finale("sleep", "That is your whole week. Rest up!"));
   }
 
   render();
@@ -50,10 +52,28 @@ export function scheduleView(container) {
 }
 
 /* ---- phone: one block per day ---- */
+// Stickers on the day cards. They look scattered but follow a fixed pattern, so the page never reshuffles itself.
+const DECOR = [
+  { name: "star", style: "right: 1rem; --r: 12deg" },
+  { name: "laptop", peek: true, style: "right: 2.2rem" },
+  { name: "sprout", style: "right: 1.6rem; --r: -10deg" },
+  { name: "music", peek: true, style: "right: 38%" },
+  { name: "flower", style: "right: 1.1rem; --r: 14deg" },
+  { name: "bag", peek: true, style: "right: 1.4rem" },
+  { name: "heart", style: "right: 2rem; --r: -8deg" },
+  { name: "pencil", peek: true, style: "right: 30%" },
+];
+function decorFor(i) {
+  const d = DECOR[i % DECOR.length];
+  if (i === 0 && d.peek) return null;    // nothing peeks over the very first card (the semester buttons are right above it)
+  return d.peek ? peek(d.name, d.style) : sticker(d.name, "stk-corner", d.style);
+}
+
 function phoneList(week, tint) {
   const today = new Date().getDay();
   return h("ol", { class: "sched-list" }, week.map(({ day, items }, i) =>
-    h("li", { class: `sched-day${i % 2 ? " alt" : ""}${day === today ? " is-today" : ""}` },
+    h("li", { class: `sched-day${i % 2 ? " alt" : ""}${day === today ? " is-today" : ""}${DECOR[i % DECOR.length].peek ? " has-peek" : ""}` },
+      decorFor(i),
       // Left: the day (MON, TUE...). Right: that day's classes, each with a thin theme-colored bar.
       h("h2", { class: "sched-dayname", "aria-label": dayName(day) }, h("span", { "aria-hidden": "true" }, dayShort(day)),
         day === today ? h("span", { class: "sched-today" }, "Today") : null),

@@ -11,6 +11,7 @@ import { termPicker } from "../ui/termPicker.js";
 import { scheduleSwitch } from "../ui/scheduleSwitch.js";
 import { banner, meetingText } from "../ui/scheduleBits.js";
 import { capybara } from "../ui/capybara.js";
+import { sticker, peek, finale } from "../ui/stickers.js";
 
 export function coursesView(container) {
   let showArchived = false;
@@ -25,7 +26,7 @@ export function coursesView(container) {
 
   function render() {
     const term = termNow();
-    clear(top).append(banner("Courses", term));
+    clear(top).append(banner("Courses", term, "book"));
     const courses = state.courses.filter((c) => (showArchived || !c.archived) && inTerm(c, term))
       .sort((a, b) => (a.code || a.name).localeCompare(b.code || b.name, undefined, { sensitivity: "base" }));
     clear(body);
@@ -36,17 +37,25 @@ export function coursesView(container) {
         h("a", { class: "btn btn-primary", href: "#/course/new" }, "Add a course")));
       return;
     }
-    body.append(h("div", { class: "course-grid" }, courses.map((c, i) => card(c, i))));
+    body.append(h("div", { class: "course-grid" }, courses.map((c, i) => card(c, i))), finale("grad", "That is everything for this semester."));
   }
 
   render();
   return { update() { picker.update(); render(); } };
 }
 
+// Every third card gets a capybara peeking over its top edge, and the one before it a small sticker in the bottom corner.
+const PEEKS = [["laptop", "left: 1.4rem"], ["music", "right: 5.5rem"], ["bag", "left: 40%"], ["pencil", "right: 5rem"], ["book", "left: 1.4rem"]];
+const BITS = [["sprout", "--r: -10deg"], ["star", "--r: 12deg"], ["flower", "--r: 8deg"], ["heart", "--r: -8deg"], ["paw", "--r: 10deg"], ["sparkle", "--r: -12deg"]];
+
 function card(course, i = 0) {
+  const mode = i % 3 === 2 ? "peek" : i % 3 === 0 ? "bit" : "";
+  const k = Math.floor(i / 3);
   const slots = cleanSlots(course.slots);
   const row = (label, value) => (value ? h("div", { class: "course-row" }, h("dt", {}, label), h("dd", {}, value)) : null);
-  return h("article", { class: `card course-card${i % 2 ? " alt" : ""}` },
+  return h("article", { class: `card course-card${i % 2 ? " alt" : ""}${mode === "peek" ? " has-peek" : ""}${mode === "bit" ? " has-bit" : ""}` },
+    mode === "peek" ? peek(PEEKS[k % PEEKS.length][0], PEEKS[k % PEEKS.length][1]) : null,
+    mode === "bit" ? sticker(BITS[k % BITS.length][0], "stk-bit", BITS[k % BITS.length][1]) : null,
     h("div", { class: "course-head" },
       h("div", {},
         course.code ? h("p", { class: "course-code" }, course.code) : null,
