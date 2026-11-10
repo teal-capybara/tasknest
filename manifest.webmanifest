@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "TaskNest",
-  "short_name": "TaskNest",
+  "name": "Cove",
+  "short_name": "Cove",
   "description": "Personal school and organization task tracker that works offline.",
   "start_url": "./",
   "scope": "./",
@@ -10,8 +10,8 @@
   "background_color": "#FDF9E3",
   "theme_color": "#8ED1C4",
   "icons": [
-    { "src": "icons/tasknest-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/tasknest-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/tasknest-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "icons/cove-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/cove-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/cove-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

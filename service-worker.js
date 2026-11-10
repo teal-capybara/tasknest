@@ -15,9 +15,9 @@
    If you add a new file to the app, add it to SHELL_FILES too.
    ========================================================================== */
 
-const VERSION = "v6-schedule7";
-const SHELL_CACHE = `tasknest-shell-${VERSION}`;
-const SDK_CACHE = "tasknest-firebase-sdk"; // Firebase files are versioned by URL, so this one is kept
+const VERSION = "v6-cove2";
+const SHELL_CACHE = `cove-shell-${VERSION}`;
+const SDK_CACHE = "cove-firebase-sdk"; // Firebase files are versioned by URL, so this one is kept
 
 // Paths are relative to this file, so it works under /your-repo-name/ on GitHub Pages.
 const SHELL_FILES = [
@@ -94,8 +94,8 @@ const SHELL_FILES = [
   "js/views/scheduleView.js",
   "js/views/coursesView.js",
   "js/views/courseFormView.js",
-  "icons/tasknest-apple-180.png",
-  "icons/tasknest-favicon-64.png",
+  "icons/cove-apple-180.png",
+  "icons/cove-favicon-64.png",
   "icons/art/capy-cheering.png",
   "icons/art/capy-coffee.png",
   "icons/art/capy-goal.png",
@@ -154,9 +154,9 @@ const SHELL_FILES = [
   "icons/ui/tag.png",
   "icons/ui/tasks.png",
   "icons/ui/view.png",
-  "icons/tasknest-192.png",
-  "icons/tasknest-512.png",
-  "icons/tasknest-maskable-512.png",
+  "icons/cove-192.png",
+  "icons/cove-512.png",
+  "icons/cove-maskable-512.png",
 ].map((path) => new URL(path, self.registration.scope).href);
 
 const INDEX_URL = new URL("index.html", self.registration.scope).href;
@@ -181,7 +181,7 @@ self.addEventListener("activate", (event) => {
     caches.keys()
       .then((names) => Promise.all(
         names
-          .filter((n) => n.startsWith("tasknest-shell-") && n !== SHELL_CACHE)
+          .filter((n) => (n.startsWith("cove-shell-") && n !== SHELL_CACHE) || n.startsWith("tasknest-"))   // also clears the caches made before the rename
           .map((n) => caches.delete(n))
       ))
       .then(() => self.clients.claim())

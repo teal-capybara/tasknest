@@ -186,7 +186,7 @@ async function clearThisDevice() {
   } catch (err) {
     // Usually happens when the app is open in another tab. Close it and retry.
     console.warn("Could not clear local data:", err);
-    toast("Couldn't clear this device's data. Close other TaskNest tabs and try again.", 6000);
+    toast("Couldn't clear this device's data. Close other Cove tabs and try again.", 6000);
     return;
   }
   location.reload();

@@ -22,7 +22,7 @@ export function captureInstallPrompt() {
   });
   window.addEventListener("appinstalled", () => {
     deferredPrompt = null;
-    if (text) text.textContent = "TaskNest is installed on this device.";
+    if (text) text.textContent = "Cove is installed on this device.";
     refresh();
   });
 }

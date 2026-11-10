@@ -11,7 +11,7 @@
    or refused before a single write happens.
    ========================================================================== */
 
-export const BACKUP_APP = "TaskNest";
+export const BACKUP_APP = "Cove";
 export const BACKUP_FORMAT = 1;
 export const MAX_BACKUP_BYTES = 8 * 1024 * 1024;
 
@@ -48,7 +48,7 @@ export function buildBackup(state, now = Date.now()) {
 
 export const backupFileName = (now = Date.now()) => {
   const d = new Date(now), p = (n) => String(n).padStart(2, "0");
-  return `tasknest-backup-${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}.json`;
+  return `cove-backup-${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}.json`;
 };
 
 /** Removes anything Firestore would refuse (field names like __x__) and anything that is not plain JSON data. */
@@ -74,11 +74,12 @@ function cleanValue(v, depth = 0) {
  *      or { ok: false, error: "plain words" }.
  */
 export function parseBackup(text) {
-  if (typeof text !== "string" || text.length > MAX_BACKUP_BYTES) return { ok: false, error: "That file is too large to be a TaskNest backup." };
+  if (typeof text !== "string" || text.length > MAX_BACKUP_BYTES) return { ok: false, error: "That file is too large to be a Cove backup." };
   let raw;
-  try { raw = JSON.parse(text); } catch (e) { return { ok: false, error: "That file isn't a TaskNest backup (it couldn't be read as a backup)." }; }
-  if (!isPlain(raw) || raw.app !== BACKUP_APP) return { ok: false, error: "That file isn't a TaskNest backup." };
-  if (raw.format !== BACKUP_FORMAT) return { ok: false, error: "This backup was made by a different version of TaskNest and can't be read here." };
+  try { raw = JSON.parse(text); } catch (e) { return { ok: false, error: "That file isn't a Cove backup (it couldn't be read as a backup)." }; }
+  // Backups made before the app was renamed to Cove say "TaskNest"; they still import.
+  if (!isPlain(raw) || ![BACKUP_APP, "TaskNest"].includes(raw.app))  return { ok: false, error: "That file isn't a Cove backup." };
+  if (raw.format !== BACKUP_FORMAT) return { ok: false, error: "This backup was made by a different version of Cove and can't be read here." };
 
   const data = {};
   const counts = {};

@@ -11,7 +11,7 @@
      no list, search or export of them. Only ONE day's entry is read, and only while
      that day's window is open on the Calendar (js/ui/dayWindow.js).
    - An entry with no text and no mood is deleted rather than stored.
-   - It is hidden in the app, not encrypted: anyone who can open TaskNest signed in
+   - It is hidden in the app, not encrypted: anyone who can open Cove signed in
      as you could find it by opening the diary of a day.
    ========================================================================== */
 

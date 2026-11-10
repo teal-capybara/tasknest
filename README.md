@@ -1,4 +1,4 @@
-# TaskNest (Phase 6: Class schedule and courses)
+# Cove (Phase 6: Class schedule and courses)
 
 A personal school and organization task tracker that installs on your phone and works offline.
 
@@ -58,7 +58,7 @@ js/
   ui/                   Reusable pieces: dom.js, dialogs.js, taskCard.js, taskActions.js ...
   views/                One file per screen: dashboardView, calendarView, eventFormView, eventDetailView, tasksView, taskFormView, taskDetailView,
                         manageView, settingsView (the Settings list and all its pages)
-icons/                  The app icon (tasknest-*.png: browser tab, home screen, Android adaptive, iPhone)
+icons/                  The app icon (cove-*.png: browser tab, home screen, Android adaptive, iPhone)
 ```
 
 Technologies: plain HTML, CSS and JavaScript (no build step, nothing to install), Firebase Authentication and Cloud Firestore (free "Spark" plan), GitHub Pages for hosting. The Firebase code is loaded from Google's CDN.
@@ -69,9 +69,9 @@ Technologies: plain HTML, CSS and JavaScript (no build step, nothing to install)
 
 You already have the repo, Firebase and GitHub Pages set up. You only replace the files.
 
-1. Unzip `tasknest-phase2.5.zip`. **It does not contain `js/config.js`, on purpose.** Your repo already has your Firebase values in it, and this keeps them safe from being overwritten. Do not upload or create a new `config.js`.
+1. Unzip `cove-phase6.zip`. **It does not contain `js/config.js`, on purpose.** Your repo already has your Firebase values in it, and this keeps them safe from being overwritten. Do not upload or create a new `config.js`.
 2. On GitHub, open your `tasknest` repo, click **Add file, then Upload files**.
-3. Drag in **everything inside the unzipped `tasknest` folder** (the `css`, `js`, `icons` folders and the loose files). GitHub replaces files with the same name and adds the new ones. Commit changes.
+3. Drag in **everything inside the unzipped `cove` folder** (the `css`, `js`, `icons` folders and the loose files). GitHub replaces files with the same name and adds the new ones. Commit changes.
 4. Wait about a minute. Open the app. A banner **"A new version is ready. Reload"** appears; tap **Reload**.
 5. No Firebase changes are needed. Your database rules already cover the new data.
 6. Your existing tasks, courses and custom task types keep working. Custom types you made before this version count as **Academics** types. An Organizations task that still has an Academics type (for example "Project") keeps showing it, and asks you to pick an Organizations type the next time you edit it.
@@ -88,7 +88,7 @@ This zip has no `config.js`, so first add one. Create `js/config.js` using the c
 
 1. **Create a project.** <https://console.firebase.google.com>, **Create a project**, turn Google Analytics **off**.
 2. **Stay on the free plan.** Never click "Upgrade" or add a card. If anything asks for a card, stop.
-3. **Register the web app.** On the project home click **+ Add app**, choose **Web** (`</>`), nickname `TaskNest`, leave Hosting unchecked, **Register app**. Copy the six `firebaseConfig` values into `js/config.js`. They are not secrets.
+3. **Register the web app.** On the project home click **+ Add app**, choose **Web** (`</>`), nickname `Cove`, leave Hosting unchecked, **Register app**. Copy the six `firebaseConfig` values into `js/config.js`. They are not secrets.
 4. **Turn on Google sign-in.** **Security, then Authentication, then Get started, then Sign-in method, then Google, Enable, Save.** Then **Settings, Authorized domains, Add domain**: `YOURUSERNAME.github.io`.
 5. **Create the database.** **Databases and storage, then Firestore, then Create database.** Standard edition, ID `(default)`, a nearby location (Singapore or Bangkok), **Production mode**. Leave scheduled backups **unchecked** (they need a paid plan).
 6. **Rules.** Firestore, **Rules** tab: delete everything, paste `firestore.rules`, **Publish**.
@@ -123,7 +123,7 @@ New **public** repository, upload the files (including the `css`, `js`, `icons` 
 
 **Mood.** In a day's window, next to the capybara, there is a face button. Tap it and pick how you felt that day from 12 moods (ecstatic, happy, confident, grateful, calm, okay, tired, anxious, stressed, sad, depressed, angry). It saves straight away, and tapping the same mood again clears it. Like the diary, it is private: it is saved in that day's entry and only shows in that day's window.
 
-**Backup.** Settings, then Backup. *Download backup* saves one file (`tasknest-backup-DATE.json`) with your courses, tasks, events, your own task and event types, and your settings. Your diary and moods are not included. To restore, choose a backup file: you see what is inside, then pick **Add to what I have** (nothing is deleted; same items are updated) or **Replace everything** (anything not in the file is deleted, after a confirmation). Keep a backup now and then, for example before a big change.
+**Backup.** Settings, then Backup. *Download backup* saves one file (`cove-backup-DATE.json`) with your courses, tasks, events, your own task and event types, and your settings. Your diary and moods are not included. To restore, choose a backup file: you see what is inside, then pick **Add to what I have** (nothing is deleted; same items are updated) or **Replace everything** (anything not in the file is deleted, after a confirmation). Keep a backup now and then, for example before a big change.
 
 **Add button on desktop.** The round Add pill is at the lower right on computers too, and says "Add event" on the Calendar.
 
@@ -272,10 +272,10 @@ The capybaras are in `icons/art/` and the small icons in `icons/ui/` (all PNG, c
 | "Sync problem" chip | Same as above. Make sure you sign in with the same Google account |
 | "Could not save: permission-denied" | The rules refuse your account. Recheck Part C |
 | Changes to the code don't show up | You didn't bump `VERSION`, or you haven't tapped Reload |
-| Blank page on GitHub Pages | You uploaded the `tasknest` folder itself instead of what is inside it |
+| Blank page on GitHub Pages | You uploaded the `cove` folder itself instead of what is inside it |
 | After the update, sign-in screen asks for Firebase values | `config.js` was overwritten with the placeholder. Paste your values in again |
 | A course or type shows "Unknown" | It was deleted on another device and this one has not synced yet |
-| The home-screen icon is still the old one after updating | Android keeps the old icon until the app is reinstalled: remove TaskNest from your home screen, wait a minute, then install it again from the browser menu. The icon files are named `tasknest-*.png`; you can delete any older `icon-*.png`, `apple-touch-icon.png` and `favicon-64.png` files from your repo |
+| The home-screen icon is still the old one after updating | Android keeps the old icon until the app is reinstalled: remove Cove from your home screen, wait a minute, then install it again from the browser menu. The icon files are named `tasknest-*.png`; you can delete any older `icon-*.png`, `apple-touch-icon.png` and `favicon-64.png` files from your repo |
 | The form shows old text I didn't expect | It is a saved draft. Tap **Start over** (or **Cancel**) to remove it |
 | I can't find my archived task | Settings, Archived tasks. (If its course is archived, restore the course in Manage) |
 

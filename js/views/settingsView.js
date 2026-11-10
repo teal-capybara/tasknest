@@ -59,7 +59,7 @@ const SUMMARY = {
   archived: () => plural(state.tasks.filter((t) => t.archived && !isOutOfTerm(t)).length, "archived task"),
   manage: () => "Task types and event types",
   backup: () => (getSettings().lastExportAt ? `Last saved ${new Date(getSettings().lastExportAt).toLocaleDateString([], { month: "short", day: "numeric" })}` : "Save a copy of your data"),
-  install: () => "Add TaskNest to your home screen",
+  install: () => "Add Cove to your home screen",
   offline: () => "Check that offline saving works",
 };
 
@@ -73,12 +73,12 @@ function menuPage(container) {
   });
 
   const fill = () => rows.forEach((r) => { r.hint.textContent = SUMMARY[r.id](); });
-  const versionLine = h("p", { class: "muted small", id: "app-version" }, `TaskNest files: ${BUILD}`);
+  const versionLine = h("p", { class: "muted small", id: "app-version" }, `Cove files: ${BUILD}`);
   // The offline copy has its own version name (from service-worker.js). If it differs from the files' version, an upload was probably incomplete.
   if (window.caches) caches.keys().then((names) => {
-    const shell = names.filter((n) => n.startsWith("tasknest-shell-")).map((n) => n.slice("tasknest-shell-".length));
+    const shell = names.filter((n) => n.startsWith("cove-shell-")).map((n) => n.slice("cove-shell-".length));
     if (!shell.length) return;
-    versionLine.textContent = shell.includes(BUILD) ? `TaskNest ${BUILD}` : `TaskNest files: ${BUILD} · offline copy: ${shell.join(", ")}. If these differ, reload the app, or check that every file from the latest zip was uploaded.`;
+    versionLine.textContent = shell.includes(BUILD) ? `Cove ${BUILD}` : `Cove files: ${BUILD} · offline copy: ${shell.join(", ")}. If these differ, reload the app, or check that every file from the latest zip was uploaded.`;
   }).catch(() => {});
   container.append(
     h("div", { class: "page-head" }, h("h1", {}, "Settings")),
@@ -285,7 +285,7 @@ const SECTIONS = {
         parsed = null; choices.hidden = true;
         const file = fileInput.files && fileInput.files[0];
         if (!file) { message.textContent = ""; return; }
-        if (file.size > 8 * 1024 * 1024) { message.textContent = "That file is too large to be a TaskNest backup."; return; }
+        if (file.size > 8 * 1024 * 1024) { message.textContent = "That file is too large to be a Cove backup."; return; }
         let text;
         try { text = await file.text(); } catch (e) { message.textContent = "Couldn't read that file."; return; }
         const result = parseBackup(text);
@@ -304,7 +304,7 @@ const SECTIONS = {
           h("p", { class: "small", id: "backup-counts" }, `Right now: ${counts()}.`),
           exportButton),
         h("section", { class: "card" }, h("h2", {}, "Bring a backup back"),
-          h("p", { class: "muted" }, "Choose a TaskNest backup file. You'll see what's in it before anything changes."),
+          h("p", { class: "muted" }, "Choose a Cove backup file. You'll see what's in it before anything changes."),
           h("label", { class: "label", for: "backup-file" }, "Backup file"), fileInput, message, choices));
     },
   },
@@ -313,7 +313,7 @@ const SECTIONS = {
     title: "Install the app",
     build(container) {
       const text = h("p", { class: "muted" }, "On Android Chrome: open the ⋮ menu, then choose Install app (or Add to Home screen).");
-      const button = h("button", { type: "button", class: "btn btn-primary", hidden: true }, "Install TaskNest");
+      const button = h("button", { type: "button", class: "btn btn-primary", hidden: true }, "Install Cove");
       container.append(h("section", { class: "card" }, text, button));
       bindInstallCard(button, text);
     },

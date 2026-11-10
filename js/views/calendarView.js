@@ -168,12 +168,14 @@ export function calendarView(container, params, query = {}) {
     if (dayWindow) dayWindow.close();
     const win = openDayWindow({
       date,
-      getItems: () => allItems().get(key) || [],
+      getItems: (k) => allItems().get(k) || [],
+      // Swiping to another day inside the window: follow it on the calendar behind.
+      onDayChange: (d) => { memory.cursor = d; render(); },
       // (closing is reported a moment later, so only forget THIS window, not a newer one)
       onClose: () => {
         if (dayWindow !== win) return;
         dayWindow = null;
-        const cell = body.querySelector(`[data-day="${key}"]`);
+        const cell = body.querySelector(`[data-day="${dayKey(win.date())}"]`);
         if (cell) cell.focus();
       },
     });

@@ -94,7 +94,7 @@ function navigate() {
     // The floating "Add task" button is only a distraction while you are already on the form.
     document.body.classList.toggle("hide-fab", Boolean(route.hideAdd));
     setAddButton(route.add === "event");
-    document.title = `${route.title} · TaskNest`;
+    document.title = `${route.title} · Cove`;
     if (isReady()) mount();
     else showLoading();
     return;
